@@ -14,7 +14,7 @@ Upgrade: When the price is too high, the user can place a deal with the informat
 # Data Sources: 
 Price analysis over time: Statistics Canada: Monthly average retail prices 
 Using a webScraper: https://blog.hubspot.com/website/how-to-inspect  https://youtu.be/BEvRZUEQ3Dc  
-**Targeted grocery stores: **
+**Targeted grocery stores:**
 - Costco https://www.costcobusinesscentre.ca/grocery.html 
 - Walmart https://www.walmart.ca/browse/grocery/10019	
 - NoFills https://www.nofrills.ca	
@@ -32,9 +32,15 @@ Backup plan: if the web scraper doesn’t work, we will create a simulator app t
 
 # Description on a high-level of major classes/objects:
 **PriceMatchManagement:** Program starting place, create a HomePage and contains the user list, ItemsDatabase, and PriceDatabase
+
 **User** Object with username, password, and the group orders that the user committed and requested
+
 **HomePage:** GUI, inner class includes, SearchItemPage, PriceAnalysisPage, GroupOrderPage
+
 **ItemsDatabase:** A large database of the prices from different grocery stores
+
 **PriceDatabase:** A database of the prices of the items since 1995, updated every month ← for price analyze use
+
 **WebScraper:** a tool to collect data by extracting data from the HTML source code in the website
+
 
