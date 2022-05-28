@@ -43,4 +43,5 @@ Backup plan: if the web scraper doesn’t work, we will create a simulator app t
 
 **WebScraper:** a tool to collect data by extracting data from the HTML source code in the website
 
-
+# Rough Layout
+![](IMG_2422.jpeg)
