@@ -10,19 +10,79 @@ import java.util.*;
  * This class gets the website's data and save it as......
  * https://youtu.be/yw7B85174JQ 
  * @author Kylie Wong and Michelle Chan, ICS4UE
- * @version 1.1, build May 27, 2022
+ * @version 1.2, build May 28, 2022
  */
 public class WebScraper {
     private static LinkedHashMap<String, String> sobeysItemsMap = new LinkedHashMap<String, String>();
-    final static String SOBEYS_URL = "https://voila.ca/products?source=navigation";
+    final static String STATISTICS_URL = "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000201&cube" + 
+        "TimeFrame.startMonth=10&cubeTimeFrame.startYear=2021&cubeTimeFrame.endMonth=04&cubeTimeFrame.endYear=2022&" + 
+        "referencePeriods=20211001%2C20220401";
+    
+    final static String WALMART_URL = "https://www.walmart.ca/browse/grocery/10019";
+    final static String COSTCO_URL = "https://www.costcobusinesscentre.ca/grocery.html"; 
+    //https://www.costcobusinesscentre.ca/fruits-vegetables.html
+    final static String NO_FILLS_URL = "https://www.nofrills.ca/food/fruits-vegetables/c/28000?navid=flyout-L2-fruits-vegetables";
+    final static String SOBEYS_URL = "https://voila.ca/products?source=navigation";    
+
 //----------------------------------------------------------------------------
     public static void main(String[] args){
-        setUpSobeysList();
+        setUpStatisticsCanadaPriceMatchList(STATISTICS_URL);
+        setUpCostcoList(COSTCO_URL);
+        setUpWalmartList(WALMART_URL);
+        setUpNoFillsList(NO_FILLS_URL);
+        setUpSobeysList(SOBEYS_URL);
     }
 //----------------------------------------------------------------------------
-    private static void setUpSobeysList(){
+    private static void setUpStatisticsCanadaPriceMatchList(String url){
+         try{
+            final Document document = Jsoup.connect(url).get();
+            //System.out.println(document.outerHtml());
+            String title = document.title();
+            System.out.println("website: " + title + "\n");
+        }catch (IOException e){
+            e.printStackTrace();
+        } 
+    }
+
+//----------------------------------------------------------------------------
+    private static void setUpCostcoList(String url){
+         try{
+            final Document document = Jsoup.connect(url).get();
+            //System.out.println(document.outerHtml());
+            String title = document.title();
+            System.out.println("website: " + title + "\n");
+        }catch (IOException e){
+            e.printStackTrace();
+        } 
+    }
+
+//----------------------------------------------------------------------------
+    private static void setUpWalmartList(String url){
+         try{
+            final Document document = Jsoup.connect(url).get();
+            //System.out.println(document.outerHtml());
+            String title = document.title();
+            System.out.println("website: " + title + "\n");
+        }catch (IOException e){
+            e.printStackTrace();
+        } 
+    }
+
+//----------------------------------------------------------------------------
+    private static void setUpNoFillsList(String url){
+         try{
+            final Document document = Jsoup.connect(url).get();
+            //System.out.println(document.outerHtml());
+            String title = document.title();
+            System.out.println("website: " + title + "\n");
+        }catch (IOException e){
+            e.printStackTrace();
+        } 
+    }
+//----------------------------------------------------------------------------
+    private static void setUpSobeysList(String url){
         try{
-            final Document document = Jsoup.connect(SOBEYS_URL).get();
+            final Document document = Jsoup.connect(url).get();
             //System.out.println(document.outerHtml());
             String title = document.title();
             System.out.println("website: " + title + "\n");
