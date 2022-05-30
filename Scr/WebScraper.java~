@@ -19,90 +19,60 @@ public class WebScraper {
         "referencePeriods=20211001%2C20220401";
     
     final static String WALMART_URL = "https://www.walmart.ca/browse/grocery/10019";
-    final static String COSTCO_URL = "https://www.costcobusinesscentre.ca/fruits-vegetables.html?sortBy=+"; 
-    //https://www.costcobusinesscentre.ca/grocery.html
+    final static String COSTCO_URL = "https://www.costcobusinesscentre.ca/grocery.html"; 
+    //https://www.costcobusinesscentre.ca/fruits-vegetables.html
     final static String NO_FILLS_URL = "https://www.nofrills.ca/food/fruits-vegetables/c/28000?navid=flyout-L2-fruits-vegetables";
     final static String SOBEYS_URL = "https://voila.ca/products?source=navigation";    
-    final static String METRO_URL = "https://www.fortinos.ca/food/fruits-vegetables/c/28000?navid=flyout-L2-fruits-vegetables";
+
 //----------------------------------------------------------------------------
     public static void main(String[] args){
-//        setUpStatisticsCanadaPriceMatchList(STATISTICS_URL);
-        //setUpCostcoList(COSTCO_URL);
-        //setUpMetroList(METRO_URL);
-//        setUpWalmartList(WALMART_URL);
-//        setUpNoFillsList(NO_FILLS_URL);
+        setUpStatisticsCanadaPriceMatchList(STATISTICS_URL);
+        setUpCostcoList(COSTCO_URL);
+        setUpWalmartList(WALMART_URL);
+        setUpNoFillsList(NO_FILLS_URL);
         setUpSobeysList(SOBEYS_URL);
     }
 //----------------------------------------------------------------------------
     private static void setUpStatisticsCanadaPriceMatchList(String url){
          try{
-             final Document document = Jsoup.connect(url).get();
-             System.out.println(document);
-             
-             String outerHTML = document.outerHtml();
-         }catch (IOException e){
-             e.printStackTrace();
-         } 
+            final Document document = Jsoup.connect(url).get();
+            //System.out.println(document.outerHtml());
+            String title = document.title();
+            System.out.println("website: " + title + "\n");
+        }catch (IOException e){
+            e.printStackTrace();
+        } 
     }
 
 //----------------------------------------------------------------------------
-    private static void setUpCostcoList(String url){ //missing prices
+    private static void setUpCostcoList(String url){
          try{
             final Document document = Jsoup.connect(url).get();
             //System.out.println(document.outerHtml());
             String title = document.title();
             System.out.println("website: " + title + "\n");
-            
-            Elements prices = document.getElementsByTag("span");
-            String itemName = "";
-            for(Element tag: prices){
-                //itemName = tags.text();
-               // sobeysItemsMap.put(itemName, "");
-                System.out.println(tag.text());
-            }
-
-        }catch (IOException e){
-            e.printStackTrace();
-        } 
-    }
-//----------------------------------------------------------------------------
-    private static void setUpMetroList(String url){
-         try{
-            final Document document = Jsoup.connect(url).get();
-            System.out.println(document.outerHtml());
-            String title = document.title();
-            System.out.println("website: " + title + "\n");
-            
-            Elements prices = document.getElementsByTag("span");
-            String itemName = "";
-            for(Element tag: prices){
-                //itemName = tags.text();
-               // sobeysItemsMap.put(itemName, "");
-              //  System.out.println(tag.text());
-            }
-
-        }catch (IOException e){
-            e.printStackTrace();
-        } 
-    }
-//----------------------------------------------------------------------------
-    private static void setUpWalmartList(String url){ //failed
-         try{
-            final Document document = Jsoup.connect(url).get();
-            System.out.println(document.outerHtml());
-            String title = document.title();
-            System.out.println("website: " + title + "\n");
         }catch (IOException e){
             e.printStackTrace();
         } 
     }
 
 //----------------------------------------------------------------------------
-    private static void setUpNoFillsList(String url){ //failed
+    private static void setUpWalmartList(String url){
          try{
             final Document document = Jsoup.connect(url).get();
             //System.out.println(document.outerHtml());
-            System.out.println(document.select(""));
+            String title = document.title();
+            System.out.println("website: " + title + "\n");
+        }catch (IOException e){
+            e.printStackTrace();
+        } 
+    }
+
+//----------------------------------------------------------------------------
+    private static void setUpNoFillsList(String url){
+         try{
+            final Document document = Jsoup.connect(url).get();
+            //System.out.println(document.outerHtml());
             String title = document.title();
             System.out.println("website: " + title + "\n");
         }catch (IOException e){
@@ -110,7 +80,7 @@ public class WebScraper {
         } 
     }
 //----------------------------------------------------------------------------
-    private static void setUpSobeysList(String url){ //successful
+    private static void setUpSobeysList(String url){
         try{
             final Document document = Jsoup.connect(url).get();
             //System.out.println(document.outerHtml());
