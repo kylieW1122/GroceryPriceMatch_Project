@@ -1,3 +1,4 @@
+import java.util.HashMap;
 /**[PriceMatchManagement.java]
  * This is final project - price match program
  * This class contains the main method to start the program
@@ -8,7 +9,14 @@
 
 public class PriceMatchManagement{
     //private user id list? 
-    public void main(String[] args){
+    private static HashMap<String, String> sobeysItemsMap;
+    //private static DATATYPE? statisticCanadaData;
+//----------------------------------------------------------------------------
+    public static void main(String[] args){
+        WebScraper scraper = new WebScraper();
+        /********************SOBEYS**********************/
+        sobeysItemsMap = scraper.getSobeysItemList();
+        
         //create object a home page here
         //create object webscraper here
     }
