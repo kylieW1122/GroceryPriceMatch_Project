@@ -13,50 +13,77 @@ import java.io.FileReader;
  * This class gets the website's data and save it as......
  * https://youtu.be/yw7B85174JQ 
  * @author Kylie Wong and Michelle Chan, ICS4UE
- * @version 1.2, build May 28, 2022
+ * @version 2.0, build May 31, 2022
  */
 public class WebScraper {
     private static HashMap<String, String> sobeysItemsMap = new HashMap<String, String>();
-    final static String STATISTICS_URL = "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000201&cube" + 
-        "TimeFrame.startMonth=10&cubeTimeFrame.startYear=2021&cubeTimeFrame.endMonth=04&cubeTimeFrame.endYear=2022&" + 
-        "referencePeriods=20211001%2C20220401";
+    private static HashMap<String, double[]> statisticsHashmap;
+    //-----------------------------
+    final static String SOBEYS_URL = "https://voila.ca/products?source=navigation&sublocationId=43a936d1-df1d-4bf1-a09c-b23c6a8edf63";  
+    final static String STATISTICS_CANADA_FILENAME = "StatisticsCanada/1810000201-eng.csv";
+    final static String COSTCO_FILENAME = "costCo.csv";
+    final static String NOFILLS_FILENAME = "noFills.csv";
+    final static String WALMART_FILENAME = "walmart.csv";
     
-    final static String WALMART_URL = "https://www.walmart.ca/browse/grocery/10019";
-    final static String COSTCO_URL = "https://www.costcobusinesscentre.ca/fruits-vegetables.html?sortBy=+"; 
-    //https://www.costcobusinesscentre.ca/grocery.html
-    final static String NO_FILLS_URL = "https://www.nofrills.ca/food/fruits-vegetables/c/28000?navid=flyout-L2-fruits-vegetables";
-    final static String SOBEYS_URL = "https://voila.ca/products?source=navigation&sublocationId=43a936d1-df1d-4bf1-a09c-b23c6a8edf63";    
-    final static String FORTINO_URL = "https://www.loblaws.ca/food/fruits-vegetables/c/28000?navid=flyout-L2-fruits-vegetables";
-    //"https://www.longos.com/Fresh-Fruits-and-Vegetables/c/701";
-    //"https://www.fortinos.ca/food/fruits-vegetables/c/28000?navid=flyout-L2-fruits-vegetables";
+    public static void main(String[] args){ //delete - just for debugging 
+        WebScraper scraper = new WebScraper();
+    }
 //----------------------------------------------------------------------------
     WebScraper(){
-        setUpStatisticsCanadaPriceMatchList(STATISTICS_URL);
-        //setUpCostcoList(COSTCO_URL);
-       // setUpFortinoList(FORTINO_URL);
-//        setUpWalmartList(WALMART_URL);
-//        setUpNoFillsList(NO_FILLS_URL);
-        setUpSobeysList(SOBEYS_URL);
+        statisticsHashmap = setUpStatisticsCanadaPriceMatchList(STATISTICS_CANADA_FILENAME);
+        System.out.println(statisticsHashmap);
+        
+//        setUpCostcoList(COSTCO_FILENAME);
+//        setUpWalmartList(WALMART_FILENAME);
+//        setUpNoFillsList(NOFILLS_FILENAME);
+//        setUpSobeysList(SOBEYS_URL);
     }
 //----------------------------------------------------------------------------
     public static HashMap<String, String> getSobeysItemList(){
         return sobeysItemsMap;
     }
+    public static HashMap<String, double[]> getStatisiticsPriceData(){
+        return statisticsHashmap;
+    }
 //----------------------------------------------------------------------------
-    private static void setUpStatisticsCanadaPriceMatchList(String url){
+    private static HashMap<String, double[]> setUpStatisticsCanadaPriceMatchList(String fileName){
+        HashMap<String, double[]> statisticsList = new  HashMap<String, double[]>();
          try{
-             BufferedReader reader = new BufferedReader(new FileReader("Database/StatisticsCanada/1810000201-eng.csv"));
+             BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
              String line = "";
+             line = reader.readLine();
+             String[] timeline = line.substring(1).split(",");
+             int size = timeline.length;
+             reader.readLine(); //read the useless line between the title and the data
+             /*******************************************************************************/
              while((line = reader.readLine()) != null){
-                 //String[] values
-                 //System.out.println(line);
-                 //System.out.println("----------------------");
+                 String[] values = line.split(",");
+                 double[] prices = new double[size];
+                 int index=0;
+                 for(int i=1; i<values.length; i++){
+                     String temp = values[i];
+                     Double d;
+                     try{
+                         d = Double.parseDouble(temp);
+                     }catch (NumberFormatException numberEx){ //if the data format is not a double
+                         d = 0.00;   
+                     }
+                     prices[index] = d;
+                     index++;
+                 }
+                 statisticsList.put(values[0], prices);
              }
+             /*******************************************************************************/
          }catch (IOException e){
              e.printStackTrace();
          } 
+         return statisticsList;
     }
-
+    private static void printArray(String[] arr){
+        for(String str:arr){
+            System.out.print(str + ", ");
+        }
+    }
 //----------------------------------------------------------------------------
     private static void setUpSobeysList(String url){ //successful, data stored in a HashMap
         //todo: format the text, price value
@@ -91,67 +118,46 @@ public class WebScraper {
         } 
     }
 //----------------------------------------------------------------------------
-    private static void setUpCostcoList(String url){ //missing prices
+    private static void setUpCostcoList(String fileName){
          try{
-            final Document document = Jsoup.connect(url).get();
-            //System.out.println(document.outerHtml());
-            String title = document.title();
-            System.out.println("website: " + title + "\n");
-            
-            Elements prices = document.getElementsByTag("span");
-            String itemName = "";
-            for(Element tag: prices){
-                //itemName = tags.text();
-               // sobeysItemsMap.put(itemName, "");
-                System.out.println(tag.text());
-            }
-
-        }catch (IOException e){
-            e.printStackTrace();
-        } 
+             BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
+             String line = "";
+             while((line = reader.readLine()) != null){
+                 //String[] values
+                 //System.out.println(line);
+                 //System.out.println("----------------------");
+             }
+         }catch (IOException e){
+             e.printStackTrace();
+         } 
     }
 //----------------------------------------------------------------------------
-    private static void setUpFortinoList(String url){
-         try{
-            final Document document = Jsoup.connect(url).get();
-            System.out.println(document.outerHtml());
-            String title = document.title();
-            System.out.println("website: " + title + "\n");
-            
-            Elements prices = document.getElementsByTag("span");
-            String itemName = "";
-            for(Element tag: prices){
-                //itemName = tags.text();
-               // sobeysItemsMap.put(itemName, "");
-              //  System.out.println(tag.text());
-            }
-
-        }catch (IOException e){
-            e.printStackTrace();
-        } 
-    }
-//----------------------------------------------------------------------------
-    private static void setUpWalmartList(String url){ //failed
-         try{
-            final Document document = Jsoup.connect(url).get();
-            System.out.println(document.outerHtml());
-            String title = document.title();
-            System.out.println("website: " + title + "\n");
-        }catch (IOException e){
-            e.printStackTrace();
-        } 
+    private static void setUpWalmartList(String fileName){
+        try{
+             BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
+             String line = "";
+             while((line = reader.readLine()) != null){
+                 //String[] values
+                 //System.out.println(line);
+                 //System.out.println("----------------------");
+             }
+         }catch (IOException e){
+             e.printStackTrace();
+         } 
     }
 
 //----------------------------------------------------------------------------
-    private static void setUpNoFillsList(String url){ //failed
+    private static void setUpNoFillsList(String fileName){
          try{
-            final Document document = Jsoup.connect(url).get();
-            //System.out.println(document.outerHtml());
-            System.out.println(document.select(""));
-            String title = document.title();
-            System.out.println("website: " + title + "\n");
-        }catch (IOException e){
-            e.printStackTrace();
-        } 
+             BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
+             String line = "";
+             while((line = reader.readLine()) != null){
+                 //String[] values
+                 //System.out.println(line);
+                 //System.out.println("----------------------");
+             }
+         }catch (IOException e){
+             e.printStackTrace();
+         } 
     }
 }

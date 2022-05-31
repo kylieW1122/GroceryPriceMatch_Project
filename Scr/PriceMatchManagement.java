@@ -14,9 +14,13 @@ public class PriceMatchManagement{
 //----------------------------------------------------------------------------
     public static void main(String[] args){
         WebScraper scraper = new WebScraper();
+       
+        //!!!!!!!!!!!!merge PriceAnalysisPage into HomePage as an inner class!!!!!!!!!!!!!
+       // PriceAnalysisPage pricePanel = new PriceAnalysisPage(scraper.getStatisiticsPriceData());
+        
+        
         /********************SOBEYS**********************/
         sobeysItemsMap = scraper.getSobeysItemList();
-        
         //create object a home page here
         //create object webscraper here
     }
