@@ -9,18 +9,16 @@ import java.util.HashMap;
 
 public class PriceMatchManagement{
     //private user id list? 
-    private static HashMap<String, String> sobeysItemsMap;
     //private static DATATYPE? statisticCanadaData;
 //----------------------------------------------------------------------------
     public static void main(String[] args){
-        WebScraper scraper = new WebScraper();
+        DataBase database = new DataBase();
        
         //!!!!!!!!!!!!merge PriceAnalysisPage into HomePage as an inner class!!!!!!!!!!!!!
        // PriceAnalysisPage pricePanel = new PriceAnalysisPage(scraper.getStatisiticsPriceData());
         
         
         /********************SOBEYS**********************/
-        sobeysItemsMap = scraper.getSobeysItemList();
         //create object a home page here
         //create object webscraper here
     }

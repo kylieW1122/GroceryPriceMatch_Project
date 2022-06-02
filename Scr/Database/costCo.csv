@@ -1,171 +1,97 @@
-﻿web-scraper-order,web-scraper-start-url,itemName,price
-"1653953699-85","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Seedless Limes
-1.36 kg","$7.99"
-"1653953699-95","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Whole White Mushrooms
-680 g","$6.99"
-"1653953699-89","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Mini Cucumbers
-2.27 kg","$7.49"
-"1653953699-23","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Red Bell Peppers
-5 kg","$21.29"
-"1653953699-84","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Ginger Root
-1.36 kg","$7.99"
-"1653953699-61","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Organic Peeled Carrots","$11.19"
-"1653953699-67","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Asparagus
-1 kg","$9.09"
-"1653953699-80","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Red Delicious Apples
-2.72 kg","$8.29"
-"1653953699-21","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Large Carrots
-11.34 kg","$22.89"
-"1653953699-81","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Sweet Corn On The Cob
-Pack of 8","$8.19"
-"1653953699-51","https://www.costcobusinesscentre.ca/fruits-vegetables.html","CDS Garlic Fresh Peeled Garlic
-1.36 kg","$12.49"
-"1653953699-73","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Kale Superblend","$8.89"
-"1653953699-68","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Shallots
-2.27 kg","$9.09"
-"1653953699-41","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Avocados","$15.19"
-"1653953699-27","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Red Beets
-11.34 kg","$19.79"
-"1653953699-54","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Sweetie Grapefruit
-2.27 kg","$11.79"
-"1653953699-82","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Sweet Bell Peppers
-1.13 kg / 2,5 lb","$8.19"
-"1653953699-71","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Blueberries
-510 g","$8.89"
-"1653953699-13","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Sweet Potatoes
-18.14 kg","$38.99"
-"1653953699-24","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Pomegranates
-Pack of 6","$20.19"
-"1653953699-6","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Red Onions
-11.34 kg","$44.89"
-"1653953699-5","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Iceberg Lettuce
-Pack of 24 or 30","$44.99"
-"1653953699-52","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Large Carrots
-4.54 kg","$12.29"
-"1653953699-44","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Happy Village Organic Smyrna Figs
-1.13 kg","$14.09"
-"1653953699-29","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Portabella Mushrooms
-2.27 kg","$19.49"
-"1653953699-63","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Peaches","$10.29"
-"1653953699-12","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Jumbo Carrots
-22.7 kg","$38.99"
-"1653953699-55","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Grape Tomatoes
-2.72 kg","$11.79"
-"1653953699-83","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Ultimate Cesar Salad Kit","$8.09"
-"1653953699-22","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Regular Eggplant
-11.34 kg","$21.99"
-"1653953699-37","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Red Cherries
-907 g","$16.09"
-"1653953699-74","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Kirkland Signature Minced California Garlic
-1.36 kg","$8.69"
-"1653953699-43","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Red Mangoes","$14.49"
-"1653953699-76","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Chopped Kale
-680 g","$8.49"
-"1653953699-58","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Mini Pointed Peppers
-1.36 kg","$11.29"
-"1653953699-92","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Broccoli Florets
-908 g","$7.09"
-"1653953699-4","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Red Beefsteak Field Tomatoes
-11.34 kg","$46.89"
-"1653953699-2","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Jumbo Spanish Onions
-22.7 kg","$47.99"
-"1653953699-53","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Yellow Onions","$12.29"
-"1653953699-56","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Bartlett Pears
-1.81 kg","$11.79"
-"1653953699-96","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Mini Bella Mushrooms","$6.99"
-"1653953699-45","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Lemons
-3.64 kg","$13.99"
-"1653953699-20","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Large Russet Potatoes
-22.7 kg","$24.99"
-"1653953699-30","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Yellow Bell Peppers
-5 kg","$19.29"
-"1653953699-34","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Mini Bella Mushrooms
-2.27 kg","$17.49"
-"1653953699-26","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Yellow Potatoes #2 Grade
-22.7 kg","$19.99"
-"1653953699-47","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Russet Potatoes
-6.08 kg","$13.19"
-"1653953699-39","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Salad Tomatoes
-6.81 kg","$15.29"
-"1653953699-15","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Yukon Gold Potatoes
-22.7 kg","$29.99"
-"1653953699-87","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Jalapeno Peppers","$7.79"
-"1653953699-62","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Black Grapes","$10.39"
-"1653953699-1","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Hass Avocados
-Pack of 48 or 60","$84.89"
-"1653953699-93","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Sweet Baby Carrots
-680 g","$6.99"
-"1653953699-8","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Choice Green Peppers
-1 1/9 bushel","$44.29"
-"1653953699-88","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Golden Honeydew Melon","$7.69"
-"1653953699-57","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Seedless Red Grapes
-1.36 kg","$11.29"
-"1653953699-79","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Whole Garlic
-1.36 kg","$8.29"
-"1653953699-10","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Fennec Foods Frozen Wild Blueberries
-5 x 1 kg","$43.39"
-"1653953699-94","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Portabella Mushrooms","$6.99"
-"1653953699-46","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Seedless Green Grapes
-1.36 kg","$13.29"
-"1653953699-28","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Orange Bell Peppers
-5 kg","$19.69"
-"1653953699-7","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Roma Tomatoes
-11.34 kg","$44.89"
-"1653953699-14","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Green Cabbage
-Pack of 12 to 14","$30.99"
-"1653953699-19","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Broccoli Crowns
-4.54 kg","$26.79"
-"1653953699-11","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Zucchini
-11.34 kg","$41.59"
-"1653953699-72","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Yellow Potatoes
-4.54 kg","$8.89"
-"1653953699-64","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Green Kiwi
-1.36 kg","$10.19"
-"1653953699-60","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Ataulfo Mangoes","$11.19"
-"1653953699-35","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Seedless Watermelons","$16.79"
-"1653953699-77","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Coleslaw","$8.49"
-"1653953699-86","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Raspberries
-340 g","$7.89"
-"1653953699-38","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Whole White Mushrooms
- 2.27 kg","$15.49"
-"1653953699-75","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Dynamic Duo Mixed Potato Nuggets
-2.27 kg","$8.49"
-"1653953699-48","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Strawberries","$13.09"
-"1653953699-31","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Fresh Mix Tomatoes
-2.72 kg","$18.79"
-"1653953699-66","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Sweet Vidalia Onions
-2.27 kg","$9.49"
-"1653953699-33","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Long Sweet Peppers","$18.19"
-"1653953699-16","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Yellow Dragonfruit","$29.59"
-"1653953699-18","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Yellow Fleshed Potatoes
-22.7 kg","$26.99"
-"1653953699-65","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Clementines
-2.27 kg","$9.59"
-"1653953699-9","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Cauliflower
-Pack of 9 or 12","$43.49"
-"1653953699-69","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Terra Delyssa Deglet Noor Organic Pitted Dates
-1 kg","$9.09"
-"1653953699-17","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Canary Melon","$28.29"
-"1653953699-40","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Hass Avocados
-Pack of 6","$15.29"
-"1653953699-49","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Navel Oranges
-3.63 kg","$12.99"
-"1653953699-78","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Romaine Hearts
-Pack of 6","$8.29"
-"1653953699-70","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Sweet Kale Salad Twinpack","$8.99"
-"1653953699-91","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Celery Sticks
-1.13 kg","$7.09"
-"1653953699-90","https://www.costcobusinesscentre.ca/fruits-vegetables.html","English Cucumbers
-Pack of 12","$7.29"
-"1653953699-59","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Red Grapes","$11.29"
-"1653953699-25","https://www.costcobusinesscentre.ca/fruits-vegetables.html","White Potatoes #2 Grade
-22.7 kg","$19.99"
-"1653953699-36","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Sliced White Mushrooms
-2.27 kg","$16.49"
-"1653953699-32","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Blackberries","$18.59"
-"1653953699-50","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Dole Mandarin Oranges
-20 × 107 mL","$12.59"
-"1653953699-3","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Yellow Onions
-22.7 kg","$46.99"
-"1653953699-42","https://www.costcobusinesscentre.ca/fruits-vegetables.html","Tomatoes On The Vine
-5 kg","$14.59"
+web-scraper-order,web-scraper-start-url,itemName,price
+1653953699-85,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Seedless Limes 1.36 kg,$7.99
+1653953699-95,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Whole White Mushrooms 680 g,$6.99
+1653953699-89,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Mini Cucumbers 2.27 kg,$7.49
+1653953699-23,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Red Bell Peppers 5 kg,$21.29
+1653953699-84,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Ginger Root 1.36 kg,$7.99
+1653953699-61,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Organic Peeled Carrots,$11.19
+1653953699-67,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Asparagus 1 kg,$9.09
+1653953699-80,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Red Delicious Apples 2.72 kg,$8.29
+1653953699-21,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Large Carrots 11.34 kg,$22.89
+1653953699-81,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Sweet Corn On The Cob Pack of 8,$8.19
+1653953699-51,https://www.costcobusinesscentre.ca/fruits-vegetables.html,CDS Garlic Fresh Peeled Garlic 1.36 kg,$12.49
+1653953699-73,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Kale Superblend,$8.89
+1653953699-68,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Shallots 2.27 kg,$9.09
+1653953699-41,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Avocados,$15.19
+1653953699-27,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Red Beets 11.34 kg,$19.79
+1653953699-54,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Sweetie Grapefruit 2.27 kg,$11.79
+1653953699-82,https://www.costcobusinesscentre.ca/fruits-vegetables.html,"Sweet Bell Peppers 1.13 kg / 2,5 lb",$8.19
+1653953699-71,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Blueberries 510 g,$8.89
+1653953699-13,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Sweet Potatoes 18.14 kg,$38.99
+1653953699-24,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Pomegranates Pack of 6,$20.19
+1653953699-6,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Red Onions 11.34 kg,$44.89
+1653953699-5,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Iceberg Lettuce Pack of 24 or 30,$44.99
+1653953699-52,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Large Carrots 4.54 kg,$12.29
+1653953699-44,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Happy Village Organic Smyrna Figs 1.13 kg,$14.09
+1653953699-29,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Portabella Mushrooms 2.27 kg,$19.49
+1653953699-63,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Peaches,$10.29
+1653953699-12,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Jumbo Carrots 22.7 kg,$38.99
+1653953699-55,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Grape Tomatoes 2.72 kg,$11.79
+1653953699-83,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Ultimate Cesar Salad Kit,$8.09
+1653953699-22,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Regular Eggplant 11.34 kg,$21.99
+1653953699-37,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Red Cherries 907 g,$16.09
+1653953699-74,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Kirkland Signature Minced California Garlic 1.36 kg,$8.69
+1653953699-43,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Red Mangoes,$14.49
+1653953699-76,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Chopped Kale 680 g,$8.49
+1653953699-58,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Mini Pointed Peppers 1.36 kg,$11.29
+1653953699-92,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Broccoli Florets 908 g,$7.09
+1653953699-4,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Red Beefsteak Field Tomatoes 11.34 kg,$46.89
+1653953699-2,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Jumbo Spanish Onions 22.7 kg,$47.99
+1653953699-53,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Yellow Onions,$12.29
+1653953699-56,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Bartlett Pears 1.81 kg,$11.79
+1653953699-96,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Mini Bella Mushrooms,$6.99
+1653953699-45,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Lemons 3.64 kg,$13.99
+1653953699-20,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Large Russet Potatoes 22.7 kg,$24.99
+1653953699-30,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Yellow Bell Peppers 5 kg,$19.29
+1653953699-34,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Mini Bella Mushrooms 2.27 kg,$17.49
+1653953699-26,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Yellow Potatoes #2 Grade 22.7 kg,$19.99
+1653953699-47,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Russet Potatoes 6.08 kg,$13.19
+1653953699-39,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Salad Tomatoes 6.81 kg,$15.29
+1653953699-15,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Yukon Gold Potatoes 22.7 kg,$29.99
+1653953699-87,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Jalapeno Peppers,$7.79
+1653953699-62,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Black Grapes,$10.39
+1653953699-1,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Hass Avocados Pack of 48 or 60,$84.89
+1653953699-93,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Sweet Baby Carrots 680 g,$6.99
+1653953699-8,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Choice Green Peppers 1 1/9 bushel,$44.29
+1653953699-88,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Golden Honeydew Melon,$7.69
+1653953699-57,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Seedless Red Grapes 1.36 kg,$11.29
+1653953699-79,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Whole Garlic 1.36 kg,$8.29
+1653953699-10,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Fennec Foods Frozen Wild Blueberries 5 x 1 kg,$43.39
+1653953699-94,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Portabella Mushrooms,$6.99
+1653953699-46,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Seedless Green Grapes 1.36 kg,$13.29
+1653953699-28,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Orange Bell Peppers 5 kg,$19.69
+1653953699-7,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Roma Tomatoes 11.34 kg,$44.89
+1653953699-14,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Green Cabbage Pack of 12 to 14,$30.99
+1653953699-19,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Broccoli Crowns 4.54 kg,$26.79
+1653953699-11,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Zucchini 11.34 kg,$41.59
+1653953699-72,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Yellow Potatoes 4.54 kg,$8.89
+1653953699-64,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Green Kiwi 1.36 kg,$10.19
+1653953699-60,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Ataulfo Mangoes,$11.19
+1653953699-35,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Seedless Watermelons,$16.79
+1653953699-77,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Coleslaw,$8.49
+1653953699-86,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Raspberries 340 g,$7.89
+1653953699-38,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Whole White Mushrooms 2.27 kg,$15.49
+1653953699-75,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Dynamic Duo Mixed Potato Nuggets 2.27 kg,$8.49
+1653953699-48,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Strawberries,$13.09
+1653953699-31,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Fresh Mix Tomatoes 2.72 kg,$18.79
+1653953699-66,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Sweet Vidalia Onions 2.27 kg,$9.49
+1653953699-33,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Long Sweet Peppers,$18.19
+1653953699-16,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Yellow Dragonfruit,$29.59
+1653953699-18,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Yellow Fleshed Potatoes 22.7 kg,$26.99
+1653953699-65,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Clementines 2.27 kg,$9.59
+1653953699-9,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Cauliflower Pack of 9 or 12,$43.49
+1653953699-69,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Terra Delyssa Deglet Noor Organic Pitted Dates 1 kg,$9.09
+1653953699-17,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Canary Melon,$28.29
+1653953699-40,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Hass Avocados Pack of 6,$15.29
+1653953699-49,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Navel Oranges 3.63 kg,$12.99
+1653953699-78,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Romaine Hearts Pack of 6,$8.29
+1653953699-70,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Sweet Kale Salad Twinpack,$8.99
+1653953699-91,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Celery Sticks 1.13 kg,$7.09
+1653953699-90,https://www.costcobusinesscentre.ca/fruits-vegetables.html,English Cucumbers Pack of 12,$7.29
+1653953699-59,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Red Grapes,$11.29
+1653953699-25,https://www.costcobusinesscentre.ca/fruits-vegetables.html,White Potatoes #2 Grade 22.7 kg,$19.99
+1653953699-36,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Sliced White Mushrooms 2.27 kg,$16.49
+1653953699-32,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Blackberries,$18.59
+1653953699-50,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Dole Mandarin Oranges 20 × 107 mL,$12.59
+1653953699-3,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Yellow Onions 22.7 kg,$46.99
+1653953699-42,https://www.costcobusinesscentre.ca/fruits-vegetables.html,Tomatoes On The Vine 5 kg,$14.59
