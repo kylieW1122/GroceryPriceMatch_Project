@@ -21,7 +21,7 @@ public class DataBase {
     private static HashMap<String, String> noFillsItemsMap;
     
     private static HashMap<String, double[]> statisticsHashmap;
-    //-----------------------------
+
     final static String SOBEYS_URL = "https://voila.ca/products?source=navigation&sublocationId=43a936d1-df1d-4bf1-a09c-b23c6a8edf63";  
     final static String STATISTICS_CANADA_FILENAME = "StatisticsCanada/1810000201-eng.csv";
     final static String COSTCO_FILENAME = "costCo.csv";
@@ -33,21 +33,31 @@ public class DataBase {
     }
 //----------------------------------------------------------------------------
     DataBase(){
-//        statisticsHashmap = setUpStatisticsCanadaPriceMatchList(STATISTICS_CANADA_FILENAME);
-//        System.out.println(statisticsHashmap);
-//        costCoItemsMap = setUpCostcoList(COSTCO_FILENAME);
+        statisticsHashmap = setUpStatisticsCanadaPriceMatchList(STATISTICS_CANADA_FILENAME);
+        //System.out.println(statisticsHashmap);
+        costCoItemsMap = setUpCostcoList(COSTCO_FILENAME);
         walmartItemsMap = setUpWalmartList(WALMART_FILENAME);
-//        noFillsItemsMap = setUpNoFillsList(NOFILLS_FILENAME);
-//       sobeysItemsMap = setUpSobeysList(SOBEYS_URL);
+        sobeysItemsMap = setUpSobeysList(SOBEYS_URL);
+        //noFillsItemsMap = setUpNoFillsList(NOFILLS_FILENAME);
+        //System.out.println("noFills: \n" + noFillsItemsMap.toString() + "\n");
+        
+        System.out.println("costco: \n" + costCoItemsMap.toString() + "\n");
+        System.out.println("walmart: \n" + walmartItemsMap.toString() + "\n");
+        System.out.println("sobeys: \n" + sobeysItemsMap.toString() + "\n");
+        //searchItemKeyword("Banana");
     }
 //----------------------------------------------------------------------------
-    public static HashMap<String, String> getSobeysItemList(){
-        return sobeysItemsMap;
+    //https://stackoverflow.com/questions/33642631/search-for-keywords-in-a-hashmap-with-a-user-entered-string
+    public static boolean searchItemKeyword(String userInput){
+        userInput = userInput.toLowerCase();
+        
+        String name = "testingsdafsdfqawef";
+        if(name.contains(userInput)){
+            System.out.println(true);
+            return true;
+        }
+        return false; 
     }
-    public static HashMap<String, double[]> getStatisiticsPriceData(){
-        return statisticsHashmap;
-    }
-   // public static HashMap
 //----------------------------------------------------------------------------
     private static HashMap<String, double[]> setUpStatisticsCanadaPriceMatchList(String fileName){ //DONE, move on to line grpah
         HashMap<String, double[]> statisticsList = new  HashMap<String, double[]>();
@@ -82,25 +92,18 @@ public class DataBase {
          } 
          return statisticsList;
     }
-    private static void printArray(String[] arr){
-        for(String str:arr){
-            System.out.print(str + ", ");
-        }
-        System.out.println("\n------------------------------------");
-    }
 //----------------------------------------------------------------------------
-    private static HashMap<String, String> setUpSobeysList(String url){ //successful, data stored in a HashMap
+    private static HashMap<String, String> setUpSobeysList(String url){ 
          HashMap<String, String> sobeysList = new  HashMap<String, String>();
-//todo: format the text, price value
         try{
             final Document document = Jsoup.connect(url).get();
             ArrayList<String> itemNameArrayList = new ArrayList<String>();
-            
+            //System.out.println(document.outerHtml());
             Elements test = document.select("div.layout__Container-sc-1cgl98j-0.laSkfV");
             Element selectByTag = test.last();
             /************************/
             Elements tag = selectByTag.getElementsByTag("h3");
-            Elements prices = selectByTag.getElementsByTag("span");
+            Elements prices = selectByTag.getElementsByTag("strong");
             String itemName = "";
             for(Element tags: tag){
                 itemName = tags.text();
@@ -108,16 +111,15 @@ public class DataBase {
             }
             String spanTagString = "";
             for(Element price: prices){
-                spanTagString = spanTagString + price.text();
+                spanTagString = spanTagString + price.text() + "~";
             }
             
-            String[] arrOfStr = spanTagString.split("You have of this item in your cart");
+            String[] arrOfStr = spanTagString.split("~");
             int indexOfMap = 0;
             for (String a : arrOfStr){
                 sobeysList.put(itemNameArrayList.get(indexOfMap), a);
                 indexOfMap++;
             }
-            System.out.println(sobeysItemsMap.toString() + "\n");
         }catch (IOException e){
             e.printStackTrace();
         } 
@@ -136,7 +138,6 @@ public class DataBase {
                  String[] values = line.split(",");
                  costCoList.put(values[2], values[3]);
              }
-             System.out.println(costCoList.toString());
          }catch (IOException e){
              e.printStackTrace();
          } 
@@ -154,7 +155,6 @@ public class DataBase {
                  String temp = values[2] + " " + values[3];
                  walmartList.put(temp, values[4]);
              }
-             System.out.println(walmartList.toString());
          }catch (IOException e){
              e.printStackTrace();
          }
@@ -171,9 +171,8 @@ public class DataBase {
                  String[] values = line.split(",");
                  String temp = values[3] + ", " + values[4];
                  temp = temp.replaceAll("\"", "");
-                 noFillsList.put(values[2], temp); //format: itemName = price/kg, price(as a whole quantity)
+                 noFillsList.put(values[2].replaceAll("\"", ""), temp); //format: itemName = price/kg, price(as a whole quantity)
              }
-             System.out.println(noFillsList.toString());
          }catch (IOException e){
              e.printStackTrace();
          } 

@@ -1,4 +1,4 @@
-import java.util.HashMap;
+import java.util.ArrayList;
 /**[PriceMatchManagement.java]
  * This is final project - price match program
  * This class contains the main method to start the program
@@ -8,18 +8,21 @@ import java.util.HashMap;
  */
 
 public class PriceMatchManagement{
-    //private user id list? 
-    //private static DATATYPE? statisticCanadaData;
+    private static ArrayList<User> userList = new ArrayList<User>();
 //----------------------------------------------------------------------------
     public static void main(String[] args){
         DataBase database = new DataBase();
-       
-        //!!!!!!!!!!!!merge PriceAnalysisPage into HomePage as an inner class!!!!!!!!!!!!!
-       // PriceAnalysisPage pricePanel = new PriceAnalysisPage(scraper.getStatisiticsPriceData());
-        
-        
-        /********************SOBEYS**********************/
         //create object a home page here
-        //create object webscraper here
     }
+//----------------------------------------------------------------------------
+    public static boolean registerUser(String id, String password){
+        User tempUser = new User(id, password);
+        if(userList.contains(tempUser)){
+            return false; //false - userId taken 
+        }else{
+            userList.add(tempUser);
+        }
+        return true;
+    }
+//----------------------------------------------------------------------------
 }
