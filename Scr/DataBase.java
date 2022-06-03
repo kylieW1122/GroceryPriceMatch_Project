@@ -12,13 +12,15 @@ import java.io.FileReader;
  * This is final project - price match program
  * This class gets the item data from website and CSV flies and save them as HashMaps
  * @author Kylie Wong and Michelle Chan, ICS4UE
- * @version 2.1, build June 1, 2022
+ * @version 3.0, build June 3, 2022
  */
 public class DataBase {
     private static HashMap<String, String> sobeysItemsMap;
     private static HashMap<String, String> costCoItemsMap;
     private static HashMap<String, String> walmartItemsMap;   
     private static HashMap<String, String> noFillsItemsMap;
+    
+    private static HashMap<String, ArrayList<String>> keywordMap;
     
     private static HashMap<String, double[]> statisticsHashmap;
 
@@ -33,30 +35,80 @@ public class DataBase {
     }
 //----------------------------------------------------------------------------
     DataBase(){
+        keywordMap = new HashMap<String, ArrayList<String>>();
+        setUp();
+     
+        searchItemKeyword("bag"); //use this method in GUI search field
+        //System.out.println("final: " + keywordMap.keySet().toString() + "size: " + keywordMap.size());
+    }
+//----------------------------------------------------------------------------
+    private static void setUp(){
         statisticsHashmap = setUpStatisticsCanadaPriceMatchList(STATISTICS_CANADA_FILENAME);
-        //System.out.println(statisticsHashmap);
         costCoItemsMap = setUpCostcoList(COSTCO_FILENAME);
         walmartItemsMap = setUpWalmartList(WALMART_FILENAME);
         sobeysItemsMap = setUpSobeysList(SOBEYS_URL);
-        //noFillsItemsMap = setUpNoFillsList(NOFILLS_FILENAME);
-        //System.out.println("noFills: \n" + noFillsItemsMap.toString() + "\n");
+//        noFillsItemsMap = setUpNoFillsList(NOFILLS_FILENAME);
+//        System.out.println("noFills: \n" + noFillsItemsMap.toString() + "\n");
         
+//        System.out.println("StatisticsCanada: " + statisticsHashmap.toString() + "\n");
         System.out.println("costco: \n" + costCoItemsMap.toString() + "\n");
         System.out.println("walmart: \n" + walmartItemsMap.toString() + "\n");
         System.out.println("sobeys: \n" + sobeysItemsMap.toString() + "\n");
-        //searchItemKeyword("Banana");
     }
 //----------------------------------------------------------------------------
-    //https://stackoverflow.com/questions/33642631/search-for-keywords-in-a-hashmap-with-a-user-entered-string
-    public static boolean searchItemKeyword(String userInput){
-        userInput = userInput.toLowerCase();
+    private static void addKeyword(String itemName, String storeName){
+        String temp = itemName.toLowerCase();
+        ArrayList<String> removeTargets = new ArrayList<String>();
+        Collections.addAll(removeTargets, "kg", "g", "lb", "ml", "oz", "x");
         
-        String name = "testingsdafsdfqawef";
-        if(name.contains(userInput)){
-            System.out.println(true);
-            return true;
+        temp = temp.replaceAll("\\d", ""); 
+        temp = temp.replaceAll("\\p{Punct}", "");
+        String infoName = storeName + " - " + itemName;
+        String[] arr = temp.split(" ");
+        for(String str: arr){
+            str = str.replaceAll(" ", "");
+            if( (removeTargets.contains(str)) || (str.equals(""))){
+                //do not add these into the keyword list
+            }else{
+                if(keywordMap.containsKey(str)){
+                    ArrayList<String> tempList = keywordMap.get(str);
+                    tempList.add(infoName);
+                }else{
+                    ArrayList<String> arrayList = new ArrayList<String>();
+                    arrayList.add(infoName);
+                    //indexOfTheCompareItem(arrayList, infoName, 1);
+                    keywordMap.put(str, arrayList); 
+                }
+            }
         }
-        return false; 
+    }
+//----------------------------------------------------------------------------
+    public static ArrayList<String> searchItemKeyword(String userInput){
+        userInput = userInput.toLowerCase();
+        if(keywordMap.containsKey(userInput)){
+            //System.out.println("Yes\n" + keywordMap.get(userInput).toString());
+            return keywordMap.get(userInput);
+        }
+        return null; 
+    }
+//----------------------------------------------------------------------------
+    public static int indexOfTheCompareItem(ArrayList<String> arrayList, String targetItem, int indexOfStore){
+        String storeName = targetItem.substring(0, targetItem.indexOf(" - "));
+        String itemName = targetItem.substring(targetItem.indexOf(" - ") + 3);
+        String priceString = targetItem.substring(targetItem.indexOf(" = " + 3));
+        double itemPrice = priceStringToDouble(priceString);
+        
+       // System.out.println(storeName + " " + itemName + " " + itemPrice);
+//        for(int i=0; i<arrayList.size(); i++){
+//            
+//        }
+        return -1;
+    
+    }
+//----------------------------------------------------------------------------
+    private static double priceStringToDouble(String priceString){
+        
+        return -100.0;
     }
 //----------------------------------------------------------------------------
     private static HashMap<String, double[]> setUpStatisticsCanadaPriceMatchList(String fileName){ //DONE, move on to line grpah
@@ -117,7 +169,9 @@ public class DataBase {
             String[] arrOfStr = spanTagString.split("~");
             int indexOfMap = 0;
             for (String a : arrOfStr){
-                sobeysList.put(itemNameArrayList.get(indexOfMap), a);
+                String itemNameTemp = itemNameArrayList.get(indexOfMap);
+                sobeysList.put(itemNameTemp, a);
+                addKeyword(itemNameTemp + " = " + a ,"Sobeys");
                 indexOfMap++;
             }
         }catch (IOException e){
@@ -136,7 +190,10 @@ public class DataBase {
              /*******************************************************************************/
              while((line = reader.readLine()) != null){
                  String[] values = line.split(",");
-                 costCoList.put(values[2], values[3]);
+                 String itemNameTemp = values[2];
+                 String itemPriceTemp = values[3];
+                 costCoList.put(itemNameTemp, itemPriceTemp);
+                 addKeyword(itemNameTemp + " = " + itemPriceTemp, "CostCo");
              }
          }catch (IOException e){
              e.printStackTrace();
@@ -152,8 +209,10 @@ public class DataBase {
              reader.readLine(); //read the useless line between the title and the data
              while((line = reader.readLine()) != null){
                  String[] values = line.split(",");
-                 String temp = values[2] + " " + values[3];
-                 walmartList.put(temp, values[4]);
+                 String itemNameTemp = values[2] + " " + values[3];
+                 String itemPriceTemp = values[4];
+                 walmartList.put(itemNameTemp, itemPriceTemp);
+                 addKeyword(itemNameTemp + " = " + itemPriceTemp,"Walmart");
              }
          }catch (IOException e){
              e.printStackTrace();
@@ -172,6 +231,7 @@ public class DataBase {
                  String temp = values[3] + ", " + values[4];
                  temp = temp.replaceAll("\"", "");
                  noFillsList.put(values[2].replaceAll("\"", ""), temp); //format: itemName = price/kg, price(as a whole quantity)
+//                 addKeyword(itemNameTemp,"NoFills");
              }
          }catch (IOException e){
              e.printStackTrace();
