@@ -37,9 +37,8 @@ public class DataBase {
     DataBase(){
         keywordMap = new HashMap<String, ArrayList<String>>();
         setUp();
-     
-        searchItemKeyword("bag"); //use this method in GUI search field
-        //System.out.println("final: " + keywordMap.keySet().toString() + "size: " + keywordMap.size());
+        //TO DO: create function - priceStringToDouble, indexOfTheCompareItem!!!!!!!!!!!!!!!!!!!
+        getKeywordList("bag"); //use this method in GUI search field
     }
 //----------------------------------------------------------------------------
     private static void setUp(){
@@ -47,8 +46,6 @@ public class DataBase {
         costCoItemsMap = setUpCostcoList(COSTCO_FILENAME);
         walmartItemsMap = setUpWalmartList(WALMART_FILENAME);
         sobeysItemsMap = setUpSobeysList(SOBEYS_URL);
-//        noFillsItemsMap = setUpNoFillsList(NOFILLS_FILENAME);
-//        System.out.println("noFills: \n" + noFillsItemsMap.toString() + "\n");
         
 //        System.out.println("StatisticsCanada: " + statisticsHashmap.toString() + "\n");
         System.out.println("costco: \n" + costCoItemsMap.toString() + "\n");
@@ -83,7 +80,7 @@ public class DataBase {
         }
     }
 //----------------------------------------------------------------------------
-    public static ArrayList<String> searchItemKeyword(String userInput){
+    public static ArrayList<String> getKeywordList(String userInput){
         userInput = userInput.toLowerCase();
         if(keywordMap.containsKey(userInput)){
             //System.out.println("Yes\n" + keywordMap.get(userInput).toString());
@@ -106,12 +103,11 @@ public class DataBase {
     
     }
 //----------------------------------------------------------------------------
-    private static double priceStringToDouble(String priceString){
-        
+    private static double priceStringToDouble(String priceString){ //!!!!!!!!!!!!!!!!!!!
         return -100.0;
     }
 //----------------------------------------------------------------------------
-    private static HashMap<String, double[]> setUpStatisticsCanadaPriceMatchList(String fileName){ //DONE, move on to line grpah
+    private static HashMap<String, double[]> setUpStatisticsCanadaPriceMatchList(String fileName){ //DONE
         HashMap<String, double[]> statisticsList = new  HashMap<String, double[]>();
          try{
              BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
@@ -220,22 +216,4 @@ public class DataBase {
          return walmartList;
     }
 //----------------------------------------------------------------------------
-    private static HashMap<String, String> setUpNoFillsList(String fileName){
-        HashMap<String, String> noFillsList = new HashMap<String, String>();
-         try{
-             BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
-             String line = "";
-             reader.readLine(); //read the useless line between the title and the data
-             while((line = reader.readLine()) != null){
-                 String[] values = line.split(",");
-                 String temp = values[3] + ", " + values[4];
-                 temp = temp.replaceAll("\"", "");
-                 noFillsList.put(values[2].replaceAll("\"", ""), temp); //format: itemName = price/kg, price(as a whole quantity)
-//                 addKeyword(itemNameTemp,"NoFills");
-             }
-         }catch (IOException e){
-             e.printStackTrace();
-         } 
-         return noFillsList;
-    }
 }
