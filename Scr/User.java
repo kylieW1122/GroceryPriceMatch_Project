@@ -1,7 +1,10 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
+import java.io.ObjectInputStream;
+import java.io.InputStream;
 /**[User.java]
  * This is final project - price match program
  * This class represent the object - User
@@ -20,11 +23,13 @@ public class User{
     Socket clientSocket;
     PrintWriter output;    
     BufferedReader input;
+    
     public static void main(String[] args){
         
         //start homepage here, for user
         User user = new User("jel", "ds");
-        Scanner userInput = new Scanner(System.in);
+        user.userLogin("", "");
+       /* Scanner userInput = new Scanner(System.in);
         String line = userInput.nextLine();
         while(!line.equals("bye")){
             if(line.equals("login")){
@@ -33,7 +38,12 @@ public class User{
                 user.createGroupOrder(line);
             }
             line = userInput.nextLine();
-        }
+        }*/
+    }
+    User(){
+        this.requestGroupOrderList = new ArrayList<String>();
+        this.userID = "";
+        this.password = "";
     }
 //----------------------------------------------------------------------------
     User(String id, String password){
@@ -70,6 +80,12 @@ public class User{
             output = new PrintWriter(clientSocket.getOutputStream());
             input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             System.out.println("Connection to server established!");
+            HashMap<String, String> list;
+            ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
+            Object object = objectInputStream.readObject();
+            list = (HashMap<String, String>)object;
+            
+            System.out.println(list.toString());
             //testing - delete after
             output.println("Hi. I am a basic client!");           //send a message to the server
             output.flush();                                       //ensure the message was sent but not kept in the buffer

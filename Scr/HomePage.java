@@ -26,17 +26,20 @@ import java.util.ArrayList;
   * @author Kylie Wong and Michelle Chan, ICS4UE
   */
 public class HomePage extends JFrame implements ActionListener{
+    private User user;
     private static String[] actionStrings = {"Home", "Price Analysis", "Group Order", "View Account Details"};
     private SearchItemPage searchItemPanel;
     private PriceAnalysisPage priceAnalysisPanel;
     private GroupOrderPage groupOrderPanel;
     private AccountDetailPage acountDetailPanel;
+    private AccountLoginPage accountLoginPanel;
     
     private final String HOME_PAGE_INDEX  = "0";
     private final String SEARCH_PAGE_INDEX = "1";
     private final String PRICE_ANALYSIS_INDEX = "2";
     private final String GROUP_ORDER_INDEX = "3";
     private final String ACCOUNT_DETAIL_INDEX = "4";
+    private final String ACCOUNT_LOGIN_INDEX = "5";
     
     private final String SEARCH_STR = "Search";
     private final String PRICE_ANALYSIS_STR = "Price Analysis";
@@ -68,11 +71,12 @@ public class HomePage extends JFrame implements ActionListener{
      * Launch the application.
      */
     public static void main(String[] args) {
-        HomePage frame = new HomePage();
+        HomePage frame = new HomePage(new User());
         DataBase database = new DataBase();
     }
 //----------------------------------------------------------------------------
-    HomePage(){
+    HomePage(User user){
+        this.user = user;
         this.setTitle("Company Name");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(750, 500);
@@ -130,6 +134,8 @@ public class HomePage extends JFrame implements ActionListener{
         cardPanel.add(groupOrderPanel, GROUP_ORDER_INDEX);
         acountDetailPanel = new AccountDetailPage();
         cardPanel.add(acountDetailPanel, ACCOUNT_DETAIL_INDEX);
+        accountLoginPanel = new AccountLoginPage();
+        cardPanel.add(accountLoginPanel, ACCOUNT_LOGIN_INDEX);
         
         /*****************************************************************/
         cl.show(cardPanel, "0");
@@ -148,22 +154,27 @@ public class HomePage extends JFrame implements ActionListener{
                 index = index+1;
             }
             String cardNo = Integer.toString(index);
-            cl.show(cardPanel, cardNo);
+            System.out.println("card no: " + cardNo);
+            if(cardNo.equals(GROUP_ORDER_INDEX)){
+                loginRequired(GROUP_ORDER_INDEX);
+            }else if (cardNo.equals(ACCOUNT_DETAIL_INDEX)){
+                loginRequired(ACCOUNT_DETAIL_INDEX);
+            }else{
+                cl.show(cardPanel, cardNo);
+            }
         }else if (event.getSource() instanceof JButton){
             System.out.println("jbutton click!");
             String command = event.getActionCommand();
             if(command.equals(PRICE_ANALYSIS_STR)){
                 cl.show(cardPanel, PRICE_ANALYSIS_INDEX);
-                actionList.setSelectedIndex(Integer.parseInt(PRICE_ANALYSIS_INDEX));
+                actionList.setSelectedIndex(Integer.parseInt(PRICE_ANALYSIS_INDEX)-1);
             }else if (command.equals(GROUP_ORDER_STR)){
-                cl.show(cardPanel, GROUP_ORDER_INDEX);
-                actionList.setSelectedIndex(Integer.parseInt(GROUP_ORDER_INDEX));
+                loginRequired(GROUP_ORDER_INDEX);
             }else if (command.equals(BACK_HOME_STR)){
                 cl.show(cardPanel, HOME_PAGE_INDEX);
                 actionList.setSelectedIndex(Integer.parseInt(HOME_PAGE_INDEX));
             }else if (command.equals(ACCOUNT_DETAIL_STR)){
-                cl.show(cardPanel, ACCOUNT_DETAIL_INDEX);
-                actionList.setSelectedIndex(Integer.parseInt(ACCOUNT_DETAIL_INDEX));
+                loginRequired(ACCOUNT_DETAIL_INDEX);
             }else if(command.equals(SEARCH_STR)){
                 cl.show(cardPanel, SEARCH_PAGE_INDEX);
                 String userInputText = searchTextField.getText();
@@ -171,6 +182,13 @@ public class HomePage extends JFrame implements ActionListener{
                 System.out.println("user text: " + userInputText);
                 searchItemPanel.searchKeyWord(userInputText);
             }
+        }
+    }
+    private void loginRequired(String pageIndex){
+        if(false){
+        //if user is not yet logged in
+        }else{
+            cl.show(cardPanel, ACCOUNT_LOGIN_INDEX);
         }
     }
 //----------------------------------------------------------------------------
@@ -358,6 +376,54 @@ public class HomePage extends JFrame implements ActionListener{
 //inner class - AccountDetailPage
 //----------------------------------------------------------------------------
     private class AccountDetailPage extends JPanel{
-        AccountDetailPage(){}
+        AccountDetailPage(){
+        
+        }
+    }
+//----------------------------------------------------------------------------
+//inner class - AccountLoginPage
+//----------------------------------------------------------------------------
+    private class AccountLoginPage extends JPanel implements ActionListener{
+        JPanel loginPanel;
+        JLabel userLabel;
+        JLabel passwordLabel;
+        JLabel messageLabel;
+        JTextField userInput;
+        JTextField passwordInput;
+        JButton loginEnter;
+        
+        AccountLoginPage(){
+            loginPanel = new JPanel();
+            userLabel = new JLabel("User ID: ");
+            passwordLabel = new JLabel("Password: ");
+            loginEnter = new JButton("Enter");
+            messageLabel = new JLabel("");
+            
+            loginPanel.setLayout(new FlowLayout());
+            userInput = new JTextField(20);
+            loginPanel.add(userLabel);
+            loginPanel.add(userInput);
+            passwordInput = new JTextField(20);
+            loginPanel.add(passwordLabel);
+            loginPanel.add(passwordInput);
+            
+            this.add(loginPanel);
+            this.add(loginEnter);
+            this.add(messageLabel);
+            
+            loginEnter.addActionListener(this);
+        }
+        @Override
+        public void actionPerformed(ActionEvent event){
+            String userText = userInput.getText();
+            String passwordText = passwordInput.getText();
+           /* if (checkInformation(userText, passwordText)){ //check if password is correct
+                messageLabel.setText("Login successful!");
+                mainWindow.dispose();
+                new HomePage(garageList, staffList, staffIndex);
+            }else{
+                messageLabel.setText("Wrong username / password. Please try again.");
+            }*/
+        }
     }
 }

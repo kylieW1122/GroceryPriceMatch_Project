@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.*;
 import java.net.*;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 /**[PriceMatchManagement.java]
  * This is final project - price match program
  * This class contains the main method and the host server to start the program
@@ -13,7 +15,7 @@ import java.net.*;
  */
 
 public class HostManagement{
-    private HashMap<String, String> userHashMap = new HashMap<String, String>();
+    private HashMap<String, User> userHashMap = new HashMap<String, User>();
     
     final int PORT = 6666;
     ServerSocket serverSocket;
@@ -25,13 +27,17 @@ public class HostManagement{
         DataBase database = new DataBase();
         HostManagement hostServer = new HostManagement();
         hostServer.start();
+        
+    }
+    HostManagement(){
+        this.userHashMap.put("trying", new User());
     }
 //----------------------------------------------------------------------------
     public boolean registerUser(String id, String password){
         if(userHashMap.containsKey(id)){
             return false; //false - userId taken 
         }else{
-            userHashMap.put(id,password);
+            //userHashMap.put(id,password);
         }
         return true;
     }
@@ -56,6 +62,7 @@ public class HostManagement{
         Socket socket;
         PrintWriter output;
         BufferedReader input;
+        OutputStream outputStream;
         
         public ConnectionHandler(Socket socket) { 
             this.socket = socket;
@@ -65,6 +72,11 @@ public class HostManagement{
             try {
                 input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 output = new PrintWriter(socket.getOutputStream());
+                outputStream = socket.getOutputStream();
+                
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+                objectOutputStream.writeObject(userHashMap);
+                
                 //receive a message from the client
                 String msg = input.readLine();
                 System.out.println("Message from the client: " + msg);
@@ -75,8 +87,8 @@ public class HostManagement{
                     System.out.println(msg);
                 }
                 //after completing the communication close the streams but do not close the socket!
-                input.close();
-                output.close();
+//                input.close();
+//                output.close();
             }catch (IOException e) {e.printStackTrace();}
         }
     }  
