@@ -52,6 +52,7 @@ public class DataBase {
         System.out.println("walmart: \n" + walmartItemsMap.toString() + "\n");
         System.out.println("sobeys: \n" + sobeysItemsMap.toString() + "\n");
     }
+   // public HashMap<String, String> getCostCoItemMap(){}
 //----------------------------------------------------------------------------
     private static void addKeyword(String itemName, String storeName){
         String temp = itemName.toLowerCase();

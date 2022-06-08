@@ -17,11 +17,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.*; // delete after - wildcard
 import javax.swing.border.TitledBorder;
 
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.FormSpecs;
-import com.jgoodies.forms.layout.RowSpec;
-import javax.swing.SwingConstants;
+import java.util.ArrayList;
+
 /**[HomePage.java]
   * This is final project - price match program
   * This class contains the main method to start the program
@@ -29,27 +26,39 @@ import javax.swing.SwingConstants;
   * @author Kylie Wong and Michelle Chan, ICS4UE
   */
 public class HomePage extends JFrame implements ActionListener{
-    private static String[] actionStrings = {"Home", "Search Item", "Price Analysis", "Group Order"};
-    //HomePage mainhomePagePanel  
-    private JPanel mainPanel;
+    private static String[] actionStrings = {"Home", "Price Analysis", "Group Order", "View Account Details"};
     private SearchItemPage searchItemPanel;
     private PriceAnalysisPage priceAnalysisPanel;
     private GroupOrderPage groupOrderPanel;
+    private AccountDetailPage acountDetailPanel;
     
-    private final String SEARCH_STR = "Search: ";
-    //private inner class panels 
+    private final String HOME_PAGE_INDEX  = "0";
+    private final String SEARCH_PAGE_INDEX = "1";
+    private final String PRICE_ANALYSIS_INDEX = "2";
+    private final String GROUP_ORDER_INDEX = "3";
+    private final String ACCOUNT_DETAIL_INDEX = "4";
+    
+    private final String SEARCH_STR = "Search";
+    private final String PRICE_ANALYSIS_STR = "Price Analysis";
+    private final String GROUP_ORDER_STR = "Group Order";
+    private final String BACK_HOME_STR = "Back To Home";
+    private final String ACCOUNT_DETAIL_STR = "View Account Details";
     
     JPanel homePagePanel;
     
     JPanel midPanel;
-    JLabel searchLabel;
+    JPanel searchPanel;
+    JPanel midButtonPanel;
     JTextField searchTextField;
+    JButton enterSearchPanel;
+    
     JButton priceAnalysisButton;
     JButton groupOrderButton;
     
-    JPanel bottomPanel;
+    JPanel mainBottomPanel;
     JButton accountSettingButton;
     JButton reviewGrpOrderButton;
+    JButton bottomHomeButton;
     
     JPanel cardPanel;
     CardLayout cl;
@@ -60,6 +69,7 @@ public class HomePage extends JFrame implements ActionListener{
      */
     public static void main(String[] args) {
         HomePage frame = new HomePage();
+        DataBase database = new DataBase();
     }
 //----------------------------------------------------------------------------
     HomePage(){
@@ -67,9 +77,7 @@ public class HomePage extends JFrame implements ActionListener{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(750, 500);
         this.setResizable(true);
-        
-        mainPanel = new JPanel();
-        mainPanel.setLayout(new BorderLayout());
+        this.setLayout(new BorderLayout());
         /********************set cardPanel**********************/
         actionList = new JComboBox(actionStrings);
         actionList.setSelectedIndex(0);
@@ -82,58 +90,52 @@ public class HomePage extends JFrame implements ActionListener{
         homePagePanel.setLayout(new BorderLayout());
         
         /*************************MID JPANEL**********************************/
-        midPanel = new JPanel();
+        midPanel = new JPanel(new GridLayout(0,1));
         midPanel.setBackground(Color.WHITE);
-        
-        searchLabel = new JLabel(SEARCH_STR);
-        searchLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        searchPanel = new JPanel();
         searchTextField = new JTextField(30);
+        enterSearchPanel = new JButton(SEARCH_STR);
+        enterSearchPanel.addActionListener(this);
         
-        priceAnalysisButton = new JButton("Price Analysis");
-        groupOrderButton = new JButton("Group Order");
-        groupOrderButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            }
-        });
+        midButtonPanel = new JPanel();
+        priceAnalysisButton = new JButton(PRICE_ANALYSIS_STR);
+        priceAnalysisButton.addActionListener(this);
+        groupOrderButton = new JButton(GROUP_ORDER_STR);
+        groupOrderButton.addActionListener(this);
+        searchPanel.add(searchTextField);
+        searchPanel.add(enterSearchPanel);
         
-        midPanel.add(searchLabel);
-        midPanel.add(searchTextField);
-        midPanel.add(priceAnalysisButton);
-        midPanel.add(groupOrderButton);
+        midPanel.add(searchPanel);
+        midButtonPanel.add(priceAnalysisButton);
+        midButtonPanel.add(groupOrderButton);
+        midPanel.add(midButtonPanel);
+        
         homePagePanel.add(midPanel, BorderLayout.CENTER);
         /************************BOTTOM PANEL**********************************/
-        bottomPanel = new JPanel();
-        bottomPanel.setBackground(Color.WHITE);
+        mainBottomPanel = new JPanel();
+        bottomHomeButton = new JButton(BACK_HOME_STR);
+        bottomHomeButton.addActionListener(this);
+        accountSettingButton = new JButton(ACCOUNT_DETAIL_STR);
+        accountSettingButton.addActionListener(this);
         
-        accountSettingButton = new JButton("Account Settings");
-        accountSettingButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            }
-        });
-        
-        reviewGrpOrderButton = new JButton("Review Group Order");
-        reviewGrpOrderButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            }
-        });
-        
-        bottomPanel.add(accountSettingButton);
-        bottomPanel.add(reviewGrpOrderButton);
-        homePagePanel.add(bottomPanel, BorderLayout.SOUTH);
+        mainBottomPanel.add(bottomHomeButton);
+        mainBottomPanel.add(accountSettingButton);
         /*****************************ADD EVERYTHING INTO mainhomePagePanel************************************/
-        cardPanel.add(homePagePanel, "1");
+        cardPanel.add(homePagePanel, HOME_PAGE_INDEX);
         searchItemPanel = new SearchItemPage();
-        cardPanel.add(searchItemPanel, "2");
+        cardPanel.add(searchItemPanel, SEARCH_PAGE_INDEX);
         priceAnalysisPanel = new PriceAnalysisPage();
-        cardPanel.add(priceAnalysisPanel, "3");
+        cardPanel.add(priceAnalysisPanel, PRICE_ANALYSIS_INDEX);
         groupOrderPanel = new GroupOrderPage();
-        cardPanel.add(groupOrderPanel, "4");
+        cardPanel.add(groupOrderPanel, GROUP_ORDER_INDEX);
+        acountDetailPanel = new AccountDetailPage();
+        cardPanel.add(acountDetailPanel, ACCOUNT_DETAIL_INDEX);
         
         /*****************************************************************/
-        cl.show(cardPanel, "1");
-        mainPanel.add(actionList, BorderLayout.NORTH);
-        mainPanel.add(cardPanel, BorderLayout.CENTER);
-        this.add(mainPanel);
+        cl.show(cardPanel, "0");
+        this.add(actionList, BorderLayout.NORTH);
+        this.add(cardPanel, BorderLayout.CENTER);
+        this.add(mainBottomPanel, BorderLayout.SOUTH);
         this.setVisible(true);
     }
 //------------------------------------------------------------------------------
@@ -142,18 +144,43 @@ public class HomePage extends JFrame implements ActionListener{
         if(event.getSource() instanceof JComboBox){
             JComboBox cb = (JComboBox)event.getSource();
             int index = cb.getSelectedIndex();
-            String cardNo = Integer.toString(index+1);
+            if(index>0){
+                index = index+1;
+            }
+            String cardNo = Integer.toString(index);
             cl.show(cardPanel, cardNo);
+        }else if (event.getSource() instanceof JButton){
+            System.out.println("jbutton click!");
+            String command = event.getActionCommand();
+            if(command.equals(PRICE_ANALYSIS_STR)){
+                cl.show(cardPanel, PRICE_ANALYSIS_INDEX);
+                actionList.setSelectedIndex(Integer.parseInt(PRICE_ANALYSIS_INDEX));
+            }else if (command.equals(GROUP_ORDER_STR)){
+                cl.show(cardPanel, GROUP_ORDER_INDEX);
+                actionList.setSelectedIndex(Integer.parseInt(GROUP_ORDER_INDEX));
+            }else if (command.equals(BACK_HOME_STR)){
+                cl.show(cardPanel, HOME_PAGE_INDEX);
+                actionList.setSelectedIndex(Integer.parseInt(HOME_PAGE_INDEX));
+            }else if (command.equals(ACCOUNT_DETAIL_STR)){
+                cl.show(cardPanel, ACCOUNT_DETAIL_INDEX);
+                actionList.setSelectedIndex(Integer.parseInt(ACCOUNT_DETAIL_INDEX));
+            }else if(command.equals(SEARCH_STR)){
+                cl.show(cardPanel, SEARCH_PAGE_INDEX);
+                String userInputText = searchTextField.getText();
+                searchTextField.setText("");
+                System.out.println("user text: " + userInputText);
+                searchItemPanel.searchKeyWord(userInputText);
+            }
         }
     }
 //----------------------------------------------------------------------------
 //inner class - SearchItemPage
 //----------------------------------------------------------------------------
     private class SearchItemPage extends JPanel{
-        JPanel topPanel;
-        JButton enterSearchPanel;
-        JLabel searchLabel;
-        JTextField searchTextField;
+        private String searchString;
+        private ArrayList<String> searchResultList = new ArrayList<String>();
+        
+        JPanel resultPanel;
         
         JPanel midPanel;
         JPanel midStoreListPanel;
@@ -163,18 +190,13 @@ public class HomePage extends JFrame implements ActionListener{
         JLabel itemNameLabel;
         JLabel priceLabel;
         
+        ArrayList<JLabel> storeLabelList = new ArrayList<JLabel>();
+        ArrayList<JLabel> itemNameList = new ArrayList<JLabel>();
+        ArrayList<JLabel> priceLabelList = new ArrayList<JLabel>();
+        
         SearchItemPage(){
             this.setLayout(new BorderLayout());
-            /************************TOP PANEL**********************************/
-            topPanel = new JPanel();
-            topPanel.setBackground(Color.WHITE);
-            enterSearchPanel = new JButton("Go! ");
-            searchLabel = new JLabel(SEARCH_STR);
-            searchTextField = new JTextField(30);
-            topPanel.add(searchLabel);
-            topPanel.add(searchTextField);
-            topPanel.add(enterSearchPanel);
-            this.add(topPanel, BorderLayout.NORTH);
+            
             /************************MID PANEL**********************************/ 
             midPanel = new JPanel();
             midStoreListPanel = new JPanel();
@@ -185,15 +207,33 @@ public class HomePage extends JFrame implements ActionListener{
             itemNameLabel = new JLabel("Item Name             ");
             priceLabel = new JLabel("Price");
             midStoreListPanel.add(storeLabel);
-            midPriceListPanel.add(itemNameLabel);
+            midItemNameListPanel.add(itemNameLabel);
             midPriceListPanel.add(priceLabel);
-            
+            /***************************/ 
+            for(int i=0; i<searchResultList.size(); i++){
+                midStoreListPanel.add(storeLabelList.get(i));
+                midItemNameListPanel.add(itemNameList.get(i));
+                midPriceListPanel.add(priceLabelList.get(i));
+            }
+            /***************************/ 
             //display the list of info here with a button of the group order
             
             midPanel.add(midStoreListPanel);
+            midPanel.add(midItemNameListPanel);
             midPanel.add(midPriceListPanel);
-            midPanel.add(midPriceListPanel);
+            
             this.add(midPanel, BorderLayout.CENTER);
+        }
+//---------------------------------------------------------------------------- 
+        public void searchKeyWord(String str){
+            System.out.println("hsdfa");
+            this.searchString = str;
+            //searchResultList = new ArrayList<>(); // call method from database
+            searchResultList.add("testing");
+            storeLabelList.add(new JLabel("store name 1"));
+            itemNameList.add(new JLabel("item name 1"));
+            priceLabelList.add(new JLabel("$$$ 1"));
+            super.repaint();
         }
     }
 //----------------------------------------------------------------------------
@@ -313,5 +353,11 @@ public class HomePage extends JFrame implements ActionListener{
                 this.setBorder(title);
             }
         }
+    }
+//----------------------------------------------------------------------------
+//inner class - AccountDetailPage
+//----------------------------------------------------------------------------
+    private class AccountDetailPage extends JPanel{
+        AccountDetailPage(){}
     }
 }
