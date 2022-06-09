@@ -72,7 +72,7 @@ public class HomePage extends JFrame implements ActionListener{
      */
     public static void main(String[] args) {
         HomePage frame = new HomePage(new User());
-        DataBase database = new DataBase();
+       // DataBase database = new DataBase();
     }
 //----------------------------------------------------------------------------
     HomePage(User user){
@@ -166,17 +166,15 @@ public class HomePage extends JFrame implements ActionListener{
             System.out.println("jbutton click!");
             String command = event.getActionCommand();
             if(command.equals(PRICE_ANALYSIS_STR)){
-                cl.show(cardPanel, PRICE_ANALYSIS_INDEX);
-                actionList.setSelectedIndex(Integer.parseInt(PRICE_ANALYSIS_INDEX)-1);
+                changeCardPanel(PRICE_ANALYSIS_INDEX);
             }else if (command.equals(GROUP_ORDER_STR)){
                 loginRequired(GROUP_ORDER_INDEX);
             }else if (command.equals(BACK_HOME_STR)){
-                cl.show(cardPanel, HOME_PAGE_INDEX);
-                actionList.setSelectedIndex(Integer.parseInt(HOME_PAGE_INDEX));
+                changeCardPanel(HOME_PAGE_INDEX);
             }else if (command.equals(ACCOUNT_DETAIL_STR)){
                 loginRequired(ACCOUNT_DETAIL_INDEX);
             }else if(command.equals(SEARCH_STR)){
-                cl.show(cardPanel, SEARCH_PAGE_INDEX);
+                changeCardPanel(SEARCH_PAGE_INDEX);
                 String userInputText = searchTextField.getText();
                 searchTextField.setText("");
                 System.out.println("user text: " + userInputText);
@@ -184,19 +182,31 @@ public class HomePage extends JFrame implements ActionListener{
             }
         }
     }
+//----------------------------------------------------------------------------
     private void loginRequired(String pageIndex){
-        if(false){
-        //if user is not yet logged in
+        if(user.getUserID()!=null){     //if user is logged in
+            changeCardPanel(pageIndex);
         }else{
+            accountLoginPanel.setNextIndex(pageIndex);
             cl.show(cardPanel, ACCOUNT_LOGIN_INDEX);
+            System.out.println("not yet login");
         }
+    }
+//----------------------------------------------------------------------------
+    private void changeCardPanel(String index){
+         cl.show(cardPanel, index);
+         if(index.equals(HOME_PAGE_INDEX)){
+             actionList.setSelectedIndex(Integer.parseInt(index));
+         }else if (!index.equals(SEARCH_PAGE_INDEX)){
+             actionList.setSelectedIndex(Integer.parseInt(index)-1);
+         }
     }
 //----------------------------------------------------------------------------
 //inner class - SearchItemPage
 //----------------------------------------------------------------------------
     private class SearchItemPage extends JPanel{
         private String searchString;
-        private ArrayList<String> searchResultList = new ArrayList<String>();
+        private ArrayList<String> searchResultList;
         
         JPanel resultPanel;
         
@@ -244,14 +254,15 @@ public class HomePage extends JFrame implements ActionListener{
         }
 //---------------------------------------------------------------------------- 
         public void searchKeyWord(String str){
-            System.out.println("hsdfa");
+            System.out.println("searching for item: " + str);
             this.searchString = str;
-            //searchResultList = new ArrayList<>(); // call method from database
-            searchResultList.add("testing");
+            searchResultList = user.getKeywordList(str);
+            
             storeLabelList.add(new JLabel("store name 1"));
             itemNameList.add(new JLabel("item name 1"));
             priceLabelList.add(new JLabel("$$$ 1"));
             super.repaint();
+            System.out.println("arraylist of result:\n" + searchResultList.toString());
         }
     }
 //----------------------------------------------------------------------------
@@ -384,6 +395,7 @@ public class HomePage extends JFrame implements ActionListener{
 //inner class - AccountLoginPage
 //----------------------------------------------------------------------------
     private class AccountLoginPage extends JPanel implements ActionListener{
+        private String nextPageIndex;
         JPanel loginPanel;
         JLabel userLabel;
         JLabel passwordLabel;
@@ -413,17 +425,23 @@ public class HomePage extends JFrame implements ActionListener{
             
             loginEnter.addActionListener(this);
         }
+        public void setNextIndex(String index){
+            this.nextPageIndex = index;
+        }
         @Override
         public void actionPerformed(ActionEvent event){
             String userText = userInput.getText();
             String passwordText = passwordInput.getText();
-           /* if (checkInformation(userText, passwordText)){ //check if password is correct
-                messageLabel.setText("Login successful!");
-                mainWindow.dispose();
-                new HomePage(garageList, staffList, staffIndex);
-            }else{
-                messageLabel.setText("Wrong username / password. Please try again.");
-            }*/
+            //catch unacceptable character in here; edit messagelabel's text
+            
+            boolean loginStatus = user.userLogin(userText, passwordText);
+            if(loginStatus){
+                changeCardPanel(this.nextPageIndex);
+            }else{    //wrong userId / password
+                messageLabel.setText("Wrong user ID / password. Please try again.");
+            }
+            userInput.setText("");
+            passwordInput.setText("");
         }
     }
 }

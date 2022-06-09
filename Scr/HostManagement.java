@@ -1,51 +1,94 @@
-//package es.neil.networking;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.*;
 import java.net.*;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.ObjectInputStream;
+import java.io.InputStream;
+import java.io.FileReader;
+import java.io.BufferedReader;
+
 /**[PriceMatchManagement.java]
  * This is final project - price match program
  * This class contains the main method and the host server to start the program
+ * 
+ * http://helloraspberrypi.blogspot.com/2013/12/pass-arraylist-of-object-in-socket.html
  * 
  * @author Kylie Wong and Michelle Chan, ICS4UE
  * @version 1.0, build May 27, 2022
  */
 
 public class HostManagement{
-    private HashMap<String, User> userHashMap = new HashMap<String, User>();
+    private HashMap<String, ArrayList<String>> userWithRefNoMap = new HashMap<String, ArrayList<String>>();
+    private HashMap<String, String> userPasswordMap = new HashMap<String, String>();
+    private HashMap<String, ArrayList<String>> refNoMap = new HashMap<String, ArrayList<String>>();
+    
+    private DataBase database;
+    static FileReader fileReader; 
+    static BufferedReader input;
     
     final int PORT = 6666;
     ServerSocket serverSocket;
     Socket clientSocket;
-    PrintWriter output;
-    BufferedReader input;
+    
 //----------------------------------------------------------------------------
-    public static void main(String[] args) throws Exception{
-        DataBase database = new DataBase();
+    public static void main(String[] args){
         HostManagement hostServer = new HostManagement();
-        hostServer.start();
         
     }
     HostManagement(){
-        this.userHashMap.put("trying", new User());
+        this.database = new DataBase();
+        this.setUp();
+        System.out.println("hashmap: " + userPasswordMap.toString());
+        try{
+            this.start();
+        }catch(Exception e){  e.printStackTrace(); }
     }
 //----------------------------------------------------------------------------
-    public boolean registerUser(String id, String password){
-        if(userHashMap.containsKey(id)){
+    private void setUp(){
+        String fileName = "UserInfo.txt";
+        try{
+            fileReader = new FileReader(fileName);
+            input = new BufferedReader(fileReader);
+            //read the first line "User Information Sheet (#. userID: Password OrderRefNo)"of the file that is useless
+            input.readLine(); 
+            while(input.ready()){    //keep reading lines while the End-of-File hasn't been reached
+                String name = input.readLine(); 
+                String password = name.substring(name.indexOf(":")+2);
+                name = name.substring(3, name.indexOf(":"));
+                userPasswordMap.put(name, password);
+            }
+            input.close();
+        }catch (Exception e){
+            System.out.println("ERROR - file '" + fileName + "' not found. ");
+        }
+        System.out.println("setting up");
+    }
+//----------------------------------------------------------------------------
+    private boolean loginUser(String id, String password){
+        if(userPasswordMap.containsKey(id)){
+            String correctPassword = userPasswordMap.get(id);
+            if(password.equals(correctPassword)){         // password correct
+                return true;
+            }
+        }
+        return false;
+    }
+//----------------------------------------------------------------------------
+    private boolean registerUser(String id, String password){
+        if(userPasswordMap.containsKey(id)){
             return false; //false - userId taken 
         }else{
-            //userHashMap.put(id,password);
+            userPasswordMap.put(id, password);
         }
         return true;
     }
 //----------------------------------------------------------------------------
     private void start() throws Exception{ 
         //create a socket with the local IP address and wait for connection request       
-        System.out.println("Waiting for a connection request from a client ...");
-        serverSocket = new ServerSocket(PORT);                //create and bind a socket
+            System.out.println("Waiting for a connection request from a client ...");
+            serverSocket = new ServerSocket(PORT);                //create and bind a socket
         while(true){
             clientSocket = serverSocket.accept();             //wait for connection request
             System.out.println("Client connected");
@@ -53,16 +96,15 @@ public class HostManagement{
             connectionThread.start();                         //start a new thread to handle the connection
         }
     }
-//----------------------------------------------------------------------------
-    public boolean userLogin(String userId){
-        return false;
-    }
 //------------------------------------------------------------------------------
     class ConnectionHandler extends Thread { 
         Socket socket;
         PrintWriter output;
         BufferedReader input;
-        OutputStream outputStream;
+        
+        ObjectOutputStream objectOutput;
+        ObjectInputStream objectInput;
+        String msg;
         
         public ConnectionHandler(Socket socket) { 
             this.socket = socket;
@@ -72,23 +114,30 @@ public class HostManagement{
             try {
                 input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 output = new PrintWriter(socket.getOutputStream());
-                outputStream = socket.getOutputStream();
+                objectOutput = new ObjectOutputStream(socket.getOutputStream());
+                objectInput = new ObjectInputStream(socket.getInputStream());
                 
-                ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-                objectOutputStream.writeObject(userHashMap);
-                
-                //receive a message from the client
-                String msg = input.readLine();
-                System.out.println("Message from the client: " + msg);
-                //send a response to the client
                 output.println("Client you are connected!");
                 output.flush();         
+                
                 while((msg = input.readLine())!=null){
                     System.out.println(msg);
+                    if(msg.substring(0, Const.LOGIN.length()).equals(Const.LOGIN)){
+                        String userName = msg.substring(Const.LOGIN.length(), msg.indexOf("~"));
+                        String password = msg.substring(msg.indexOf("~") +1);
+                        boolean resultOfLogin = loginUser(userName, password);
+                        System.out.println(resultOfLogin);
+                        output.println(resultOfLogin);
+                        output.flush();
+                    }else if(msg.substring(0, Const.SEARCH_KEYWORD.length()).equals(Const.SEARCH_KEYWORD)){
+                        String keyword = msg.substring(Const.SEARCH_KEYWORD.length());
+                        ArrayList<String> keywordMap = database.getKeywordList(keyword);
+                        objectOutput.writeObject(keywordMap);
+                    }
                 }
                 //after completing the communication close the streams but do not close the socket!
-//                input.close();
-//                output.close();
+                input.close();
+                output.close();
             }catch (IOException e) {e.printStackTrace();}
         }
     }  

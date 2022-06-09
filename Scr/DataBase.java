@@ -48,9 +48,9 @@ public class DataBase {
         sobeysItemsMap = setUpSobeysList(SOBEYS_URL);
         
 //        System.out.println("StatisticsCanada: " + statisticsHashmap.toString() + "\n");
-        System.out.println("costco: \n" + costCoItemsMap.toString() + "\n");
-        System.out.println("walmart: \n" + walmartItemsMap.toString() + "\n");
-        System.out.println("sobeys: \n" + sobeysItemsMap.toString() + "\n");
+//        System.out.println("costco: \n" + costCoItemsMap.toString() + "\n");
+//        System.out.println("walmart: \n" + walmartItemsMap.toString() + "\n");
+//        System.out.println("sobeys: \n" + sobeysItemsMap.toString() + "\n");
     }
    // public HashMap<String, String> getCostCoItemMap(){}
 //----------------------------------------------------------------------------

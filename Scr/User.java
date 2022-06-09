@@ -5,13 +5,14 @@ import java.net.*;
 import java.util.Scanner;
 import java.io.ObjectInputStream;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 /**[User.java]
  * This is final project - price match program
  * This class represent the object - User
  * @author Kylie Wong and Michelle Chan, ICS4UE
  * @version 1.0, build June 2, 2022
  */
-
 public class User{
     private String password;
     private String userID;
@@ -23,33 +24,20 @@ public class User{
     Socket clientSocket;
     PrintWriter output;    
     BufferedReader input;
-    
+    ObjectInputStream objectInput;
+    ObjectOutputStream objectOutput;
+//----------------------------------------------------------------------------
     public static void main(String[] args){
-        
         //start homepage here, for user
-        User user = new User("jel", "ds");
-        user.userLogin("", "");
-       /* Scanner userInput = new Scanner(System.in);
-        String line = userInput.nextLine();
-        while(!line.equals("bye")){
-            if(line.equals("login")){
-                user.userLogin("", "");
-            }else{
-                user.createGroupOrder(line);
-            }
-            line = userInput.nextLine();
-        }*/
-    }
-    User(){
-        this.requestGroupOrderList = new ArrayList<String>();
-        this.userID = "";
-        this.password = "";
+        User user = new User();
+        HomePage frame = new HomePage(user);
     }
 //----------------------------------------------------------------------------
-    User(String id, String password){
+    User(){
         this.requestGroupOrderList = new ArrayList<String>();
-        this.userID = id;
-        this.password = password;
+        this.userID = null;
+        this.password = null;
+        this.startConnecting();
     }
 //----------------------------------------------------------------------------
     public String getUserID(){ return userID; }
@@ -66,10 +54,38 @@ public class User{
 //Networking
 //----------------------------------------------------------------------------
     public boolean userLogin(String id, String password){
-        return this.startConnecting();
+        output.println(Const.LOGIN + this.userID + Const.PASSWORD +  this.password);
+        output.flush();
+        try{
+            String msg = input.readLine();
+            if(msg.equals("true")){
+                this.userID = id;
+                this.password = password;
+                return true;
+            }
+        }catch(IOException exception){
+            exception.printStackTrace();
+        }
+        return false;
     }
 //----------------------------------------------------------------------------
-    public boolean userLogout(){
+    public ArrayList<String> getKeywordList(String keyword){ // from host's database
+        ArrayList<String> result = new ArrayList<String>();
+        output.println(Const.SEARCH_KEYWORD + keyword);
+        output.flush();
+        try{
+            Object object = objectInput.readObject();
+            result = (ArrayList<String>)object;
+        }catch(ClassNotFoundException ex){
+            System.out.println(ex.toString());
+        }catch(IOException e){
+            System.out.println(e.toString());
+        }
+        System.out.println("result: " + result.toString());
+        return result;
+    }
+//----------------------------------------------------------------------------
+    private boolean userLogout(){
         return this.stopConnecting();
     }
 //----------------------------------------------------------------------------
@@ -79,18 +95,22 @@ public class User{
             clientSocket = new Socket(LOCAL_HOST, PORT);          //create and bind a socket, and request connection
             output = new PrintWriter(clientSocket.getOutputStream());
             input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            objectInput = new ObjectInputStream(clientSocket.getInputStream());
+            objectOutput = new ObjectOutputStream(clientSocket.getOutputStream());
             System.out.println("Connection to server established!");
-            HashMap<String, String> list;
-            ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
-            Object object = objectInputStream.readObject();
-            list = (HashMap<String, String>)object;
+            String msg = input.readLine();                        //get a response from the server
+            System.out.println("Message from server: '" + msg+"'"); 
+                //HashMap<String, String> list;
+//            objectOutputStream.writeObject(this);
+                /* Object object = objectInputStream.readObject();
+                 list = (HashMap<String, String>)object;
             
             System.out.println(list.toString());
             //testing - delete after
             output.println("Hi. I am a basic client!");           //send a message to the server
             output.flush();                                       //ensure the message was sent but not kept in the buffer
             String msg = input.readLine();                        //get a response from the server
-            System.out.println("Message from server: '" + msg+"'"); 
+            System.out.println("Message from server: '" + msg+"'"); */
         }catch (Exception e){
             e.printStackTrace();
             return false;
@@ -113,13 +133,5 @@ public class User{
 /****************************************************************************/
     @Override
     public String toString(){ return this.userID; }
-//----------------------------------------------------------------------------
-    @Override
-    public boolean equals(Object obj){
-        if(obj == this){ return true; }
-        if(!(obj instanceof User)){ return false; }
-        User user = (User) obj;
-        return user.getUserID().equals(this.getUserID());
-    }
 //----------------------------------------------------------------------------
 }
