@@ -19,6 +19,7 @@ public class DataBase {
     private static HashMap<String, String> costCoItemsMap;
     private static HashMap<String, String> walmartItemsMap;   
     private static HashMap<String, String> noFillsItemsMap;
+    private static List<ProductInfo> productList;
     
     private static HashMap<String, ArrayList<String>> keywordMap;
     
@@ -47,7 +48,7 @@ public class DataBase {
         walmartItemsMap = setUpWalmartList(WALMART_FILENAME);
         sobeysItemsMap = setUpSobeysList(SOBEYS_URL);
         
-//        System.out.println("StatisticsCanada: " + statisticsHashmap.toString() + "\n");
+        System.out.println("StatisticsCanada: " + statisticsHashmap.toString() + "\n");
 //        System.out.println("costco: \n" + costCoItemsMap.toString() + "\n");
 //        System.out.println("walmart: \n" + walmartItemsMap.toString() + "\n");
 //        System.out.println("sobeys: \n" + sobeysItemsMap.toString() + "\n");
@@ -108,76 +109,117 @@ public class DataBase {
         return -100.0;
     }
     
+    // finds the matching product and price and puts it into the map
     private static Map<String, Map<String, Double>> updateMatchingMap(String company, Map<String, Map<String, Double>> map,
-                                                                      HashMap<String, String> data, String matchingProductName ) {
-        
-        
-        if (map == null) { map = new HashMap<String, Map<String, Double>>(); }
-        Map<String, Double> productMap = new HashMap<String, Double>();
-        if (data != null && !data.isEmpty()) {
-            Set<String> keys = data.keySet();
-            for (String itemKeyName: keys) {
-                if (itemKeyName.contains(matchingProductName)) {
-                    String valStr = data.get(itemKeyName);
-                    valStr = valStr.substring(1);
-                    Double value = Double.valueOf(valStr);
-                    productMap.put(itemKeyName, value);
-                }
-            }
-        }
-        
-        if (productMap != null && !productMap.isEmpty())
-        {
-            map.put(company, productMap);
-        }
-        return map;
-        
+    		HashMap<String, String> data, String matchingProductName ) {
+	 
+    	// goes through the company product map and searches for items
+    	if (map == null) { map = new HashMap<String, Map<String, Double>>(); }
+    	Map<String, Double> productMap = new HashMap<String, Double>();
+    	if (data != null && !data.isEmpty()) {
+    	  Set<String> keys = data.keySet();
+	    	 for (String itemKeyName: keys) {
+	    		 if (itemKeyName.contains(matchingProductName)) {
+	    			 String valStr = data.get(itemKeyName);
+	    			 valStr = valStr.substring(1);
+	    			 Double value = Double.valueOf(valStr);
+	    			 productMap.put(itemKeyName, value);
+	    		 }
+	    	 }
+    	}
+    	
+    	if (productMap != null && !productMap.isEmpty())
+    	{
+    		map.put(company, productMap);
+    	}
+	    return map;
+	    	
     }
     
-    
+  	// uses the updateMatchingMap function to search for the product and price from each grocery company 
     public static Map<String, Map<String, Double>> productSearch(String productName) {
-        Map<String, Map<String, Double>> map = new HashMap<String, Map<String, Double>>();
-        map = updateMatchingMap("sobeys", map, sobeysItemsMap, productName );
-        map = updateMatchingMap("costco", map, costCoItemsMap, productName );
-        map = updateMatchingMap("walmart", map, walmartItemsMap, productName );
-        map = updateMatchingMap("noFills", map, noFillsItemsMap, productName );
-        
-        return map;
-        
+    	Map<String, Map<String, Double>> map = new HashMap<String, Map<String, Double>>();
+    	map = updateMatchingMap("sobeys", map, sobeysItemsMap, productName );
+    	map = updateMatchingMap("costco", map, costCoItemsMap, productName );
+    	map = updateMatchingMap("walmart", map, walmartItemsMap, productName );
+    	map = updateMatchingMap("noFills", map, noFillsItemsMap, productName );
+         
+    	return map;
+    	
+    }
+    
+    // matches the product item name and the year from the statistics Canada data
+    public static Map<String, Double> getPriceListByItemNYear(String item, String year) {
+    	Map<String, Double> map = new HashMap<String, Double>();
+    	
+    	if (productList != null && !productList.isEmpty()) {
+    		    	
+	    	for (ProductInfo prodInfo: productList) {
+	    		if (prodInfo.getItemName().equalsIgnoreCase(item) && prodInfo.getMonYear().contains(year)) {
+	    			map.put(prodInfo.getMonYear(), prodInfo.getPrice());
+	    		}
+	    	}
+    	}
+	    	return map;
+    	
     }
 //----------------------------------------------------------------------------
     private static HashMap<String, double[]> setUpStatisticsCanadaPriceMatchList(String fileName){ //DONE
         HashMap<String, double[]> statisticsList = new  HashMap<String, double[]>();
-        try{
-            BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
-            String line = "";
-            line = reader.readLine();
-            String[] timeline = line.substring(1).split(",");
-            int size = timeline.length;
-            reader.readLine(); //read the useless line between the title and the data
-            /*******************************************************************************/
-            while((line = reader.readLine()) != null){
-                String[] values = line.split(",");
-                double[] prices = new double[size];
-                int index=0;
-                for(int i=1; i<values.length; i++){
-                    String temp = values[i];
-                    Double d;
-                    try{
-                        d = Double.parseDouble(temp);
-                    }catch (NumberFormatException numberEx){ //if the data format is not a double
-                        d = 0.00;   
-                    }
-                    prices[index] = d;
-                    index++;
-                }
-                statisticsList.put(values[0], prices);
-            }
-            /*******************************************************************************/
-        }catch (IOException e){
-            e.printStackTrace();
-        } 
-        return statisticsList;
+        if (productList == null || productList.isEmpty()) {
+        	productList = new ArrayList<ProductInfo>();
+        }
+         try{
+             BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
+             String line = "";
+             line = reader.readLine();
+             String[] timeline = line.substring(1).split(",");
+             int size = timeline.length;
+             reader.readLine(); //read the useless line between the title and the data
+             /*******************************************************************************/
+             while((line = reader.readLine()) != null){
+                 String[] values = line.split(",");
+                 double[] prices = new double[size];
+                 int index=0;
+                 for(int i=1; i<values.length; i++){
+                     String temp = values[i];
+                     Double d;
+                     try{
+                         d = Double.parseDouble(temp);
+                     }catch (NumberFormatException numberEx){ //if the data format is not a double
+                         d = 0.00;   
+                     }
+                     prices[index] = d;
+                     index++;
+                 }
+                 statisticsList.put(values[0], prices);
+             }
+             
+             if (statisticsList != null && !statisticsList.isEmpty()) {
+            	 
+            
+            	 Set<String> keys = statisticsList.keySet();
+            	 
+            	 for (String key: keys) {
+            		
+            		 
+            		 double[] prices = statisticsList.get(key);
+            		 for (int i=0; i < prices.length; i++) {
+            			 ProductInfo prodInfo = new ProductInfo();
+                		 prodInfo.setItemName(key);
+            			 prodInfo.setMonYear(timeline[i]);
+            			 
+            			 prodInfo.setPrice(prices[i]);
+            			 productList.add(prodInfo);
+            		 }
+            		 
+            	 }
+             }
+             /*******************************************************************************/
+         }catch (IOException e){
+             e.printStackTrace();
+         } 
+         return statisticsList;
     }
 //----------------------------------------------------------------------------
     private static HashMap<String, String> setUpSobeysList(String url){ 
