@@ -81,7 +81,9 @@ public class User{
         }catch(IOException e){
             System.out.println(e.toString());
         }
-        System.out.println("result: " + result.toString());
+        if(result == null){
+            return new ArrayList<String>();
+        }
         return result;
     }
 //----------------------------------------------------------------------------
@@ -100,17 +102,6 @@ public class User{
             System.out.println("Connection to server established!");
             String msg = input.readLine();                        //get a response from the server
             System.out.println("Message from server: '" + msg+"'"); 
-                //HashMap<String, String> list;
-//            objectOutputStream.writeObject(this);
-                /* Object object = objectInputStream.readObject();
-                 list = (HashMap<String, String>)object;
-            
-            System.out.println(list.toString());
-            //testing - delete after
-            output.println("Hi. I am a basic client!");           //send a message to the server
-            output.flush();                                       //ensure the message was sent but not kept in the buffer
-            String msg = input.readLine();                        //get a response from the server
-            System.out.println("Message from server: '" + msg+"'"); */
         }catch (Exception e){
             e.printStackTrace();
             return false;

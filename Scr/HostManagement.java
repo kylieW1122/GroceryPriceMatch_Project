@@ -12,7 +12,6 @@ import java.io.BufferedReader;
 /**[PriceMatchManagement.java]
  * This is final project - price match program
  * This class contains the main method and the host server to start the program
- * 
  * http://helloraspberrypi.blogspot.com/2013/12/pass-arraylist-of-object-in-socket.html
  * 
  * @author Kylie Wong and Michelle Chan, ICS4UE
@@ -47,7 +46,7 @@ public class HostManagement{
     }
 //----------------------------------------------------------------------------
     private void setUp(){
-        String fileName = "UserInfo.txt";
+        String fileName = "resources/UserInfo.txt";
         try{
             fileReader = new FileReader(fileName);
             input = new BufferedReader(fileReader);

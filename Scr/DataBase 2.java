@@ -9,11 +9,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;  
 
 /**[DataBase.java]
-  * This is final project - price match program
-  * This class gets the item data from website and CSV flies and save them as HashMaps
-  * @author Kylie Wong and Michelle Chan, ICS4UE
-  * @version 3.0, build June 3, 2022
-  */
+ * This is final project - price match program
+ * This class gets the item data from website and CSV flies and save them as HashMaps
+ * @author Kylie Wong and Michelle Chan, ICS4UE
+ * @version 3.0, build June 3, 2022
+ */
 public class DataBase {
     private static HashMap<String, String> sobeysItemsMap;
     private static HashMap<String, String> costCoItemsMap;
@@ -23,7 +23,7 @@ public class DataBase {
     private static HashMap<String, ArrayList<String>> keywordMap;
     
     private static HashMap<String, double[]> statisticsHashmap;
-    
+
     final static String SOBEYS_URL = "https://voila.ca/products?source=navigation&sublocationId=43a936d1-df1d-4bf1-a09c-b23c6a8edf63";  
     final static String STATISTICS_CANADA_FILENAME = "StatisticsCanada/1810000201-eng.csv";
     final static String COSTCO_FILENAME = "costCo.csv";
@@ -52,7 +52,7 @@ public class DataBase {
 //        System.out.println("walmart: \n" + walmartItemsMap.toString() + "\n");
 //        System.out.println("sobeys: \n" + sobeysItemsMap.toString() + "\n");
     }
-    // public HashMap<String, String> getCostCoItemMap(){}
+   // public HashMap<String, String> getCostCoItemMap(){}
 //----------------------------------------------------------------------------
     private static void addKeyword(String itemName, String storeName){
         String temp = itemName.toLowerCase();
@@ -96,12 +96,12 @@ public class DataBase {
         String priceString = targetItem.substring(targetItem.indexOf(" = " + 3));
         double itemPrice = priceStringToDouble(priceString);
         
-        // System.out.println(storeName + " " + itemName + " " + itemPrice);
+       // System.out.println(storeName + " " + itemName + " " + itemPrice);
 //        for(int i=0; i<arrayList.size(); i++){
 //            
 //        }
         return -1;
-        
+    
     }
 //----------------------------------------------------------------------------
     private static double priceStringToDouble(String priceString){ //!!!!!!!!!!!!!!!!!!!
@@ -109,79 +109,79 @@ public class DataBase {
     }
     
     private static Map<String, Map<String, Double>> updateMatchingMap(String company, Map<String, Map<String, Double>> map,
-                                                                      HashMap<String, String> data, String matchingProductName ) {
-        
-        
-        if (map == null) { map = new HashMap<String, Map<String, Double>>(); }
-        Map<String, Double> productMap = new HashMap<String, Double>();
-        if (data != null && !data.isEmpty()) {
-            Set<String> keys = data.keySet();
-            for (String itemKeyName: keys) {
-                if (itemKeyName.contains(matchingProductName)) {
-                    String valStr = data.get(itemKeyName);
-                    valStr = valStr.substring(1);
-                    Double value = Double.valueOf(valStr);
-                    productMap.put(itemKeyName, value);
-                }
-            }
-        }
-        
-        if (productMap != null && !productMap.isEmpty())
-        {
-            map.put(company, productMap);
-        }
-        return map;
-        
+    		HashMap<String, String> data, String matchingProductName ) {
+	 
+    	
+    	if (map == null) { map = new HashMap<String, Map<String, Double>>(); }
+    	Map<String, Double> productMap = new HashMap<String, Double>();
+    	if (data != null && !data.isEmpty()) {
+    	  Set<String> keys = data.keySet();
+	    	 for (String itemKeyName: keys) {
+	    		 if (itemKeyName.contains(matchingProductName)) {
+	    			 String valStr = data.get(itemKeyName);
+	    			 valStr = valStr.substring(1);
+	    			 Double value = Double.valueOf(valStr);
+	    			 productMap.put(itemKeyName, value);
+	    		 }
+	    	 }
+    	}
+    	
+    	if (productMap != null && !productMap.isEmpty())
+    	{
+    		map.put(company, productMap);
+    	}
+	    return map;
+	    	
     }
     
     
     public static Map<String, Map<String, Double>> productSearch(String productName) {
-        Map<String, Map<String, Double>> map = new HashMap<String, Map<String, Double>>();
-        map = updateMatchingMap("sobeys", map, sobeysItemsMap, productName );
-        map = updateMatchingMap("costco", map, costCoItemsMap, productName );
-        map = updateMatchingMap("walmart", map, walmartItemsMap, productName );
-        map = updateMatchingMap("noFills", map, noFillsItemsMap, productName );
-        
-        return map;
-        
+    	Map<String, Map<String, Double>> map = new HashMap<String, Map<String, Double>>();
+    	map = updateMatchingMap("sobeys", map, sobeysItemsMap, productName );
+    	map = updateMatchingMap("costco", map, costCoItemsMap, productName );
+    	map = updateMatchingMap("walmart", map, walmartItemsMap, productName );
+    	map = updateMatchingMap("noFills", map, noFillsItemsMap, productName );
+         
+    	return map;
+    	
     }
 //----------------------------------------------------------------------------
     private static HashMap<String, double[]> setUpStatisticsCanadaPriceMatchList(String fileName){ //DONE
         HashMap<String, double[]> statisticsList = new  HashMap<String, double[]>();
-        try{
-            BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
-            String line = "";
-            line = reader.readLine();
-            String[] timeline = line.substring(1).split(",");
-            int size = timeline.length;
-            reader.readLine(); //read the useless line between the title and the data
-            /*******************************************************************************/
-            while((line = reader.readLine()) != null){
-                String[] values = line.split(",");
-                double[] prices = new double[size];
-                int index=0;
-                for(int i=1; i<values.length; i++){
-                    String temp = values[i];
-                    Double d;
-                    try{
-                        d = Double.parseDouble(temp);
-                    }catch (NumberFormatException numberEx){ //if the data format is not a double
-                        d = 0.00;   
-                    }
-                    prices[index] = d;
-                    index++;
-                }
-                statisticsList.put(values[0], prices);
-            }
-            /*******************************************************************************/
-        }catch (IOException e){
-            e.printStackTrace();
-        } 
-        return statisticsList;
+         try{
+             BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
+             String line = "";
+             line = reader.readLine();
+             String[] timeline = line.substring(1).split(",");
+             int size = timeline.length;
+             reader.readLine(); //read the useless line between the title and the data
+             /*******************************************************************************/
+             while((line = reader.readLine()) != null){
+                 String[] values = line.split(",");
+                 double[] prices = new double[size];
+                 int index=0;
+                 for(int i=1; i<values.length; i++){
+                     String temp = values[i];
+                     Double d;
+                     try{
+                         d = Double.parseDouble(temp);
+                     }catch (NumberFormatException numberEx){ //if the data format is not a double
+                         d = 0.00;   
+                     }
+                     prices[index] = d;
+                     index++;
+                 }
+                 statisticsList.put(values[0], prices);
+             }
+             /*******************************************************************************/
+         }catch (IOException e){
+             e.printStackTrace();
+         } 
+         return statisticsList;
     }
 //----------------------------------------------------------------------------
     private static HashMap<String, String> setUpSobeysList(String url){ 
-        HashMap<String, String> sobeysList = new  HashMap<String, String>();
+         HashMap<String, String> sobeysList = new  HashMap<String, String>();
         try{
             final Document document = Jsoup.connect(url).get();
             ArrayList<String> itemNameArrayList = new ArrayList<String>();
@@ -217,42 +217,42 @@ public class DataBase {
 //----------------------------------------------------------------------------
     private static HashMap<String, String> setUpCostcoList(String fileName){ 
         HashMap<String, String> costCoList = new HashMap<String, String>();
-        try{
-            BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
-            String line = "";
-            
-            reader.readLine(); //read the useless line between the title and the data
-            /*******************************************************************************/
-            while((line = reader.readLine()) != null){
-                String[] values = line.split(",");
-                String itemNameTemp = values[2];
-                String itemPriceTemp = values[3];
-                costCoList.put(itemNameTemp, itemPriceTemp);
-                addKeyword(itemNameTemp + " = " + itemPriceTemp, "CostCo");
-            }
-        }catch (IOException e){
-            e.printStackTrace();
-        } 
-        return costCoList;
+         try{
+             BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
+             String line = "";
+             
+             reader.readLine(); //read the useless line between the title and the data
+             /*******************************************************************************/
+             while((line = reader.readLine()) != null){
+                 String[] values = line.split(",");
+                 String itemNameTemp = values[2];
+                 String itemPriceTemp = values[3];
+                 costCoList.put(itemNameTemp, itemPriceTemp);
+                 addKeyword(itemNameTemp + " = " + itemPriceTemp, "CostCo");
+             }
+         }catch (IOException e){
+             e.printStackTrace();
+         } 
+         return costCoList;
     }
 //----------------------------------------------------------------------------
     private static HashMap<String, String> setUpWalmartList(String fileName){ 
         HashMap<String, String> walmartList = new HashMap<String, String>();
         try{
-            BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
-            String line = "";
-            reader.readLine(); //read the useless line between the title and the data
-            while((line = reader.readLine()) != null){
-                String[] values = line.split(",");
-                String itemNameTemp = values[2] + " " + values[3];
-                String itemPriceTemp = values[4];
-                walmartList.put(itemNameTemp, itemPriceTemp);
-                addKeyword(itemNameTemp + " = " + itemPriceTemp,"Walmart");
-            }
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-        return walmartList;
+             BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
+             String line = "";
+             reader.readLine(); //read the useless line between the title and the data
+             while((line = reader.readLine()) != null){
+                 String[] values = line.split(",");
+                 String itemNameTemp = values[2] + " " + values[3];
+                 String itemPriceTemp = values[4];
+                 walmartList.put(itemNameTemp, itemPriceTemp);
+                 addKeyword(itemNameTemp + " = " + itemPriceTemp,"Walmart");
+             }
+         }catch (IOException e){
+             e.printStackTrace();
+         }
+         return walmartList;
     }
 //----------------------------------------------------------------------------
 }

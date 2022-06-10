@@ -19,6 +19,34 @@ import javax.swing.border.TitledBorder;
 
 import java.util.ArrayList;
 
+
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.GridBagConstraints;
+import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableModel;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.JButton;
+import javax.swing.ImageIcon;
+import javax.swing.SwingConstants;
+import java.awt.Font;
+
 /**[HomePage.java]
   * This is final project - price match program
   * This class contains the main method to start the program
@@ -71,8 +99,7 @@ public class HomePage extends JFrame implements ActionListener{
      * Launch the application.
      */
     public static void main(String[] args) {
-        HomePage frame = new HomePage(new User());
-       // DataBase database = new DataBase();
+        HomePage frame = new HomePage(new User()); //delete - just for testing
     }
 //----------------------------------------------------------------------------
     HomePage(User user){
@@ -126,7 +153,8 @@ public class HomePage extends JFrame implements ActionListener{
         mainBottomPanel.add(accountSettingButton);
         /*****************************ADD EVERYTHING INTO mainhomePagePanel************************************/
         cardPanel.add(homePagePanel, HOME_PAGE_INDEX);
-        searchItemPanel = new SearchItemPage();
+        String[][] emptyList = {{"", "", ""}};
+        searchItemPanel = new SearchItemPage(emptyList);
         cardPanel.add(searchItemPanel, SEARCH_PAGE_INDEX);
         priceAnalysisPanel = new PriceAnalysisPage();
         cardPanel.add(priceAnalysisPanel, PRICE_ANALYSIS_INDEX);
@@ -205,64 +233,83 @@ public class HomePage extends JFrame implements ActionListener{
 //inner class - SearchItemPage
 //----------------------------------------------------------------------------
     private class SearchItemPage extends JPanel{
-        private String searchString;
-        private ArrayList<String> searchResultList;
+        private ArrayList<String> searchResultList = new ArrayList<String>();
+        private final String[] columnNames = {"Store", "Item name", "Price"};
         
-        JPanel resultPanel;
-        
-        JPanel midPanel;
-        JPanel midStoreListPanel;
-        JPanel midItemNameListPanel;
-        JPanel midPriceListPanel;
-        JLabel storeLabel;
-        JLabel itemNameLabel;
-        JLabel priceLabel;
-        
-        ArrayList<JLabel> storeLabelList = new ArrayList<JLabel>();
-        ArrayList<JLabel> itemNameList = new ArrayList<JLabel>();
-        ArrayList<JLabel> priceLabelList = new ArrayList<JLabel>();
-        
-        SearchItemPage(){
-            this.setLayout(new BorderLayout());
+        JScrollPane scrollPane;
+        JTable table;
+        DefaultTableModel model;
+        JTableHeader header;
+        GridBagLayout gridBagLayout;
+        GridBagConstraints gbc_scrollPane;
+//----------------------------------------------------------------------------
+        SearchItemPage(String[][] data){
+            if(data.length>0){
+                model = new DefaultTableModel(data, columnNames) {
+                    @Override
+                    public Class getColumnClass(int column) {
+                        return getValueAt(0, column).getClass();
+                    }
+                };
+
+            gridBagLayout = new GridBagLayout();
+            gridBagLayout.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
+            gridBagLayout.rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+            gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+            this.setLayout(gridBagLayout);
             
-            /************************MID PANEL**********************************/ 
-            midPanel = new JPanel();
-            midStoreListPanel = new JPanel();
-            midItemNameListPanel = new JPanel();
-            midPriceListPanel = new JPanel();
-            //Title Labels
-            storeLabel = new JLabel("Store              ");
-            itemNameLabel = new JLabel("Item Name             ");
-            priceLabel = new JLabel("Price");
-            midStoreListPanel.add(storeLabel);
-            midItemNameListPanel.add(itemNameLabel);
-            midPriceListPanel.add(priceLabel);
-            /***************************/ 
-            for(int i=0; i<searchResultList.size(); i++){
-                midStoreListPanel.add(storeLabelList.get(i));
-                midItemNameListPanel.add(itemNameList.get(i));
-                midPriceListPanel.add(priceLabelList.get(i));
+            gbc_scrollPane = new GridBagConstraints();
+            gbc_scrollPane.gridheight = 2;
+            
+            table = new JTable(model);
+            table.setBorder(new LineBorder(new Color(0, 0, 0)));
+            header = table.getTableHeader();
+            
+            header.setBackground(Color.GREEN);
+            header.setForeground(Color.BLACK);
+            
+            scrollPane = new JScrollPane(table);
+            gbc_scrollPane.gridwidth = 4;
+            gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
+            gbc_scrollPane.fill = GridBagConstraints.BOTH;
+            gbc_scrollPane.gridx = 2;
+            gbc_scrollPane.gridy = 4;
+            
+            this.add(scrollPane, gbc_scrollPane);
             }
-            /***************************/ 
-            //display the list of info here with a button of the group order
-            
-            midPanel.add(midStoreListPanel);
-            midPanel.add(midItemNameListPanel);
-            midPanel.add(midPriceListPanel);
-            
-            this.add(midPanel, BorderLayout.CENTER);
         }
 //---------------------------------------------------------------------------- 
-        public void searchKeyWord(String str){
-            System.out.println("searching for item: " + str);
-            this.searchString = str;
-            searchResultList = user.getKeywordList(str);
+        private void update(){
+            String[][] temp = {{"a", "b", "c"}, {"x", "zs", "sdfasd"}};
+            model = new DefaultTableModel(temp, columnNames) {
+                @Override
+                public Class getColumnClass(int column) {
+                    return getValueAt(0, column).getClass();
+                }
+            };
+            this.revalidate();
+            this.repaint();
+        }
+//---------------------------------------------------------------------------- 
+        private void searchKeyWord(String string){
             
-            storeLabelList.add(new JLabel("store name 1"));
-            itemNameList.add(new JLabel("item name 1"));
-            priceLabelList.add(new JLabel("$$$ 1"));
-            super.repaint();
+            System.out.println("searching for item: " + string);
+            searchResultList = user.getKeywordList(string);
+
+            for(int i=0; i<searchResultList.size(); i++){
+                String str = searchResultList.get(i);
+                
+                String store = str.substring(0, str.indexOf(" - "));
+                String itemName = str.substring(str.indexOf(" - ")+3, str.indexOf(" = ")); // user Const.xxx
+                String price = str.substring(str.indexOf(" = ")+3);
+                
+//                storeLabelList.add(new JLabel(store));
+//                itemNameList.add(new JLabel(itemName));
+//                priceLabelList.add(new JLabel(price));
+            }
             System.out.println("arraylist of result:\n" + searchResultList.toString());
+            update();
         }
     }
 //----------------------------------------------------------------------------
