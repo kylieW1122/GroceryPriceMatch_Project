@@ -168,6 +168,7 @@ public class HomePage extends JFrame implements ActionListener{
         
         /*****************************************************************/
         cl.show(cardPanel, "0");
+//        actionList.setPopupVisible(true);
         this.add(actionList, BorderLayout.NORTH);
         this.add(cardPanel, BorderLayout.CENTER);
         this.add(mainBottomPanel, BorderLayout.SOUTH);
@@ -359,7 +360,16 @@ public class HomePage extends JFrame implements ActionListener{
         JTextField itemNameField;
         JButton createRequestButton;
         
-        private String[] labels = {"Item: ", "Amount: ", "Location: ", "Time: "};
+        JComboBox itemComboBox;
+        JLabel itemLabel;
+        JLabel amountLabel;
+        JComboBox amountComboBox;
+        JLabel priceLabel;
+        
+        final String PRICE_DEFAULT_STR = "Price: $ ";
+//----------------------------------------------------------------------------
+        private String[] labels = {"Location: ", "Time: "};
+        private String[] amountList_cb = {"", "10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %", "80 %", "90 %"};
         GroupOrderPage(){
             this.setLayout(new BorderLayout());
             
@@ -367,22 +377,48 @@ public class HomePage extends JFrame implements ActionListener{
             rightPanel = new JPanel();
             labelPanel = new JPanel();
             textFieldPanel = new JPanel();
-            rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+            rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.PAGE_AXIS));
             /**********************set up request label list ****************************/
             createRequestButton = new JButton("Create");
             int labelsLength = labels.length;
             requestLabelList = new JLabel[labelsLength];
             requestJTextFieldList = new JTextField[labelsLength];
-            
-            for (int l = 0; l < labelsLength; l++) {
+            /***********ITEM************/
+            itemLabel = new JLabel("Item: ");
+            itemLabel.setAlignmentX(JLabel.LEFT);
+            itemNameField = new JTextField(20);
+            itemComboBox = new JComboBox(amountList_cb);
+            //AutoCompleteDecorator.decorate(itemComboBox);
+            //itemComboBox.setVisible(false);
+           // rightPanel.add(itemLabel);
+            rightPanel.add(itemNameField);
+            rightPanel.add(itemComboBox);
+            rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+            /***********AMOUNT************/
+            amountLabel = new JLabel("Amount(%): ");
+            amountLabel.setAlignmentX(JLabel.LEFT);
+            amountComboBox = new JComboBox(amountList_cb);
+            amountComboBox.setSelectedIndex(0);
+            rightPanel.add(amountLabel);
+            rightPanel.add(amountComboBox);
+            rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+            /***********PRICE************/
+            priceLabel = new JLabel(PRICE_DEFAULT_STR);
+            priceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            rightPanel.add(priceLabel);
+            rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+            /***********LOCAQTION AND TIME************/
+            for (int l = 0; l < labelsLength; l++) { // only textfield on Location and Time
                 requestLabelList[l] = new JLabel(labels[l]);
                 requestJTextFieldList[l] = new JTextField(10);
+                requestJTextFieldList[l].addKeyListener(this);
                 rightPanel.add(requestLabelList[l]);
                 rightPanel.add(requestJTextFieldList[l]);
+                rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
             }
-            itemNameField = requestJTextFieldList[0];
-            itemNameField.addKeyListener(this);
             rightPanel.add(createRequestButton);
+            
+            
             JPanel innerPanel = new JPanel(new FlowLayout());
             
             
@@ -397,6 +433,7 @@ public class HomePage extends JFrame implements ActionListener{
 //----------------------------------------------------------------------------
         @Override
         public void keyPressed(KeyEvent e){
+            //itemComboBox
             //update JComboBox list
             //https://stackoverflow.com/questions/6674462/how-to-list-suggestions-to-when-typing-inside-the-text-field
             /*You should try JComboBox as an autosuggest box instead of JTextField. But if you still want it to be done using JTextField then...

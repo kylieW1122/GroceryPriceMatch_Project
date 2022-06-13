@@ -80,7 +80,7 @@ public class DataBase {
         }
     }
 //----------------------------------------------------------------------------
-    public static ArrayList<String> searchItemKeyword(String userInput){
+    public static ArrayList<String> searchItemKeyword(String userInput){ //sort the list
         ArrayList<String> searchResult = new ArrayList<String>();
         userInput = userInput.toLowerCase();
         for(String str: keywordMap.keySet()){
@@ -92,42 +92,6 @@ public class DataBase {
         searchResult.clear();
         searchResult.addAll(set);
         return searchResult; 
-    }
-//----------------------------------------------------------------------------
-    // finds the matching product and price and puts it into the map
-    private static Map<String, Map<String, Double>> updateMatchingMap(String company, Map<String, Map<String, Double>> map,
-                                                                      HashMap<String, String> data, String matchingProductName ) {
-        
-        // goes through the company product map and searches for items
-        if (map == null) { map = new HashMap<String, Map<String, Double>>(); }
-        Map<String, Double> productMap = new HashMap<String, Double>();
-        if (data != null && !data.isEmpty()) {
-            Set<String> keys = data.keySet();
-            for (String itemKeyName: keys) {
-                if (itemKeyName.contains(matchingProductName)) {
-                    String valStr = data.get(itemKeyName);
-                    valStr = valStr.substring(1);
-                    Double value = Double.valueOf(valStr);
-                    productMap.put(itemKeyName, value);
-                }
-            }
-        }
-        
-        if (productMap != null && !productMap.isEmpty()){
-            map.put(company, productMap);
-        }
-        return map;
-    }
-//----------------------------------------------------------------------------
-    // uses the updateMatchingMap function to search for the product and price from each grocery company 
-    public static Map<String, Map<String, Double>> productSearch(String productName) {
-        Map<String, Map<String, Double>> map = new HashMap<String, Map<String, Double>>();
-        map = updateMatchingMap("Sobeys", map, sobeysItemsMap, productName );
-        map = updateMatchingMap("Costco", map, costCoItemsMap, productName );
-        map = updateMatchingMap("Walmart", map, walmartItemsMap, productName );
-        map = updateMatchingMap("NoFills", map, noFillsItemsMap, productName );
-        return map;
-        
     }
 //----------------------------------------------------------------------------
     // matches the product item name and the year from the statistics Canada data
