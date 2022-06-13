@@ -27,10 +27,10 @@ public class DataBase {
     private static HashMap<String, double[]> statisticsHashmap;
     
     final static String SOBEYS_URL = "https://voila.ca/products?source=navigation&sublocationId=43a936d1-df1d-4bf1-a09c-b23c6a8edf63";  
-    final static String STATISTICS_CANADA_FILENAME = "StatisticsCanada/1810000201-eng.csv";
-    final static String COSTCO_FILENAME = "costCo.csv";
-    final static String NOFILLS_FILENAME = "noFills.csv";
-    final static String WALMART_FILENAME = "walmart.csv";
+    final static String STATISTICS_CANADA_FILENAME = "resources/Database/StatisticsCanada/1810000201-eng.csv";
+    final static String COSTCO_FILENAME = "resources/Database/costCo.csv";
+    final static String NOFILLS_FILENAME = "resources/Database/noFills.csv";
+    final static String WALMART_FILENAME = "resources/Database/walmart.csv";
     
     public static void main(String[] args){ //delete - just for debugging 
         DataBase base = new DataBase();
@@ -150,7 +150,7 @@ public class DataBase {
             productList = new ArrayList<ProductInfo>();
         }
         try{
-            BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
             String line = "";
             line = reader.readLine();
             String[] timeline = line.substring(1).split(",");
@@ -240,7 +240,7 @@ public class DataBase {
     private static HashMap<String, String> setUpCostcoList(String fileName){ 
         HashMap<String, String> costCoList = new HashMap<String, String>();
         try{
-            BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
             String line = "";
             
             reader.readLine(); //read the useless line between the title and the data
@@ -261,7 +261,7 @@ public class DataBase {
     private static HashMap<String, String> setUpWalmartList(String fileName){ 
         HashMap<String, String> walmartList = new HashMap<String, String>();
         try{
-            BufferedReader reader = new BufferedReader(new FileReader("Database/" + fileName));
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
             String line = "";
             reader.readLine(); //read the useless line between the title and the data
             while((line = reader.readLine()) != null){
