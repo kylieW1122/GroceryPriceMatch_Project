@@ -3,6 +3,8 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
 import java.awt.CardLayout;
 import java.awt.*; // delete after - wildcard not accepted
 
@@ -153,8 +155,7 @@ public class HomePage extends JFrame implements ActionListener{
         mainBottomPanel.add(accountSettingButton);
         /*****************************ADD EVERYTHING INTO mainhomePagePanel************************************/
         cardPanel.add(homePagePanel, HOME_PAGE_INDEX);
-        String[][] emptyList = {{"", "", ""}};
-        searchItemPanel = new SearchItemPage(emptyList);
+        searchItemPanel = new SearchItemPage();
         cardPanel.add(searchItemPanel, SEARCH_PAGE_INDEX);
         priceAnalysisPanel = new PriceAnalysisPage();
         cardPanel.add(priceAnalysisPanel, PRICE_ANALYSIS_INDEX);
@@ -222,12 +223,12 @@ public class HomePage extends JFrame implements ActionListener{
     }
 //----------------------------------------------------------------------------
     private void changeCardPanel(String index){
-         cl.show(cardPanel, index);
-         if(index.equals(HOME_PAGE_INDEX)){
-             actionList.setSelectedIndex(Integer.parseInt(index));
-         }else if (!index.equals(SEARCH_PAGE_INDEX)){
-             actionList.setSelectedIndex(Integer.parseInt(index)-1);
-         }
+        cl.show(cardPanel, index);
+        if(index.equals(HOME_PAGE_INDEX)){
+            actionList.setSelectedIndex(Integer.parseInt(index));
+        }else if (!index.equals(SEARCH_PAGE_INDEX)){
+            actionList.setSelectedIndex(Integer.parseInt(index)-1);
+        }
     }
 //----------------------------------------------------------------------------
 //inner class - SearchItemPage
@@ -243,73 +244,72 @@ public class HomePage extends JFrame implements ActionListener{
         GridBagLayout gridBagLayout;
         GridBagConstraints gbc_scrollPane;
 //----------------------------------------------------------------------------
-        SearchItemPage(String[][] data){
-            if(data.length>0){
+        SearchItemPage(){
+            String[][] emptyList = {{"", "", ""}};
+            setUpSearchPanel(emptyList);
+        }
+//----------------------------------------------------------------------------
+        private void setUpSearchPanel(String[][] data){
+             if(data.length>0){
                 model = new DefaultTableModel(data, columnNames) {
                     @Override
                     public Class getColumnClass(int column) {
                         return getValueAt(0, column).getClass();
                     }
                 };
-
-            gridBagLayout = new GridBagLayout();
-            gridBagLayout.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-            gridBagLayout.rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-            gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
-            gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-            this.setLayout(gridBagLayout);
-            
-            gbc_scrollPane = new GridBagConstraints();
-            gbc_scrollPane.gridheight = 2;
-            
-            table = new JTable(model);
-            table.setBorder(new LineBorder(new Color(0, 0, 0)));
-            header = table.getTableHeader();
-            
-            header.setBackground(Color.GREEN);
-            header.setForeground(Color.BLACK);
-            
-            scrollPane = new JScrollPane(table);
-            gbc_scrollPane.gridwidth = 4;
-            gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
-            gbc_scrollPane.fill = GridBagConstraints.BOTH;
-            gbc_scrollPane.gridx = 2;
-            gbc_scrollPane.gridy = 4;
-            
-            this.add(scrollPane, gbc_scrollPane);
+                
+                gridBagLayout = new GridBagLayout();
+                gridBagLayout.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
+                gridBagLayout.rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+                gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+                this.setLayout(gridBagLayout);
+                
+                gbc_scrollPane = new GridBagConstraints();
+                gbc_scrollPane.gridheight = 2;
+                
+                table = new JTable(model);
+                table.setBorder(new LineBorder(new Color(0, 0, 0)));
+                header = table.getTableHeader();
+                
+                header.setBackground(Color.GREEN);
+                header.setForeground(Color.BLACK);
+                
+                scrollPane = new JScrollPane(table);
+                gbc_scrollPane.gridwidth = 4;
+                gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
+                gbc_scrollPane.fill = GridBagConstraints.BOTH;
+                gbc_scrollPane.gridx = 2;
+                gbc_scrollPane.gridy = 4;
+                
+                this.add(scrollPane, gbc_scrollPane);
             }
         }
 //---------------------------------------------------------------------------- 
-        private void update(){
-            String[][] temp = {{"a", "b", "c"}, {"x", "zs", "sdfasd"}};
-            model = new DefaultTableModel(temp, columnNames) {
-                @Override
-                public Class getColumnClass(int column) {
-                    return getValueAt(0, column).getClass();
-                }
-            };
+        private void update(String[][] data){ //update jpanel with the search result
+            this.removeAll();
+            this.setUpSearchPanel(data);
             this.revalidate();
             this.repaint();
         }
 //---------------------------------------------------------------------------- 
-        private void searchKeyWord(String string){
-            
-            System.out.println("searching for item: " + string);
-            searchResultList = user.getKeywordList(string);
-
-            for(int i=0; i<searchResultList.size(); i++){
-                String str = searchResultList.get(i);
+        private void searchKeyWord(String searchText){
+            searchResultList = user.getKeywordList(searchText);
+            String [][] data = {{"","",""}}; 
+            int numOfItems = searchResultList.size();
+            if(numOfItems>0){
+                data = new String[numOfItems][3];
                 
-                String store = str.substring(0, str.indexOf(" - "));
-                String itemName = str.substring(str.indexOf(" - ")+3, str.indexOf(" = ")); // user Const.xxx
-                String price = str.substring(str.indexOf(" = ")+3);
-                
-//                storeLabelList.add(new JLabel(store));
-//                itemNameList.add(new JLabel(itemName));
-//                priceLabelList.add(new JLabel(price));
+                int mapCount = 0;
+                for (String itemInfoStr: searchResultList){
+                    data[mapCount][0] = itemInfoStr.substring(0, itemInfoStr.indexOf(" - "));
+                    data[mapCount][1] = itemInfoStr.substring(itemInfoStr.indexOf(" - ") + 3, itemInfoStr.indexOf(" = "));
+                    data[mapCount][2] = itemInfoStr.substring(itemInfoStr.indexOf(" = ") +3);
+                    mapCount ++;
+                    
+                }
             }
-            System.out.println("arraylist of result:\n" + searchResultList.toString());
-            update();
+            update(data);
         }
     }
 //----------------------------------------------------------------------------
@@ -350,12 +350,13 @@ public class HomePage extends JFrame implements ActionListener{
 //----------------------------------------------------------------------------
 //inner class - GroupOrderPage
 //----------------------------------------------------------------------------
-    private class GroupOrderPage extends JPanel{
+    private class GroupOrderPage extends JPanel implements KeyListener{
         JPanel topPanel;
         JPanel rightPanel;
         JPanel labelPanel, textFieldPanel;
         JLabel[] requestLabelList;
         JTextField[] requestJTextFieldList;
+        JTextField itemNameField;
         JButton createRequestButton;
         
         private String[] labels = {"Item: ", "Amount: ", "Location: ", "Time: "};
@@ -379,17 +380,40 @@ public class HomePage extends JFrame implements ActionListener{
                 rightPanel.add(requestLabelList[l]);
                 rightPanel.add(requestJTextFieldList[l]);
             }
+            itemNameField = requestJTextFieldList[0];
+            itemNameField.addKeyListener(this);
             rightPanel.add(createRequestButton);
             JPanel innerPanel = new JPanel(new FlowLayout());
             
             
             this.add(rightPanel, BorderLayout.EAST);
+            /*****loop throught the group order list*****/
             innerPanel.add(new OrderPanel("user_1_abc", "testing item"));
             innerPanel.add(new OrderPanel("user2", "item___1"));
             innerPanel.add(new OrderPanel("user3", "item"));
             innerPanel.add(new OrderPanel("user4", "item1"));
             this.add(innerPanel);
         }
+//----------------------------------------------------------------------------
+        @Override
+        public void keyPressed(KeyEvent e){
+            //update JComboBox list
+            //https://stackoverflow.com/questions/6674462/how-to-list-suggestions-to-when-typing-inside-the-text-field
+            /*You should try JComboBox as an autosuggest box instead of JTextField. But if you still want it to be done using JTextField then...
+                
+                Make a JPanel containing list of suggestion.Initially it will be not visible.
+                Whenever user types something search for it and add results to the list in JPanel.
+                Show that JPanel at the bottom of textfield in upper layer of frame.
+                Implement click event on list so that when ever user clicks on it the text is copied to textfield.
+        */
+        }
+        @Override
+        public void keyTyped(KeyEvent e){}
+        @Override
+        public void keyReleased(KeyEvent e){}
+//----------------------------------------------------------------------------
+        //inner class inside GroupOrderPage - OrderPanel
+//----------------------------------------------------------------------------
         private class OrderPanel extends JPanel{
             private String userID;
             private String itemInfo;
@@ -398,7 +422,7 @@ public class HomePage extends JFrame implements ActionListener{
             final JLabel amountLabel = new JLabel("Amount Remaining: ");
             final JButton acceptButton = new JButton("Accept");
             JLabel userIdLabel,itemNameLabel, amountUnitLabel;
-                
+            
             OrderPanel(String id, String itemInfoStr){
                 this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
                 this.setSize(100,50);
@@ -435,7 +459,7 @@ public class HomePage extends JFrame implements ActionListener{
 //----------------------------------------------------------------------------
     private class AccountDetailPage extends JPanel{
         AccountDetailPage(){
-        
+            
         }
     }
 //----------------------------------------------------------------------------
@@ -479,6 +503,7 @@ public class HomePage extends JFrame implements ActionListener{
         public void actionPerformed(ActionEvent event){
             String userText = userInput.getText();
             String passwordText = passwordInput.getText();
+            System.out.println("log: " + userText + "/" + passwordText);
             //catch unacceptable character in here; edit messagelabel's text
             
             boolean loginStatus = user.userLogin(userText, passwordText);

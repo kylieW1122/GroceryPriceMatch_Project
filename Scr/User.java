@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
@@ -27,8 +27,7 @@ public class User{
     ObjectInputStream objectInput;
     ObjectOutputStream objectOutput;
 //----------------------------------------------------------------------------
-    public static void main(String[] args){
-        //start homepage here, for user
+    public static void main(String[] args){ //start homepage here, for user
         User user = new User();
         HomePage frame = new HomePage(user);
     }
@@ -54,7 +53,7 @@ public class User{
 //Networking
 //----------------------------------------------------------------------------
     public boolean userLogin(String id, String password){
-        output.println(Const.LOGIN + this.userID + Const.PASSWORD +  this.password);
+        output.println(Const.LOGIN + id + Const.PASSWORD + password);
         output.flush();
         try{
             String msg = input.readLine();
@@ -103,6 +102,7 @@ public class User{
             String msg = input.readLine();                        //get a response from the server
             System.out.println("Message from server: '" + msg+"'"); 
         }catch (Exception e){
+            //directly use database, instead of host, block all group order
             e.printStackTrace();
             return false;
         }

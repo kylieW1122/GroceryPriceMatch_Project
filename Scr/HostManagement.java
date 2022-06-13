@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.*;
 import java.io.*;
 import java.net.*;
 import java.io.ObjectOutputStream;
@@ -130,8 +131,9 @@ public class HostManagement{
                         output.flush();
                     }else if(msg.substring(0, Const.SEARCH_KEYWORD.length()).equals(Const.SEARCH_KEYWORD)){
                         String keyword = msg.substring(Const.SEARCH_KEYWORD.length());
-                        ArrayList<String> keywordMap = database.getKeywordList(keyword);
-                        objectOutput.writeObject(keywordMap);
+                        ArrayList<String> resultList = DataBase.searchItemKeyword(keyword);
+                       // Map<String, Map<String, Double>> keywordMap = DataBase.productSearch(keyword);
+                        objectOutput.writeObject(resultList);
                     }
                 }
                 //after completing the communication close the streams but do not close the socket!
