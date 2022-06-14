@@ -14,9 +14,14 @@ import java.util.Random;
 
 import javax.swing.JPanel;
 
+/**
+ * @author Michelle
+ * This panel will draw the axis, graph and data for the bar graph
+ */
+
 public class BarChartPanel extends JPanel{
 	
-	    public static final int TOP_BUFFER = 30; // where additional text is drawn
+	    public static final int TOP_BUFFER = 30; 
 	    public static final int AXIS_OFFSET = 20;
 
 
@@ -53,12 +58,8 @@ public class BarChartPanel extends JPanel{
 
 	        int width = this.getWidth();
 	        int height = this.getHeight();
-
-	        // chart area size
 	        chartwidth = width - 2*AXIS_OFFSET;
 	        chartheight = height - 2*AXIS_OFFSET - TOP_BUFFER;
-
-	        // Chart origin coords
 	        chartX = AXIS_OFFSET;
 	        chartY = height - AXIS_OFFSET;
 
@@ -75,7 +76,6 @@ public class BarChartPanel extends JPanel{
 		        if (max < wrapper)
 		            max = wrapper;
 		    }
-		//    System.out.println("max "+max);
 		    int barWidth = (int) (chartwidth/numBars);
 		
 		    int  height, xLeft, yTopLeft;
@@ -93,7 +93,6 @@ public class BarChartPanel extends JPanel{
 		
 		        Color color = getRandomColor();
 		        g2.setColor(color);
-		        //g2.draw(rec);
 		        g2.fill(rec);
 		        
 		        FontMetrics fm = g2.getFontMetrics();
@@ -106,10 +105,8 @@ public class BarChartPanel extends JPanel{
 		        	g2.setColor(Color.WHITE);
 		        }
 		        
-		 //       int x = xLeft + ((barWidth - fm.stringWidth(barName)) / 2);
 		        int x = xLeft + (barWidth / 2);
 		        int y = yTopLeft + height - 60;
-		 //       g2.drawString(g2,x,  y, barName);
 		        drawRotateText(g2, x,  y, barName);
 		        
 		        drawText(g2, x,  yTopLeft + 8, 8, value.toString());
@@ -156,14 +153,7 @@ public class BarChartPanel extends JPanel{
 		    Color origColor = g2.getColor(); 
 		    g2.setColor(Color.BLACK);
 		    drawText(g2, chartX + chartwidth/2, chartY + AXIS_OFFSET/2 +3, 12,  xLabel);
-	//	    g2.drawString(xLabel, chartX + chartwidth/2, chartY + AXIS_OFFSET/2 +3) ;
-		
-		    // draw vertical string
-		
 		    drawText(g2, AXIS_OFFSET/2+3, chartY - chartheight/2, 12, yLabel);
-	//	    g2.drawString(yLabel,AXIS_OFFSET/2+3, chartY - chartheight/2);
-
-		
 		    g2.setStroke(origStoke);
 		    g2.setColor(origColor);
 		}

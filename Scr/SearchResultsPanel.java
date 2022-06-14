@@ -25,13 +25,19 @@ import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
 import java.awt.Font;
 
+
+/**
+ * @author Michelle
+ * This will display the search results in a table format
+ * There is a search button to search for a new item and a back button to go back to the search panel
+ */
+
 public class SearchResultsPanel extends JPanel {
 
 	private JTable table;
 	private DefaultTableModel model;
 	String[] columnNames = {"Store", "Item name", "Price"};
 	private MainFrame mainFrame;
- //   JTextField searchTextField = new JTextField();
 	
 	/**
 	 * Create the panel.

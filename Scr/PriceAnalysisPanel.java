@@ -22,6 +22,15 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+
+
+/**
+ * @author Michelle
+ * This is the price analysis panel which will call BarChartPanel to display the graph
+ * Within this panel, there is a search text button for the user to search for the product keyword
+ * There are two labels to display the item name and year for the searched product from the Statistics Canada data
+ * There is a back button to go back to the search panel
+ */
 public class PriceAnalysisPanel extends JPanel {
 	
 	private MainFrame mainFrame;

@@ -48,10 +48,10 @@ public class DataBase {
         walmartItemsMap = setUpWalmartList(WALMART_FILENAME);
         sobeysItemsMap = setUpSobeysList(SOBEYS_URL);
         
-//        System.out.println("StatisticsCanada: " + statisticsHashmap.toString() + "\n");
-//        System.out.println("costco: \n" + costCoItemsMap.toString() + "\n");
-//        System.out.println("walmart: \n" + walmartItemsMap.toString() + "\n");
-//        System.out.println("sobeys: \n" + sobeysItemsMap.toString() + "\n");
+//       System.out.println("StatisticsCanada: " + statisticsHashmap.toString() + "\n");
+//       System.out.println("costco: \n" + costCoItemsMap.toString() + "\n");
+//       System.out.println("walmart: \n" + walmartItemsMap.toString() + "\n");
+//       System.out.println("sobeys: \n" + sobeysItemsMap.toString() + "\n");
     }
 //----------------------------------------------------------------------------
     private static void addKeyword(String itemName, String storeName){
@@ -80,6 +80,7 @@ public class DataBase {
         }
     }
 //----------------------------------------------------------------------------
+
     public static ArrayList<String> searchItemKeyword(String userInput){ //sort the list
         ArrayList<String> searchResult = new ArrayList<String>();
         userInput = userInput.toLowerCase();
@@ -94,6 +95,7 @@ public class DataBase {
         return searchResult; 
     }
 //----------------------------------------------------------------------------
+    //DO NOT REMOVE, THIS IS REQUIRED FOR SEARCH FOR ITEM USING STATISTICS CANADA DATA
     // matches the product item name and the year from the statistics Canada data
     public static Map<String, Double> getPriceListByItemNYear(String item, String year) {
         Map<String, Double> map = new HashMap<String, Double>();
@@ -107,6 +109,50 @@ public class DataBase {
         }
         return map;
     }
+    
+    //DO NOT REMOVE, THIS IS REQUIRED TO UPDATE THE MAP 
+    // Finds the product by name from each grocery map and puts them all into one main map
+   private static Map<String, Map<String, Double>> updateMatchingMap(String company, Map<String, Map<String, Double>> map,
+    		HashMap<String, String> data, String matchingProductName ) {
+	 
+    	
+    	if (map == null) { map = new HashMap<String, Map<String, Double>>(); }
+    	Map<String, Double> productMap = new HashMap<String, Double>();
+    	if (data != null && !data.isEmpty()) {
+    	  Set<String> keys = data.keySet();
+	    	 for (String itemKeyName: keys) {
+	    		 if (itemKeyName.toLowerCase().contains(matchingProductName.toLowerCase())) {
+	    			 String valStr = data.get(itemKeyName);
+	    			 valStr = valStr.substring(1);
+	    			 Double value = Double.valueOf(valStr);
+	    			 productMap.put(itemKeyName, value);
+	    		 }
+	    	 }
+    	}
+    	
+ 
+    	if (productMap != null && !productMap.isEmpty())
+    	{
+    		map.put(company, productMap);
+    	}
+	    return map;
+	    	
+    }
+    
+   //DO NOT REMOVE, THIS IS REQUIRED FOR SEARCH FUNCTIONALITY
+   // Item name search between different grocery stores
+   // This method will reuse updateMatchinMap to update the map for different grocery stores 
+    public static Map<String, Map<String, Double>> productSearch(String productName) {
+    	Map<String, Map<String, Double>> map = new HashMap<String, Map<String, Double>>();
+    	map = updateMatchingMap("sobeys", map, sobeysItemsMap, productName );
+    	map = updateMatchingMap("costco", map, costCoItemsMap, productName );
+    	map = updateMatchingMap("walmart", map, walmartItemsMap, productName );
+    	map = updateMatchingMap("noFills", map, noFillsItemsMap, productName );
+         
+    	return map;
+    	
+    }
+    
 //----------------------------------------------------------------------------
     private static HashMap<String, double[]> setUpStatisticsCanadaPriceMatchList(String fileName){ //DONE
         HashMap<String, double[]> statisticsList = new  HashMap<String, double[]>();

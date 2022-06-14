@@ -1,4 +1,8 @@
 
+/**
+ * @author Michelle
+ * Stores the product info in this Object
+ */
 public class ProductInfo {
 	
 	private String monYear;
