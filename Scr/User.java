@@ -110,6 +110,21 @@ public class User{
         return false;
     }
 //----------------------------------------------------------------------------
+    public HashMap<String, ArrayList<String>> refreshGroupOrder(){
+        HashMap<String, ArrayList<String>> groupOrderRefList = new HashMap<String, ArrayList<String>>();
+        output.println(Const.GROUP_REFRESH);
+        output.flush();
+        try{
+            Object object = objectInput.readObject();
+            groupOrderRefList = (HashMap<String, ArrayList<String>>)object;
+        }catch(ClassNotFoundException ex){
+            System.out.println(ex.toString());
+        }catch(IOException e){
+            System.out.println(e.toString());
+        }
+        return groupOrderRefList;
+    }
+//----------------------------------------------------------------------------
     private boolean userLogout(){
         return this.stopConnecting();
     }

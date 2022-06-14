@@ -246,7 +246,7 @@ public class HomePage extends JFrame implements ActionListener{
         }
 //----------------------------------------------------------------------------
         private void setUpSearchPanel(String[][] data){
-             if(data.length>0){
+            if(data.length>0){
                 model = new DefaultTableModel(data, columnNames) {
                     @Override
                     public Class getColumnClass(int column) {
@@ -364,16 +364,20 @@ public class HomePage extends JFrame implements ActionListener{
         JLabel dateLabel;
         JLabel timeLabel;
         
+        JPanel orderDisplayPanel;
+        
         final String PRICE_DEFAULT_STR = "Price: $ ";
         final String LOCATION_DEFAULT_STR = "Store Location: ";
         
         private Double amountPercentage = -1.0;
         private String itemInfo = "";
+        
+        private HashMap<String, ArrayList<String>> groupOrderMap; //{1438865252=[Red Bell Peppers 5 kg, $21.29, CostCo, A~0.4]}
 //----------------------------------------------------------------------------
         private String[] amountList_cb = {"", "10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %", "80 %", "90 %"};
         GroupOrderPage(){
+            this.groupOrderMap = user.refreshGroupOrder(); // new HashMap<String, ArrayList<String>>();
             this.setLayout(new BorderLayout());
-            
             topPanel = new JPanel();
             rightPanel = new JPanel();
             labelPanel = new JPanel();
@@ -430,111 +434,121 @@ public class HomePage extends JFrame implements ActionListener{
             createRequestButton.addActionListener(this);
             rightPanel.add(createRequestButton);
             
-            JPanel innerPanel = new JPanel(new FlowLayout());
+            orderDisplayPanel = new JPanel(new FlowLayout());
             
             this.add(rightPanel, BorderLayout.EAST);
-            /*****loop throught the group order list*****/
-            innerPanel.add(new OrderPanel("user_1_abc", "testing item"));
-            innerPanel.add(new OrderPanel("user2", "item___1"));
-            innerPanel.add(new OrderPanel("user3", "item"));
-            innerPanel.add(new OrderPanel("user4", "item1"));
-            this.add(innerPanel);
+            setUpGroupOrderBoxes();
+            this.add(orderDisplayPanel, BorderLayout.CENTER);
         }
 //------------------------------------------------------------------------------
-    @Override
-    public void actionPerformed(ActionEvent event){
-        if(event.getSource() instanceof JComboBox){
-            JComboBox cb = (JComboBox)event.getSource();
-            int amountIndex = amountComboBox.getSelectedIndex();
-            int selectedIndex = itemComboBox.getSelectedIndex();
-            String amountStr = amountList_cb[amountIndex];
-
-            if( (!amountStr.equals("")) && (selectedIndex>0) ){
-                itemInfo = list.get(selectedIndex-1);
-                String totalPriceString = itemInfo.substring(itemInfo.indexOf("$")+1 , itemInfo.indexOf(" @ "));
-                String locationString = itemInfo.substring(itemInfo.indexOf(" @ ")+3);
-                amountStr = amountStr.substring(0, 2);
-                
-                amountPercentage = 0.0;
-                Double totalPrice = 0.0;
-                try{
-                    amountPercentage = Double.parseDouble(amountStr);
-                    amountPercentage = amountPercentage/100.00;
-                    totalPrice = Double.parseDouble(totalPriceString);
-                }catch (NumberFormatException numberEx){ //if the data format is not a double
-                    amountPercentage = -1.0; 
-                    totalPrice = -1.0;
-                }
-                Double finalPrice = totalPrice*amountPercentage;
-                finalPrice = Math.round(finalPrice*100.0) /100.0;
-                //System.out.println("final price!" + finalPrice + " = " + amountPercentage + " " + totalPrice);
-                /**********update panel***************/
-                priceLabel.setText(PRICE_DEFAULT_STR + finalPrice);
-                locationLabel.setText(LOCATION_DEFAULT_STR + locationString);
-            }           
-            
-        }
-        if (event.getSource() instanceof JButton){
-            JButton jButton = (JButton)event.getSource();
-            boolean createStatus = false;
-            System.out.println(amountPercentage + "  " + itemInfo);
-            if(jButton.equals(createRequestButton)){
-                if ( (amountPercentage>0.0) && (!itemInfo.equals("")) ){ // and time and date is not empty
-                    createStatus = user.createGroupOrder(itemInfo, amountPercentage); // time, date 
-                }
-                if(createStatus){
-                    resetRequestPanel();
-                    System.out.println("Done - reset panel");
-                }else{
-                    System.out.println("something went wrong");
-                }
+        private void setUpGroupOrderBoxes(){
+            /*****loop throught the group order list*****/
+            for(String refNo : groupOrderMap.keySet()){
+                ArrayList<String> orderInfo = groupOrderMap.get(refNo);
+                orderDisplayPanel.add(new OrderPanel(refNo, orderInfo));
             }
             
         }
-        this.revalidate();
-        this.repaint();
-    }
+//------------------------------------------------------------------------------
+        @Override
+        public void actionPerformed(ActionEvent event){
+            if(event.getSource() instanceof JComboBox){
+                JComboBox cb = (JComboBox)event.getSource();
+                int amountIndex = amountComboBox.getSelectedIndex();
+                int selectedIndex = itemComboBox.getSelectedIndex();
+                String amountStr = amountList_cb[amountIndex];
+                
+                if( (!amountStr.equals("")) && (selectedIndex>0) ){
+                    itemInfo = list.get(selectedIndex-1);
+                    String totalPriceString = itemInfo.substring(itemInfo.indexOf("$")+1 , itemInfo.indexOf(" @ "));
+                    String locationString = itemInfo.substring(itemInfo.indexOf(" @ ")+3);
+                    amountStr = amountStr.substring(0, 2);
+                    
+                    amountPercentage = 0.0;
+                    Double totalPrice = 0.0;
+                    try{
+                        amountPercentage = Double.parseDouble(amountStr);
+                        amountPercentage = amountPercentage/100.00;
+                        totalPrice = Double.parseDouble(totalPriceString);
+                    }catch (NumberFormatException numberEx){ //if the data format is not a double
+                        amountPercentage = -1.0; 
+                        totalPrice = -1.0;
+                    }
+                    Double finalPrice = totalPrice*amountPercentage;
+                    finalPrice = Math.round(finalPrice*100.0) /100.0;
+                    //System.out.println("final price!" + finalPrice + " = " + amountPercentage + " " + totalPrice);
+                    /**********update panel***************/
+                    priceLabel.setText(PRICE_DEFAULT_STR + finalPrice);
+                    locationLabel.setText(LOCATION_DEFAULT_STR + locationString);
+                }           
+                
+            }
+            if (event.getSource() instanceof JButton){
+                JButton jButton = (JButton)event.getSource();
+                boolean createStatus = false;
+                System.out.println(amountPercentage + "  " + itemInfo);
+                if(jButton.equals(createRequestButton)){
+                    if ( (amountPercentage>0.0) && (!itemInfo.equals("")) ){ // and time and date is not empty
+                        createStatus = user.createGroupOrder(itemInfo, amountPercentage); // time, date 
+                    }
+                    if(createStatus){
+                        resetRequestPanel();
+                        System.out.println("Done - reset panel");
+                    }else{
+                        System.out.println("something went wrong");
+                    }
+                } 
+            }
+            this.revalidate();
+            this.repaint();
+        }
 //----------------------------------------------------------------------------
-    private void resetRequestPanel(){
-        priceLabel.setText(PRICE_DEFAULT_STR);
-        locationLabel.setText(LOCATION_DEFAULT_STR);
-        amountComboBox.setSelectedIndex(0);
-        AutoCompleteComboBox cb = (AutoCompleteComboBox) itemComboBox;
-        cb.resetField();
-    }
+        private void resetRequestPanel(){
+            priceLabel.setText(PRICE_DEFAULT_STR);
+            locationLabel.setText(LOCATION_DEFAULT_STR);
+            amountComboBox.setSelectedIndex(0);
+            AutoCompleteComboBox cb = (AutoCompleteComboBox) itemComboBox;
+            cb.resetField();
+        }
 //----------------------------------------------------------------------------
         //inner class inside GroupOrderPage - OrderPanel
 //----------------------------------------------------------------------------
         private class OrderPanel extends JPanel{ //actionListener
+            //1438865252=[Red Bell Peppers 5 kg, $21.29, CostCo, A~0.4]
+            private String refNo;
             private String userID;
             private String itemInfo;
-            
-            final JLabel itemLabel = new JLabel("Item: ");
-            final JLabel amountLabel = new JLabel("Amount Remaining: ");
+           
             final JButton acceptButton = new JButton("Accept");
-            JLabel userIdLabel,itemNameLabel, amountUnitLabel;
+            final String MEMBER_LABEL_STR = "Group member: ";
+            final String ITEM_LABEL_STR = "Item: ";
+            final String AMOUNT_LABEL_STR = "Amount Remaining: ";
+            final String PRICE_LABEL_STR = "Price: ";
+            JLabel memberLabel, itemLabel, amountLabel, priceLabel;
             
-            OrderPanel(String id, String itemInfoStr){
+            OrderPanel(String refNo, ArrayList<String> orderInfo){
                 this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
                 this.setSize(100,50);
-                this.userID = id;
-                this.itemInfo = itemInfoStr;
-                this.itemNameLabel = new JLabel(itemInfoStr);      //do some decoding on the itemInfoStr
-                this.amountUnitLabel = new JLabel("unit?");
-                /********************************/
-                itemLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-                itemNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-                this.add(itemLabel);
-                this.add(itemNameLabel);
-                this.add(Box.createRigidArea(new Dimension(50,10)));
-                /********************************/
-                amountLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-                this.add(amountLabel);
-                /********************************/
-                amountUnitLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-                this.add(amountUnitLabel);        //!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                this.add(Box.createRigidArea(new Dimension(50,20)));
-                /********************************/
+                this.refNo = refNo; 
+                //String refno
+                this.userID = "";
+                this.itemInfo = "";
+//                this.itemNameLabel = new JLabel();      //do some decoding on the itemInfoStr
+//                this.amountUnitLabel = new JLabel();
+//                /********************************/
+//                itemLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+//                itemNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+//                this.add(itemLabel);
+//                this.add(itemNameLabel);
+//                this.add(Box.createRigidArea(new Dimension(50,10)));
+//                /********************************/
+//                amountLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+//                this.add(amountLabel);
+//                /********************************/
+//                amountUnitLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+//                this.add(amountUnitLabel);        //!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//                this.add(Box.createRigidArea(new Dimension(50,20)));
+//                /********************************/
                 acceptButton.setAlignmentX(Component.CENTER_ALIGNMENT);
                 this.add(acceptButton);
                 TitledBorder title;

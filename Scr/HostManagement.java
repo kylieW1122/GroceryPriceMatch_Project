@@ -40,8 +40,6 @@ public class HostManagement{
     HostManagement(){
         this.database = new DataBase();
         this.setUp();
-        this.generateUniqueRefNo("Ginger Root 1.36 kg");
-        System.out.println("hashmap: " + userPasswordMap.toString());
         try{
             this.start();
         }catch(Exception e){  e.printStackTrace(); }
@@ -65,6 +63,8 @@ public class HostManagement{
             System.out.println("ERROR - file '" + fileName + "' not found. ");
         }
         System.out.println("setting up");
+        makeGroupOrder("Asparagus 1 kg = $9.09 @ CostCo~A~0.4~");
+        makeGroupOrder("Choice Green Peppers 1 1/9 bushel = $44.29 @ CostCo~A~0.6~");
     }
 //----------------------------------------------------------------------------
     private boolean loginUser(String id, String password){
@@ -180,6 +180,9 @@ public class HostManagement{
                         msg = msg.substring(Const.GROUP_ORDER.length());
                         makeGroupOrder(msg);
                         System.out.println("map: " + userIDRefNoMap.toString() + "\nanother map: " + refNoMap.toString());
+                    }else if (msg.substring(0, Const.GROUP_REFRESH.length()).equals(Const.GROUP_REFRESH)){
+                        objectOutput.writeObject(refNoMap);
+                        objectOutput.flush();
                     }
                 }
                 //after completing the communication close the streams but do not close the socket!
