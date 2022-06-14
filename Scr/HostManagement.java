@@ -20,9 +20,9 @@ import java.io.BufferedReader;
  */
 
 public class HostManagement{
-    private HashMap<String, ArrayList<String>> userWithRefNoMap = new HashMap<String, ArrayList<String>>();
+    private HashMap<String, ArrayList<String>> userIDRefNoMap = new HashMap<String, ArrayList<String>>();
     private HashMap<String, String> userPasswordMap = new HashMap<String, String>();
-    private HashMap<String, ArrayList<String>> refNoMap = new HashMap<String, ArrayList<String>>();
+    private HashMap<String, ArrayList<String>> refNoMap = new HashMap<String, ArrayList<String>>(); // arraylist: itemInfo, users
     
     private DataBase database;
     static FileReader fileReader; 
@@ -40,6 +40,7 @@ public class HostManagement{
     HostManagement(){
         this.database = new DataBase();
         this.setUp();
+        this.generateUniqueRefNo("Ginger Root 1.36 kg");
         System.out.println("hashmap: " + userPasswordMap.toString());
         try{
             this.start();
@@ -74,6 +75,45 @@ public class HostManagement{
             }
         }
         return false;
+    }
+//----------------------------------------------------------------------------
+    private boolean makeGroupOrder(String msg){
+        String itemInfo = msg.substring(0, msg.indexOf(Const.SPLIT));
+        String itemName = itemInfo.substring(0, itemInfo.indexOf(" = "));
+        String price = itemInfo.substring(itemInfo.indexOf(" = ") +3 , itemInfo.indexOf(" @ "));
+        String location =  itemInfo.substring(itemInfo.indexOf(" @ ") +3);
+        msg = msg.substring(msg.indexOf(Const.SPLIT)+1);
+        String userID = msg.substring(0, msg.indexOf(Const.SPLIT));
+        msg = msg.substring(msg.indexOf(Const.SPLIT)+1);
+        String amountPercentage = msg.substring(0, msg.indexOf(Const.SPLIT));
+        System.out.println("item: " + itemInfo + " userId: " + userID + " amount%: " + amountPercentage);
+        /**********Create arraylist to store them into refNoMap and userIDRefNoMap*************/
+        ArrayList<String> infoList = new ArrayList<String>();
+        infoList.add(0, itemName);
+        infoList.add(1, price);
+        infoList.add(2, location); //add time, and date
+        infoList.add(userID + Const.SPLIT + amountPercentage);
+        String refNo = generateUniqueRefNo(itemName);
+        refNoMap.put(refNo, infoList);
+        ArrayList<String> user_listOfRefNo = new ArrayList<String>(); 
+        if(userIDRefNoMap.containsKey(userID)){
+            user_listOfRefNo = userIDRefNoMap.get(userID);
+            user_listOfRefNo.add(refNo);
+        }else{
+            user_listOfRefNo.add(refNo);
+            userIDRefNoMap.put(userID, user_listOfRefNo);
+        }
+        return true;
+    }
+//----------------------------------------------------------------------------
+    private String generateUniqueRefNo(String itemInfo){
+        int hash_code = Math.abs(itemInfo.hashCode());
+        System.out.println(hash_code);
+        String refNo = Integer.toString(hash_code);
+        if(refNoMap.containsKey(refNo)){
+            System.out.println("pick a new number"); //gerneate a new number
+        }
+        return refNo;
     }
 //----------------------------------------------------------------------------
     private boolean registerUser(String id, String password){
@@ -124,7 +164,7 @@ public class HostManagement{
                     System.out.println(msg);
                     if(msg.substring(0, Const.LOGIN.length()).equals(Const.LOGIN)){
                         String userName = msg.substring(Const.LOGIN.length(), msg.indexOf("~"));
-                        String password = msg.substring(msg.indexOf("~") +1);
+                        String password = msg.substring(msg.indexOf(Const.SPLIT) +1);
                         boolean resultOfLogin = loginUser(userName, password);
                         System.out.println(resultOfLogin);
                         output.println(resultOfLogin);
@@ -132,8 +172,14 @@ public class HostManagement{
                     }else if(msg.substring(0, Const.SEARCH_KEYWORD.length()).equals(Const.SEARCH_KEYWORD)){
                         String keyword = msg.substring(Const.SEARCH_KEYWORD.length());
                         ArrayList<String> resultList = DataBase.searchItemKeyword(keyword);
-                       // Map<String, Map<String, Double>> keywordMap = DataBase.productSearch(keyword);
                         objectOutput.writeObject(resultList);
+                    }else if (msg.substring(0, Const.KEYWORD_LIST.length()).equals(Const.KEYWORD_LIST)){
+                        ArrayList<String> keywordList = DataBase.getWholeList();
+                        objectOutput.writeObject(keywordList);
+                    }else if(msg.substring(0, Const.GROUP_ORDER.length()).equals(Const.GROUP_ORDER)){
+                        msg = msg.substring(Const.GROUP_ORDER.length());
+                        makeGroupOrder(msg);
+                        System.out.println("map: " + userIDRefNoMap.toString() + "\nanother map: " + refNoMap.toString());
                     }
                 }
                 //after completing the communication close the streams but do not close the socket!

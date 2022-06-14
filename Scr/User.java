@@ -53,7 +53,7 @@ public class User{
 //Networking
 //----------------------------------------------------------------------------
     public boolean userLogin(String id, String password){
-        output.println(Const.LOGIN + id + Const.PASSWORD + password);
+        output.println(Const.LOGIN + id + Const.SPLIT + password);
         output.flush();
         try{
             String msg = input.readLine();
@@ -68,7 +68,7 @@ public class User{
         return false;
     }
 //----------------------------------------------------------------------------
-    public ArrayList<String> getKeywordList(String keyword){ // from host's database
+    public ArrayList<String> getSearchResultList(String keyword){ // from host's database
         ArrayList<String> result = new ArrayList<String>();
         output.println(Const.SEARCH_KEYWORD + keyword);
         output.flush();
@@ -84,6 +84,30 @@ public class User{
             return new ArrayList<String>();
         }
         return result;
+    }
+//----------------------------------------------------------------------------
+    public ArrayList<String> getWholeItemArrayList(){
+        ArrayList<String> result = new ArrayList<String>();
+        output.println(Const.KEYWORD_LIST);
+        output.flush();
+        try{
+            Object object = objectInput.readObject();
+            result = (ArrayList<String>)object;
+        }catch(ClassNotFoundException ex){
+            System.out.println(ex.toString());
+        }catch(IOException e){
+            System.out.println(e.toString());
+        }
+        if(result == null){
+            return new ArrayList<String>();
+        }
+        return result;
+    }
+//----------------------------------------------------------------------------
+    public boolean createGroupOrder(String itemInfo, Double amountPercentage){
+        output.println(Const.GROUP_ORDER + itemInfo + Const.SPLIT + this.userID + Const.SPLIT + amountPercentage + Const.SPLIT);
+        output.flush();
+        return false;
     }
 //----------------------------------------------------------------------------
     private boolean userLogout(){

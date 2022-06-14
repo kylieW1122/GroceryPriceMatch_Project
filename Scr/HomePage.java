@@ -21,8 +21,6 @@ import javax.swing.border.TitledBorder;
 
 import java.util.ArrayList;
 
-
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import java.awt.GridBagLayout;
@@ -42,9 +40,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
 import java.awt.Font;
@@ -295,7 +290,7 @@ public class HomePage extends JFrame implements ActionListener{
         }
 //---------------------------------------------------------------------------- 
         private void searchKeyWord(String searchText){
-            searchResultList = user.getKeywordList(searchText);
+            searchResultList = user.getSearchResultList(searchText);
             String [][] data = {{"","",""}}; 
             int numOfItems = searchResultList.size();
             if(numOfItems>0){
@@ -351,12 +346,11 @@ public class HomePage extends JFrame implements ActionListener{
 //----------------------------------------------------------------------------
 //inner class - GroupOrderPage
 //----------------------------------------------------------------------------
-    private class GroupOrderPage extends JPanel implements KeyListener{
+    private class GroupOrderPage extends JPanel implements ActionListener{
+        private ArrayList<String> list;
         JPanel topPanel;
         JPanel rightPanel;
         JPanel labelPanel, textFieldPanel;
-        JLabel[] requestLabelList;
-        JTextField[] requestJTextFieldList;
         JTextField itemNameField;
         JButton createRequestButton;
         
@@ -366,9 +360,16 @@ public class HomePage extends JFrame implements ActionListener{
         JComboBox amountComboBox;
         JLabel priceLabel;
         
+        JLabel locationLabel;
+        JLabel dateLabel;
+        JLabel timeLabel;
+        
         final String PRICE_DEFAULT_STR = "Price: $ ";
+        final String LOCATION_DEFAULT_STR = "Store Location: ";
+        
+        private Double amountPercentage = -1.0;
+        private String itemInfo = "";
 //----------------------------------------------------------------------------
-        private String[] labels = {"Location: ", "Time: "};
         private String[] amountList_cb = {"", "10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %", "80 %", "90 %"};
         GroupOrderPage(){
             this.setLayout(new BorderLayout());
@@ -378,27 +379,35 @@ public class HomePage extends JFrame implements ActionListener{
             labelPanel = new JPanel();
             textFieldPanel = new JPanel();
             rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.PAGE_AXIS));
+            rightPanel.setMaximumSize(new Dimension(200, 0));
             /**********************set up request label list ****************************/
-            createRequestButton = new JButton("Create");
-            int labelsLength = labels.length;
-            requestLabelList = new JLabel[labelsLength];
-            requestJTextFieldList = new JTextField[labelsLength];
             /***********ITEM************/
             itemLabel = new JLabel("Item: ");
             itemLabel.setAlignmentX(JLabel.LEFT);
             itemNameField = new JTextField(20);
-            itemComboBox = new JComboBox(amountList_cb);
-            //AutoCompleteDecorator.decorate(itemComboBox);
-            //itemComboBox.setVisible(false);
-           // rightPanel.add(itemLabel);
-            rightPanel.add(itemNameField);
+            list = user.getWholeItemArrayList();
+            System.out.println("size: " + list.size());
+            String[] cb_itemList =  new String[list.size()+1];
+            cb_itemList[0] = "";
+            for(int st=0; st<list.size(); st++){
+                String itemString =  list.get(st);
+                itemString = itemString.substring(0, itemString.indexOf(" = "));
+                cb_itemList[st+1] = itemString;
+            }
+            itemComboBox = new AutoCompleteComboBox(cb_itemList);
+            itemComboBox.setMaximumSize(new Dimension(200, 20));
+            //http://www.orbital-computer.de/JComboBox/
+            itemComboBox.addActionListener(this);
+            rightPanel.add(itemLabel);
             rightPanel.add(itemComboBox);
             rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
             /***********AMOUNT************/
             amountLabel = new JLabel("Amount(%): ");
             amountLabel.setAlignmentX(JLabel.LEFT);
             amountComboBox = new JComboBox(amountList_cb);
+            amountComboBox.setMaximumSize(new Dimension(200, 20));
             amountComboBox.setSelectedIndex(0);
+            amountComboBox.addActionListener(this);
             rightPanel.add(amountLabel);
             rightPanel.add(amountComboBox);
             rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
@@ -407,20 +416,21 @@ public class HomePage extends JFrame implements ActionListener{
             priceLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             rightPanel.add(priceLabel);
             rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
-            /***********LOCAQTION AND TIME************/
-            for (int l = 0; l < labelsLength; l++) { // only textfield on Location and Time
-                requestLabelList[l] = new JLabel(labels[l]);
-                requestJTextFieldList[l] = new JTextField(10);
-                requestJTextFieldList[l].addKeyListener(this);
-                rightPanel.add(requestLabelList[l]);
-                rightPanel.add(requestJTextFieldList[l]);
-                rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
-            }
+            /***********LOCATION AND TIME************/
+            locationLabel = new JLabel(LOCATION_DEFAULT_STR);
+            rightPanel.add(locationLabel);
+            rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+            dateLabel = new JLabel("Date: ");
+            timeLabel = new JLabel("Time: ");
+            rightPanel.add(dateLabel);
+            rightPanel.add(timeLabel);
+            rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+            
+            createRequestButton = new JButton("Create");
+            createRequestButton.addActionListener(this);
             rightPanel.add(createRequestButton);
             
-            
             JPanel innerPanel = new JPanel(new FlowLayout());
-            
             
             this.add(rightPanel, BorderLayout.EAST);
             /*****loop throught the group order list*****/
@@ -430,28 +440,72 @@ public class HomePage extends JFrame implements ActionListener{
             innerPanel.add(new OrderPanel("user4", "item1"));
             this.add(innerPanel);
         }
-//----------------------------------------------------------------------------
-        @Override
-        public void keyPressed(KeyEvent e){
-            //itemComboBox
-            //update JComboBox list
-            //https://stackoverflow.com/questions/6674462/how-to-list-suggestions-to-when-typing-inside-the-text-field
-            /*You should try JComboBox as an autosuggest box instead of JTextField. But if you still want it to be done using JTextField then...
+//------------------------------------------------------------------------------
+    @Override
+    public void actionPerformed(ActionEvent event){
+        if(event.getSource() instanceof JComboBox){
+            JComboBox cb = (JComboBox)event.getSource();
+            int amountIndex = amountComboBox.getSelectedIndex();
+            int selectedIndex = itemComboBox.getSelectedIndex();
+            String amountStr = amountList_cb[amountIndex];
+
+            if( (!amountStr.equals("")) && (selectedIndex>0) ){
+                itemInfo = list.get(selectedIndex-1);
+                String totalPriceString = itemInfo.substring(itemInfo.indexOf("$")+1 , itemInfo.indexOf(" @ "));
+                String locationString = itemInfo.substring(itemInfo.indexOf(" @ ")+3);
+                amountStr = amountStr.substring(0, 2);
                 
-                Make a JPanel containing list of suggestion.Initially it will be not visible.
-                Whenever user types something search for it and add results to the list in JPanel.
-                Show that JPanel at the bottom of textfield in upper layer of frame.
-                Implement click event on list so that when ever user clicks on it the text is copied to textfield.
-        */
+                amountPercentage = 0.0;
+                Double totalPrice = 0.0;
+                try{
+                    amountPercentage = Double.parseDouble(amountStr);
+                    amountPercentage = amountPercentage/100.00;
+                    totalPrice = Double.parseDouble(totalPriceString);
+                }catch (NumberFormatException numberEx){ //if the data format is not a double
+                    amountPercentage = -1.0; 
+                    totalPrice = -1.0;
+                }
+                Double finalPrice = totalPrice*amountPercentage;
+                finalPrice = Math.round(finalPrice*100.0) /100.0;
+                //System.out.println("final price!" + finalPrice + " = " + amountPercentage + " " + totalPrice);
+                /**********update panel***************/
+                priceLabel.setText(PRICE_DEFAULT_STR + finalPrice);
+                locationLabel.setText(LOCATION_DEFAULT_STR + locationString);
+            }           
+            
         }
-        @Override
-        public void keyTyped(KeyEvent e){}
-        @Override
-        public void keyReleased(KeyEvent e){}
+        if (event.getSource() instanceof JButton){
+            JButton jButton = (JButton)event.getSource();
+            boolean createStatus = false;
+            System.out.println(amountPercentage + "  " + itemInfo);
+            if(jButton.equals(createRequestButton)){
+                if ( (amountPercentage>0.0) && (!itemInfo.equals("")) ){ // and time and date is not empty
+                    createStatus = user.createGroupOrder(itemInfo, amountPercentage); // time, date 
+                }
+                if(createStatus){
+                    resetRequestPanel();
+                    System.out.println("Done - reset panel");
+                }else{
+                    System.out.println("something went wrong");
+                }
+            }
+            
+        }
+        this.revalidate();
+        this.repaint();
+    }
+//----------------------------------------------------------------------------
+    private void resetRequestPanel(){
+        priceLabel.setText(PRICE_DEFAULT_STR);
+        locationLabel.setText(LOCATION_DEFAULT_STR);
+        amountComboBox.setSelectedIndex(0);
+        AutoCompleteComboBox cb = (AutoCompleteComboBox) itemComboBox;
+        cb.resetField();
+    }
 //----------------------------------------------------------------------------
         //inner class inside GroupOrderPage - OrderPanel
 //----------------------------------------------------------------------------
-        private class OrderPanel extends JPanel{
+        private class OrderPanel extends JPanel{ //actionListener
             private String userID;
             private String itemInfo;
             
