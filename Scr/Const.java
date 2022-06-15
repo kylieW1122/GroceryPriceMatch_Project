@@ -12,8 +12,9 @@ public final class Const{
     public static final String KEYWORD_LIST = "keyList:";
     public static final String GROUP_ORDER = "group:"; 
     public static final String GROUP_REFRESH = "refresh:"; 
-    public static final String DOWN = "V"; 
-    public static final String SCROOGE = "AV<>";  //uncle Scrooge standing on a tile in 4 possible directions 
+    public static final String GROUP_JOIN = "join:"; 
+    public static final String GROUP_INFO_PENDING_SPLIT = "--------------Pending Group Order--------------";   
+    public static final String GROUP_INFO_COMPLETED_SPLIT = "--------------Completed Group Order--------------";
     //use one of the symbols, depending on the direction 
     private Const(){ 
     } 

@@ -365,6 +365,7 @@ public class HomePage extends JFrame implements ActionListener{
         JLabel timeLabel;
         
         JPanel orderDisplayPanel;
+        JButton refreshButton;
         
         final String PRICE_DEFAULT_STR = "Price: $ ";
         final String LOCATION_DEFAULT_STR = "Store Location: ";
@@ -372,11 +373,10 @@ public class HomePage extends JFrame implements ActionListener{
         private Double amountPercentage = -1.0;
         private String itemInfo = "";
         
-        private HashMap<String, ArrayList<String>> groupOrderMap; //{1438865252=[Red Bell Peppers 5 kg, $21.29, CostCo, A~0.4]}
+        private HashMap<String, ArrayList<String>> groupOrderMap;
 //----------------------------------------------------------------------------
         private String[] amountList_cb = {"", "10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %", "80 %", "90 %"};
         GroupOrderPage(){
-            this.groupOrderMap = user.refreshGroupOrder(); // new HashMap<String, ArrayList<String>>();
             this.setLayout(new BorderLayout());
             topPanel = new JPanel();
             rightPanel = new JPanel();
@@ -433,21 +433,31 @@ public class HomePage extends JFrame implements ActionListener{
             createRequestButton = new JButton("Create");
             createRequestButton.addActionListener(this);
             rightPanel.add(createRequestButton);
-            
+            JPanel upPanel = new JPanel();
+            upPanel.setLayout(new BoxLayout(upPanel, BoxLayout.Y_AXIS));
             orderDisplayPanel = new JPanel(new FlowLayout());
+            this.setUpGroupOrderBoxes();
             
+            refreshButton = new JButton("Refresh");
+            refreshButton.addActionListener(this);
+            this.add(refreshButton, BorderLayout.SOUTH);
             this.add(rightPanel, BorderLayout.EAST);
-            setUpGroupOrderBoxes();
             this.add(orderDisplayPanel, BorderLayout.CENTER);
         }
 //------------------------------------------------------------------------------
         private void setUpGroupOrderBoxes(){
-            /*****loop throught the group order list*****/
+            this.groupOrderMap = new HashMap<String, ArrayList<String>>();
+            this.groupOrderMap = user.refreshGroupOrder();
+            orderDisplayPanel.removeAll();
+            
+            System.out.println("size of the order: " + groupOrderMap.size());
+            /*****loop throught the group order list****/
             for(String refNo : groupOrderMap.keySet()){
                 ArrayList<String> orderInfo = groupOrderMap.get(refNo);
                 orderDisplayPanel.add(new OrderPanel(refNo, orderInfo));
             }
-            
+            this.revalidate();
+            this.repaint();
         }
 //------------------------------------------------------------------------------
         @Override
@@ -485,18 +495,21 @@ public class HomePage extends JFrame implements ActionListener{
             }
             if (event.getSource() instanceof JButton){
                 JButton jButton = (JButton)event.getSource();
-                boolean createStatus = false;
-                System.out.println(amountPercentage + "  " + itemInfo);
                 if(jButton.equals(createRequestButton)){
+                    boolean createStatus = false;
+                    //                System.out.println(amountPercentage + "  " + itemInfo);
                     if ( (amountPercentage>0.0) && (!itemInfo.equals("")) ){ // and time and date is not empty
                         createStatus = user.createGroupOrder(itemInfo, amountPercentage); // time, date 
                     }
                     if(createStatus){
-                        resetRequestPanel();
+                        this.resetRequestPanel();
+                        this.setUpGroupOrderBoxes();
                         System.out.println("Done - reset panel");
                     }else{
                         System.out.println("something went wrong");
                     }
+                }else if (jButton.equals(refreshButton)){
+                    this.setUpGroupOrderBoxes();
                 } 
             }
             this.revalidate();
@@ -513,49 +526,102 @@ public class HomePage extends JFrame implements ActionListener{
 //----------------------------------------------------------------------------
         //inner class inside GroupOrderPage - OrderPanel
 //----------------------------------------------------------------------------
-        private class OrderPanel extends JPanel{ //actionListener
-            //1438865252=[Red Bell Peppers 5 kg, $21.29, CostCo, A~0.4]
+        private class OrderPanel extends JPanel implements ActionListener{ 
             private String refNo;
-            private String userID;
             private String itemInfo;
-           
+            private String itemPrice;
+            private String location;
+            private String memberStr;
+            private String amountStr;
+            private Double amountPercentage;
+            
             final JButton acceptButton = new JButton("Accept");
             final String MEMBER_LABEL_STR = "Group member: ";
             final String ITEM_LABEL_STR = "Item: ";
             final String AMOUNT_LABEL_STR = "Amount Remaining: ";
             final String PRICE_LABEL_STR = "Price: ";
-            JLabel memberLabel, itemLabel, amountLabel, priceLabel;
-            
-            OrderPanel(String refNo, ArrayList<String> orderInfo){
+            final String LOCATION_STR = "Store Location: ";
+            JLabel memberLabel, itemLabel, amountLabel, priceLabel, locationLabel;
+            //----------------------------------------------------------------------------
+            OrderPanel(String refNo, ArrayList<String> orderInfoList){
+                //example format: 1438865252, {Red Bell Peppers 5 kg, $21.29, CostCo, userID~0.4}
                 this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-                this.setSize(100,50);
+                this.setPreferredSize(new Dimension(230,190));
+                this.setMaximumSize(new Dimension(230,190));
                 this.refNo = refNo; 
-                //String refno
-                this.userID = "";
-                this.itemInfo = "";
-//                this.itemNameLabel = new JLabel();      //do some decoding on the itemInfoStr
-//                this.amountUnitLabel = new JLabel();
-//                /********************************/
-//                itemLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-//                itemNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-//                this.add(itemLabel);
-//                this.add(itemNameLabel);
-//                this.add(Box.createRigidArea(new Dimension(50,10)));
-//                /********************************/
-//                amountLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-//                this.add(amountLabel);
-//                /********************************/
-//                amountUnitLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-//                this.add(amountUnitLabel);        //!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//                this.add(Box.createRigidArea(new Dimension(50,20)));
-//                /********************************/
+                if(orderInfoList.size()>=3){
+                    this.itemInfo = orderInfoList.get(0);
+                    this.itemPrice = orderInfoList.get(1);
+                    this.location = orderInfoList.get(2);
+                }
+                Double price_double = Double.parseDouble(itemPrice.substring(1));
+                Double percentageCommited = 0.0;
+                
+                this.memberStr = "";
+                for(int info=3; info<orderInfoList.size(); info++){
+                    String temp = orderInfoList.get(info);
+                    if(this.memberStr.equals("")){
+                         this.memberStr = temp.substring(0, temp.indexOf(Const.SPLIT));
+                    }else{
+                        this.memberStr = temp.substring(0, temp.indexOf(Const.SPLIT)) + ", " + this.memberStr;
+                    }
+                    temp = temp.substring(temp.indexOf(Const.SPLIT)+1);
+                    Double tempPercentage = Double.parseDouble(temp);
+                    percentageCommited = percentageCommited + tempPercentage;
+                }
+                /***calculate the price and % remaning for the order***/
+                Double percent_remaining = 1.0-percentageCommited;
+                price_double = price_double * percent_remaining;
+                price_double = Math.round(price_double*100.0)/100.0;
+                amountPercentage = percent_remaining;
+                percent_remaining = percent_remaining*100.0;
+                this.itemPrice = Double.toString(price_double);
+                this.amountStr = Double.toString(percent_remaining);
+                /*************add all them into this jpanel*****************/
+                this.add(Box.createRigidArea(new Dimension(50,10)));
+                memberLabel = new JLabel(MEMBER_LABEL_STR + this.memberStr);
+                memberLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                this.add(memberLabel);
+                this.add(Box.createRigidArea(new Dimension(50,10)));
+                
+                itemLabel = new JLabel(ITEM_LABEL_STR + this.itemInfo);
+                itemLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                this.add(itemLabel);
+                this.add(Box.createRigidArea(new Dimension(50,10)));
+                
+                amountLabel = new JLabel(AMOUNT_LABEL_STR + this.amountStr + " %");
+                amountLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                this.add(amountLabel);
+                this.add(Box.createRigidArea(new Dimension(50,10)));
+                
+                priceLabel = new JLabel(PRICE_LABEL_STR + this.itemPrice);
+                priceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                this.add(priceLabel);
+                this.add(Box.createRigidArea(new Dimension(50,10)));
+                
+                locationLabel = new JLabel(LOCATION_STR + this.location);
+                locationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                this.add(locationLabel);
+                this.add(Box.createRigidArea(new Dimension(50,10)));
+                
                 acceptButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+                acceptButton.addActionListener(this);
+                
                 this.add(acceptButton);
                 TitledBorder title;
-                title = BorderFactory.createTitledBorder("ID: " + this.userID);
+                title = BorderFactory.createTitledBorder("Ref. # " + this.refNo);
                 title.setTitleJustification(TitledBorder.CENTER);
                 
                 this.setBorder(title);
+            }
+            //----------------------------------------------------------------------------
+            @Override
+            public void actionPerformed(ActionEvent event){
+                if (event.getSource() instanceof JButton){
+                    JButton jButton = (JButton)event.getSource();
+                    user.acceptGroupOrder(this.refNo, amountPercentage);
+                    System.out.println("accept grp order " + refNo);
+                }
             }
         }
     }
@@ -580,12 +646,21 @@ public class HomePage extends JFrame implements ActionListener{
         JTextField passwordInput;
         JButton loginEnter;
         
+        JPanel registerPanel;
+        JLabel userLabel_register;
+        JLabel passwordLabel_register;
+        JTextField userInput_register;
+        JTextField passwordInput_register;
+        JButton registerEnter;
+        
         AccountLoginPage(){
+            /**********login panel***********/
             loginPanel = new JPanel();
             userLabel = new JLabel("User ID: ");
             passwordLabel = new JLabel("Password: ");
-            loginEnter = new JButton("Enter");
+            loginEnter = new JButton("Login");
             messageLabel = new JLabel("");
+            loginEnter.addActionListener(this);
             
             loginPanel.setLayout(new FlowLayout());
             userInput = new JTextField(20);
@@ -594,12 +669,28 @@ public class HomePage extends JFrame implements ActionListener{
             passwordInput = new JTextField(20);
             loginPanel.add(passwordLabel);
             loginPanel.add(passwordInput);
+            loginPanel.add(loginEnter);
+            /**********register panel***********/
+            registerPanel = new JPanel();
+            userLabel_register = new JLabel("User ID: ");
+            passwordLabel_register = new JLabel("Password: ");
+            registerEnter = new JButton("Register");
+            registerEnter.addActionListener(this);
             
+            registerPanel.setLayout(new FlowLayout());
+            userInput_register = new JTextField(20);
+            registerPanel.add(userLabel);
+            registerPanel.add(userInput);
+            passwordInput_register = new JTextField(20);
+            registerPanel.add(passwordLabel_register);
+            registerPanel.add(passwordInput_register);
+            registerPanel.add(registerEnter);
+            registerPanel.setVisible(false);
+            /**********add everything into the panel***********/
             this.add(loginPanel);
-            this.add(loginEnter);
             this.add(messageLabel);
+            this.add(registerPanel);
             
-            loginEnter.addActionListener(this);
         }
         public void setNextIndex(String index){
             this.nextPageIndex = index;

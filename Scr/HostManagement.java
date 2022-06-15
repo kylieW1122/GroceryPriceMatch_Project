@@ -11,22 +11,30 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 
 /**[PriceMatchManagement.java]
- * This is final project - price match program
- * This class contains the main method and the host server to start the program
- * http://helloraspberrypi.blogspot.com/2013/12/pass-arraylist-of-object-in-socket.html
- * 
- * @author Kylie Wong and Michelle Chan, ICS4UE
- * @version 1.0, build May 27, 2022
- */
+  * This is final project - price match program
+  * This class contains the main method and the host server to start the program
+  * http://helloraspberrypi.blogspot.com/2013/12/pass-arraylist-of-object-in-socket.html
+  * 
+  * @author Kylie Wong and Michelle Chan, ICS4UE
+  * @version 1.0, build May 27, 2022
+  */
 
 public class HostManagement{
-    private HashMap<String, ArrayList<String>> userIDRefNoMap = new HashMap<String, ArrayList<String>>();
-    private HashMap<String, String> userPasswordMap = new HashMap<String, String>();
-    private HashMap<String, ArrayList<String>> refNoMap = new HashMap<String, ArrayList<String>>(); // arraylist: itemInfo, users
-    
+    private static HashMap<String, ArrayList<String>> userIDRefNoMap = new HashMap<String, ArrayList<String>>();
+    private static HashMap<String, String> userPasswordMap = new HashMap<String, String>();
+    private static HashMap<String, ArrayList<String>> refNoMapPending = new HashMap<String, ArrayList<String>>();
+    private static HashMap<String, ArrayList<String>> refNoMapCompleted = new HashMap<String, ArrayList<String>>();
     private DataBase database;
-    static FileReader fileReader; 
-    static BufferedReader input;
+    
+    private static FileReader fileReader; 
+    private static BufferedReader input;
+    private static PrintWriter output_writer; 
+    private static File groupOrderFile;
+    private static File userInfoFile;
+    
+    private final String userinfo_fileName =  "resources/UserInfo.txt";
+    private final String groupOrder_fileName = "resources/GroupOrderInfo.txt";
+    private String userInfo_titleStr;
     
     final int PORT = 6666;
     ServerSocket serverSocket;
@@ -35,36 +43,107 @@ public class HostManagement{
 //----------------------------------------------------------------------------
     public static void main(String[] args){
         HostManagement hostServer = new HostManagement();
-        
     }
+//----------------------------------------------------------------------------
     HostManagement(){
         this.database = new DataBase();
         this.setUp();
+        this.writeOrderFile();
         try{
             this.start();
         }catch(Exception e){  e.printStackTrace(); }
     }
 //----------------------------------------------------------------------------
     private void setUp(){
-        String fileName = "resources/UserInfo.txt";
         try{
-            fileReader = new FileReader(fileName);
+            /************read user info file which has the userid, password, and user's refNo to grp order****************/
+            fileReader = new FileReader(userinfo_fileName);
             input = new BufferedReader(fileReader);
-            //read the first line "User Information Sheet (#. userID: Password OrderRefNo)"of the file that is useless
-            input.readLine(); 
+            
+            this.userInfo_titleStr = input.readLine(); 
             while(input.ready()){    //keep reading lines while the End-of-File hasn't been reached
                 String name = input.readLine(); 
-                String password = name.substring(name.indexOf(":")+2);
-                name = name.substring(3, name.indexOf(":"));
+                String password;
+                if(name.indexOf(Const.SPLIT)!=-1){
+                    password = name.substring(name.indexOf(": ")+2, name.indexOf(Const.SPLIT));
+                }else{
+                    password = name.substring(name.indexOf(": ")+2);
+                }
+                name = name.substring(3, name.indexOf(": "));
                 userPasswordMap.put(name, password);
             }
             input.close();
-        }catch (Exception e){
-            System.out.println("ERROR - file '" + fileName + "' not found. ");
+           
+            fileReader = new FileReader(groupOrder_fileName);
+            input = new BufferedReader(fileReader);
+            String line;
+            while((line = input.readLine())!= null && !line.equals(Const.GROUP_INFO_COMPLETED_SPLIT)){
+                if(!line.equals(Const.GROUP_INFO_PENDING_SPLIT)){
+                    //line format: 887974418~[Choice Green Peppers 1 1/9 bushel, $44.29, CostCo, A~0.6]
+                    String refNo = line.substring(0, line.indexOf(Const.SPLIT));
+                    line = line.substring(line.indexOf(Const.SPLIT)+1);
+                    line = line.substring(1, line.length()-1);
+                    String[] arr = line.split(", ");
+                    ArrayList<String> infoList = new ArrayList<String>();
+                    Collections.addAll(infoList, arr);
+                    refNoMapPending.put(refNo, infoList); //refNo, ArrayList<String> infoList
+                }
+            }
+            System.out.println(refNoMapPending.toString());
+            while((line = input.readLine()) != null){    //keep reading lines while the End-of-File hasn't been reached
+                //line format: 887974418~[Choice Green Peppers 1 1/9 bushel, $44.29, CostCo, A~0.6, mike~0.4]
+                String refNo = line.substring(0, line.indexOf(Const.SPLIT));
+                line = line.substring(line.indexOf(Const.SPLIT)+1);
+                line = line.substring(1, line.length()-1);
+                String[] arr = line.split(", ");
+                ArrayList<String> infoList = new ArrayList<String>();
+                Collections.addAll(infoList, arr);
+                refNoMapCompleted.put(refNo, infoList); //refNo, ArrayList<String> infoList
+            }
+            System.out.println(refNoMapCompleted.toString());
+            input.close();
+            
+        }catch (IOException e){
+            System.out.println("ERROR - file '" + userinfo_fileName + "' not found. ");
         }
-        System.out.println("setting up");
-        makeGroupOrder("Asparagus 1 kg = $9.09 @ CostCo~A~0.4~");
+        makeGroupOrder("Asparagus 1 kg = $9.09 @ CostCo~mike~0.4~");   //delete after - just for testing
         makeGroupOrder("Choice Green Peppers 1 1/9 bushel = $44.29 @ CostCo~A~0.6~");
+    }
+//----------------------------------------------------------------------------
+    private void writeOrderFile(){ // rewrite the file everytime group order list has changed
+        try{
+            groupOrderFile = new File(groupOrder_fileName);
+            output_writer = new PrintWriter(groupOrderFile);
+            output_writer.println(Const.GROUP_INFO_PENDING_SPLIT);
+            for(String refNo: refNoMapPending.keySet()){
+                ArrayList<String> list = refNoMapPending.get(refNo);
+                output_writer.println(refNo + Const.SPLIT + list.toString());
+            }
+            output_writer.println(Const.GROUP_INFO_COMPLETED_SPLIT);
+            for(String refNo: refNoMapCompleted.keySet()){
+                ArrayList<String> list = refNoMapCompleted.get(refNo);
+                output_writer.println(refNo + Const.SPLIT + list.toString());
+            }
+            output_writer.close();
+            
+            userInfoFile = new File(userinfo_fileName);
+            output_writer = new PrintWriter(userInfoFile);
+            output_writer.println(userInfo_titleStr);
+            int index=1;
+            for(String userID: userPasswordMap.keySet()){
+                ArrayList<String> refNoList = userIDRefNoMap.get(userID);
+                if(refNoList!=null){
+                    output_writer.println(index + ". " + userID + ": " + userPasswordMap.get(userID) + 
+                                          Const.SPLIT + refNoList.toString());
+                }else{
+                    output_writer.println(index + ". " + userID + ": " + userPasswordMap.get(userID)); 
+                }
+                index++;
+            }
+            output_writer.close();
+        }catch(IOException e){
+            System.out.println("ERROR - file '" + groupOrder_fileName + "' not found. ");
+        }
     }
 //----------------------------------------------------------------------------
     private boolean loginUser(String id, String password){
@@ -86,7 +165,6 @@ public class HostManagement{
         String userID = msg.substring(0, msg.indexOf(Const.SPLIT));
         msg = msg.substring(msg.indexOf(Const.SPLIT)+1);
         String amountPercentage = msg.substring(0, msg.indexOf(Const.SPLIT));
-        System.out.println("item: " + itemInfo + " userId: " + userID + " amount%: " + amountPercentage);
         /**********Create arraylist to store them into refNoMap and userIDRefNoMap*************/
         ArrayList<String> infoList = new ArrayList<String>();
         infoList.add(0, itemName);
@@ -94,7 +172,13 @@ public class HostManagement{
         infoList.add(2, location); //add time, and date
         infoList.add(userID + Const.SPLIT + amountPercentage);
         String refNo = generateUniqueRefNo(itemName);
-        refNoMap.put(refNo, infoList);
+        refNoMapPending.put(refNo, infoList);
+        updateRefNoListsInUser(refNo, userID);
+        writeOrderFile();
+        return true;
+    }
+//----------------------------------------------------------------------------
+    private void updateRefNoListsInUser(String refNo, String userID){
         ArrayList<String> user_listOfRefNo = new ArrayList<String>(); 
         if(userIDRefNoMap.containsKey(userID)){
             user_listOfRefNo = userIDRefNoMap.get(userID);
@@ -103,17 +187,38 @@ public class HostManagement{
             user_listOfRefNo.add(refNo);
             userIDRefNoMap.put(userID, user_listOfRefNo);
         }
-        return true;
+        System.out.println("update the list");
     }
 //----------------------------------------------------------------------------
     private String generateUniqueRefNo(String itemInfo){
         int hash_code = Math.abs(itemInfo.hashCode());
         System.out.println(hash_code);
         String refNo = Integer.toString(hash_code);
-        if(refNoMap.containsKey(refNo)){
-            System.out.println("pick a new number"); //gerneate a new number
+        while(refNoMapPending.containsKey(refNo)){
+            Random random = new Random();
+            char randomizedCharacter = (char) (random.nextInt(26) + 'A');
+            refNo = refNo.substring(0, refNo.length()-1);
+            refNo = refNo + randomizedCharacter;
         }
         return refNo;
+    }
+//----------------------------------------------------------------------------
+    private void acceptGroupOrder(String msg){
+        String refNo = msg.substring(0, msg.indexOf(Const.SPLIT));
+        msg = msg.substring(msg.indexOf(Const.SPLIT)+1);
+        String userID = msg.substring(0, msg.indexOf(Const.SPLIT));
+        msg = msg.substring(msg.indexOf(Const.SPLIT)+1);
+        String amountPercentage = msg;
+        
+        updateRefNoListsInUser(refNo, userID);
+        if(refNoMapPending.containsKey(refNo)){
+            ArrayList<String> orderInfoList = refNoMapPending.get(refNo);
+            orderInfoList.add(userID + Const.SPLIT + amountPercentage);
+            refNoMapCompleted.put(refNo, orderInfoList);
+            refNoMapPending.remove(refNo);
+        }
+        writeOrderFile();
+        //output.println(Const.GROUP_JOIN + refNo + Const.SPLIT + this.userID );
     }
 //----------------------------------------------------------------------------
     private boolean registerUser(String id, String password){
@@ -127,14 +232,17 @@ public class HostManagement{
 //----------------------------------------------------------------------------
     private void start() throws Exception{ 
         //create a socket with the local IP address and wait for connection request       
-            System.out.println("Waiting for a connection request from a client ...");
-            serverSocket = new ServerSocket(PORT);                //create and bind a socket
+        System.out.println("Waiting for a connection request from a client ...");
+        serverSocket = new ServerSocket(PORT);                //create and bind a socket
         while(true){
             clientSocket = serverSocket.accept();             //wait for connection request
             System.out.println("Client connected");
             Thread connectionThread = new Thread(new ConnectionHandler(clientSocket));
             connectionThread.start();                         //start a new thread to handle the connection
         }
+    }
+    private void stop() throws Exception{
+        
     }
 //------------------------------------------------------------------------------
     class ConnectionHandler extends Thread { 
@@ -149,6 +257,7 @@ public class HostManagement{
         public ConnectionHandler(Socket socket) { 
             this.socket = socket;
         }
+       
         @Override 
         public void run() {
             try {
@@ -173,16 +282,22 @@ public class HostManagement{
                         String keyword = msg.substring(Const.SEARCH_KEYWORD.length());
                         ArrayList<String> resultList = DataBase.searchItemKeyword(keyword);
                         objectOutput.writeObject(resultList);
+                        objectOutput.flush();
                     }else if (msg.substring(0, Const.KEYWORD_LIST.length()).equals(Const.KEYWORD_LIST)){
                         ArrayList<String> keywordList = DataBase.getWholeList();
                         objectOutput.writeObject(keywordList);
+                        objectOutput.flush();
                     }else if(msg.substring(0, Const.GROUP_ORDER.length()).equals(Const.GROUP_ORDER)){
                         msg = msg.substring(Const.GROUP_ORDER.length());
                         makeGroupOrder(msg);
-                        System.out.println("map: " + userIDRefNoMap.toString() + "\nanother map: " + refNoMap.toString());
                     }else if (msg.substring(0, Const.GROUP_REFRESH.length()).equals(Const.GROUP_REFRESH)){
-                        objectOutput.writeObject(refNoMap);
+                        System.out.println("main map " + refNoMapPending.toString());
+                        HashMap<String, ArrayList<String>> sendMap = new HashMap<String, ArrayList<String>>(refNoMapPending);
+                        objectOutput.writeObject(sendMap);
                         objectOutput.flush();
+                    }else if (msg.substring(0, Const.GROUP_JOIN.length()).equals(Const.GROUP_JOIN)){
+                        msg = msg.substring(Const.GROUP_JOIN.length());
+                        acceptGroupOrder(msg);
                     }
                 }
                 //after completing the communication close the streams but do not close the socket!

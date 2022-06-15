@@ -17,7 +17,8 @@ public class User{
     private String password;
     private String userID;
     private static ArrayList<String> requestGroupOrderList;
-    private ArrayList<String> committedGroupOrderList;
+    private HashSet<String> committedGroupOrderList;
+    private HashMap<String, ArrayList<String>> groupOrderList;
     
     final String LOCAL_HOST = "127.0.0.1";
     final int PORT = 6666;
@@ -34,6 +35,8 @@ public class User{
 //----------------------------------------------------------------------------
     User(){
         this.requestGroupOrderList = new ArrayList<String>();
+        this.committedGroupOrderList = new HashSet<String>();
+        this.groupOrderList = new HashMap<String, ArrayList<String>>();
         this.userID = null;
         this.password = null;
         this.startConnecting();
@@ -107,22 +110,31 @@ public class User{
     public boolean createGroupOrder(String itemInfo, Double amountPercentage){
         output.println(Const.GROUP_ORDER + itemInfo + Const.SPLIT + this.userID + Const.SPLIT + amountPercentage + Const.SPLIT);
         output.flush();
-        return false;
+        return true;
     }
 //----------------------------------------------------------------------------
     public HashMap<String, ArrayList<String>> refreshGroupOrder(){
-        HashMap<String, ArrayList<String>> groupOrderRefList = new HashMap<String, ArrayList<String>>();
+        System.out.println("BEFORE group list: " + this.groupOrderList.toString());
         output.println(Const.GROUP_REFRESH);
         output.flush();
+        this.groupOrderList.clear();
         try{
             Object object = objectInput.readObject();
-            groupOrderRefList = (HashMap<String, ArrayList<String>>)object;
+            this.groupOrderList = (HashMap<String, ArrayList<String>>)object;
         }catch(ClassNotFoundException ex){
             System.out.println(ex.toString());
         }catch(IOException e){
             System.out.println(e.toString());
         }
-        return groupOrderRefList;
+        System.out.println("AFTER group list: " + this.groupOrderList.toString());
+        return this.groupOrderList;
+    }
+//----------------------------------------------------------------------------
+    public void acceptGroupOrder(String refNo, Double percentage){
+        output.println(Const.GROUP_JOIN + refNo + Const.SPLIT + this.userID + Const.SPLIT + percentage);
+        output.flush();
+        committedGroupOrderList.add(refNo);
+        System.out.println(committedGroupOrderList.toString());
     }
 //----------------------------------------------------------------------------
     private boolean userLogout(){
