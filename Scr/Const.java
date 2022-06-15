@@ -7,6 +7,9 @@
 public final class Const{ 
     public static final String LOGIN = "login";      
     public static final String SPLIT = "~"; 
+    public static final String WRONG_PASSWORD = "wrong password"; 
+    public static final String USER_ID_TAKEN = "id taken"; 
+    public static final String NO_SUCH_USER_ID = "register"; 
     
     public static final String SEARCH_KEYWORD = "search:"; 
     public static final String KEYWORD_LIST = "keyList:";

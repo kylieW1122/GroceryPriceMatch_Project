@@ -152,6 +152,8 @@ public class HostManagement{
             if(password.equals(correctPassword)){         // password correct
                 return true;
             }
+        }else{
+            //return Const.NO_SUCH_USER_ID;
         }
         return false;
     }

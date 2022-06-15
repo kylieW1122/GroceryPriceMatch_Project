@@ -679,8 +679,8 @@ public class HomePage extends JFrame implements ActionListener{
             
             registerPanel.setLayout(new FlowLayout());
             userInput_register = new JTextField(20);
-            registerPanel.add(userLabel);
-            registerPanel.add(userInput);
+            registerPanel.add(userLabel_register);
+            registerPanel.add(userInput_register);
             passwordInput_register = new JTextField(20);
             registerPanel.add(passwordLabel_register);
             registerPanel.add(passwordInput_register);

@@ -28,9 +28,8 @@ public class DataBase {
     private static HashMap<String, double[]> statisticsHashmap;
     
     final static String SOBEYS_URL = "https://voila.ca/products?source=navigation&sublocationId=43a936d1-df1d-4bf1-a09c-b23c6a8edf63";  
-    final static String STATISTICS_CANADA_FILENAME = "resources/Database/StatisticsCanada/1810000201-eng.csv";
+    final static String STATISTICS_CANADA_FILENAME = "resources/Database/1810000201-eng.csv";
     final static String COSTCO_FILENAME = "resources/Database/costCo.csv";
-    final static String NOFILLS_FILENAME = "resources/Database/noFills.csv";
     final static String WALMART_FILENAME = "resources/Database/walmart.csv";
     
     public static void main(String[] args){ //delete - just for debugging 

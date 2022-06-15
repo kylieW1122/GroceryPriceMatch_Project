@@ -1,7 +1,9 @@
 --------------Pending Group Order--------------
-6554858N~[Asparagus 1 kg, $9.09, CostCo, mike~0.4]
 65548584~[Asparagus 1 kg, $9.09, CostCo, mike~0.4]
-869770907~[Onion Yellow Your Fresh Market 3 lb bag, $2.97, Walmart, mike~0.4]
-887974418~[Choice Green Peppers 1 1/9 bushel, $44.29, CostCo, A~0.6]
+6554858T~[Asparagus 1 kg, $9.09, CostCo, mike~0.4]
+1438865252~[Red Bell Peppers 5 kg, $21.29, CostCo, A~0.5]
 --------------Completed Group Order--------------
-887974418~[Choice Green Peppers 1 1/9 bushel, $44.29, CostCo, A~0.6, mike~0.4]
+6554858R~[Asparagus 1 kg, $9.09, CostCo, mike~0.4, A~0.6]
+887974418~[Choice Green Peppers 1 1/9 bushel, $44.29, CostCo, A~0.6, A~0.4]
+869770907~[Onion Yellow Your Fresh Market 3 lb bag, $2.97, Walmart, mike~0.4, A~0.6]
+88797441J~[Choice Green Peppers 1 1/9 bushel, $44.29, CostCo, A~0.6, A~0.4]
