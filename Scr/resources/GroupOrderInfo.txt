@@ -1,9 +1,7 @@
 --------------Pending Group Order--------------
-65548584~[Asparagus 1 kg, $9.09, CostCo, mike~0.4]
-6554858T~[Asparagus 1 kg, $9.09, CostCo, mike~0.4]
-1438865252~[Red Bell Peppers 5 kg, $21.29, CostCo, A~0.5]
+1024150716~[Seedless Limes 1.36 kg, $7.99, CostCo, mike~0.4]
+14118020Z~[Whole White Mushrooms 680 g, $6.99, CostCo, a-b-c~0.6]
+102415071Z~[Seedless Limes 1.36 kg, $7.99, CostCo, mike~0.4]
+14118020O~[Whole White Mushrooms 680 g, $6.99, CostCo, A~0.2]
+141180208~[Whole White Mushrooms 680 g, $6.99, CostCo, A~0.2]
 --------------Completed Group Order--------------
-6554858R~[Asparagus 1 kg, $9.09, CostCo, mike~0.4, A~0.6]
-887974418~[Choice Green Peppers 1 1/9 bushel, $44.29, CostCo, A~0.6, A~0.4]
-869770907~[Onion Yellow Your Fresh Market 3 lb bag, $2.97, Walmart, mike~0.4, A~0.6]
-88797441J~[Choice Green Peppers 1 1/9 bushel, $44.29, CostCo, A~0.6, A~0.4]

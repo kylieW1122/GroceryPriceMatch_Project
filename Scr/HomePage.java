@@ -72,6 +72,9 @@ public class HomePage extends JFrame implements ActionListener{
     private final String BACK_HOME_STR = "Back To Home";
     private final String ACCOUNT_DETAIL_STR = "View Account Details";
     
+    private final int DEFAULT_FRAME_SIZE_WIDTH = 1000;
+    private final int DEFAULT_FRAME_SIZE_HEIGHT = 700;
+    
     JPanel homePagePanel;
     
     JPanel midPanel;
@@ -91,19 +94,12 @@ public class HomePage extends JFrame implements ActionListener{
     JPanel cardPanel;
     CardLayout cl;
     JComboBox actionList;
-    //
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        HomePage frame = new HomePage(new User()); //delete - just for testing
-    }
 //----------------------------------------------------------------------------
     HomePage(User user){
         this.user = user;
         this.setTitle("Company Name");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(750, 500);
+        this.setSize(DEFAULT_FRAME_SIZE_WIDTH, DEFAULT_FRAME_SIZE_HEIGHT);
         this.setResizable(true);
         this.setLayout(new BorderLayout());
         /********************set cardPanel**********************/
@@ -179,7 +175,6 @@ public class HomePage extends JFrame implements ActionListener{
                 index = index+1;
             }
             String cardNo = Integer.toString(index);
-            System.out.println("card no: " + cardNo);
             if(cardNo.equals(GROUP_ORDER_INDEX)){
                 loginRequired(GROUP_ORDER_INDEX);
             }else if (cardNo.equals(ACCOUNT_DETAIL_INDEX)){
@@ -188,7 +183,6 @@ public class HomePage extends JFrame implements ActionListener{
                 cl.show(cardPanel, cardNo);
             }
         }else if (event.getSource() instanceof JButton){
-            System.out.println("jbutton click!");
             String command = event.getActionCommand();
             if(command.equals(PRICE_ANALYSIS_STR)){
                 changeCardPanel(PRICE_ANALYSIS_INDEX);
@@ -202,24 +196,25 @@ public class HomePage extends JFrame implements ActionListener{
                 changeCardPanel(SEARCH_PAGE_INDEX);
                 String userInputText = searchTextField.getText();
                 searchTextField.setText("");
-                System.out.println("user text: " + userInputText);
                 searchItemPanel.searchKeyWord(userInputText);
             }
         }
     }
 //----------------------------------------------------------------------------
     private void loginRequired(String pageIndex){
-        if(user.getUserID()!=null){     //if user is logged in
+        if(!user.getUserID().equals("")){     //if user is logged in
             changeCardPanel(pageIndex);
         }else{
             accountLoginPanel.setNextIndex(pageIndex);
             cl.show(cardPanel, ACCOUNT_LOGIN_INDEX);
-            System.out.println("not yet login");
         }
     }
 //----------------------------------------------------------------------------
     private void changeCardPanel(String index){
         cl.show(cardPanel, index);
+        if(index.equals(ACCOUNT_DETAIL_INDEX)){
+            acountDetailPanel.updateDetailPanel();
+        }
         if(index.equals(HOME_PAGE_INDEX)){
             actionList.setSelectedIndex(Integer.parseInt(index));
         }else if (!index.equals(SEARCH_PAGE_INDEX)){
@@ -347,10 +342,10 @@ public class HomePage extends JFrame implements ActionListener{
 //inner class - GroupOrderPage
 //----------------------------------------------------------------------------
     private class GroupOrderPage extends JPanel implements ActionListener{
-        private ArrayList<String> list;
         JPanel topPanel;
         JPanel rightPanel;
         JPanel labelPanel, textFieldPanel;
+        JScrollPane orderStream_scrollPane;
         JTextField itemNameField;
         JButton createRequestButton;
         
@@ -367,12 +362,18 @@ public class HomePage extends JFrame implements ActionListener{
         JPanel orderDisplayPanel;
         JButton refreshButton;
         
+        private ArrayList<String> list;
+        
         final String PRICE_DEFAULT_STR = "Price: $ ";
         final String LOCATION_DEFAULT_STR = "Store Location: ";
+        final int ORDER_PANEL_WIDTH = 230;
+        final int ORDER_PANEL_HEIGHT = 190;
+        final int SCROLL_PANE_WIDTH = 300;
         
         private Double amountPercentage = -1.0;
         private String itemInfo = "";
         
+        private ArrayList<OrderPanel> orderPanelList;
         private HashMap<String, ArrayList<String>> groupOrderMap;
 //----------------------------------------------------------------------------
         private String[] amountList_cb = {"", "10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %", "80 %", "90 %"};
@@ -382,15 +383,16 @@ public class HomePage extends JFrame implements ActionListener{
             rightPanel = new JPanel();
             labelPanel = new JPanel();
             textFieldPanel = new JPanel();
+
             rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.PAGE_AXIS));
-            rightPanel.setMaximumSize(new Dimension(200, 0));
+            rightPanel.setPreferredSize(new Dimension(250, 0));
             /**********************set up request label list ****************************/
             /***********ITEM************/
             itemLabel = new JLabel("Item: ");
             itemLabel.setAlignmentX(JLabel.LEFT);
             itemNameField = new JTextField(20);
+            
             list = user.getWholeItemArrayList();
-            System.out.println("size: " + list.size());
             String[] cb_itemList =  new String[list.size()+1];
             cb_itemList[0] = "";
             for(int st=0; st<list.size(); st++){
@@ -400,7 +402,7 @@ public class HomePage extends JFrame implements ActionListener{
             }
             itemComboBox = new AutoCompleteComboBox(cb_itemList);
             itemComboBox.setMaximumSize(new Dimension(200, 20));
-            //http://www.orbital-computer.de/JComboBox/
+            
             itemComboBox.addActionListener(this);
             rightPanel.add(itemLabel);
             rightPanel.add(itemComboBox);
@@ -433,63 +435,82 @@ public class HomePage extends JFrame implements ActionListener{
             createRequestButton = new JButton("Create");
             createRequestButton.addActionListener(this);
             rightPanel.add(createRequestButton);
-            JPanel upPanel = new JPanel();
-            upPanel.setLayout(new BoxLayout(upPanel, BoxLayout.Y_AXIS));
-            orderDisplayPanel = new JPanel(new FlowLayout());
-            this.setUpGroupOrderBoxes();
+            
+            /**********************Create group order stream******************************/
+            orderDisplayPanel = new JPanel();
+            this.updateOrderPanel();
+            orderStream_scrollPane = new JScrollPane(orderDisplayPanel, 
+                                                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            
+            orderStream_scrollPane.setMaximumSize(new Dimension(SCROLL_PANE_WIDTH,0));
             
             refreshButton = new JButton("Refresh");
             refreshButton.addActionListener(this);
+            
             this.add(refreshButton, BorderLayout.SOUTH);
             this.add(rightPanel, BorderLayout.EAST);
-            this.add(orderDisplayPanel, BorderLayout.CENTER);
+            this.add(orderStream_scrollPane, BorderLayout.CENTER);
         }
 //------------------------------------------------------------------------------
-        private void setUpGroupOrderBoxes(){
-            this.groupOrderMap = new HashMap<String, ArrayList<String>>();
-            this.groupOrderMap = user.refreshGroupOrder();
+        private void updateOrderPanel(){
+            this.orderPanelList = setUpGroupOrderBoxes();
             orderDisplayPanel.removeAll();
-            
-            System.out.println("size of the order: " + groupOrderMap.size());
-            /*****loop throught the group order list****/
-            for(String refNo : groupOrderMap.keySet()){
-                ArrayList<String> orderInfo = groupOrderMap.get(refNo);
-                orderDisplayPanel.add(new OrderPanel(refNo, orderInfo));
+
+            orderDisplayPanel.setLayout(new GridLayout(0, 3));
+            for(OrderPanel pane: this.orderPanelList){
+                orderDisplayPanel.add(pane);
             }
             this.revalidate();
             this.repaint();
         }
 //------------------------------------------------------------------------------
+        private ArrayList<OrderPanel> setUpGroupOrderBoxes(){
+            this.groupOrderMap = new HashMap<String, ArrayList<String>>();
+            this.groupOrderMap = user.refreshGroupOrder();
+            ArrayList<OrderPanel> resultList = new ArrayList<OrderPanel>();
+            resultList.clear();
+            /*****loop throught the group order list****/
+            for(String refNo : groupOrderMap.keySet()){
+                if(!user.hasCommittedThisGroupOrder(refNo)){
+                ArrayList<String> orderInfo = groupOrderMap.get(refNo);
+                resultList.add(new OrderPanel(refNo, orderInfo));
+                }
+            }
+            return resultList;
+        }
+//------------------------------------------------------------------------------
         @Override
         public void actionPerformed(ActionEvent event){
+            int amountIndex = amountComboBox.getSelectedIndex();
+            int selectedIndex = itemComboBox.getSelectedIndex();
+            String amountStr = amountList_cb[amountIndex];
             if(event.getSource() instanceof JComboBox){
                 JComboBox cb = (JComboBox)event.getSource();
-                int amountIndex = amountComboBox.getSelectedIndex();
-                int selectedIndex = itemComboBox.getSelectedIndex();
-                String amountStr = amountList_cb[amountIndex];
                 
                 if( (!amountStr.equals("")) && (selectedIndex>0) ){
-                    itemInfo = list.get(selectedIndex-1);
-                    String totalPriceString = itemInfo.substring(itemInfo.indexOf("$")+1 , itemInfo.indexOf(" @ "));
-                    String locationString = itemInfo.substring(itemInfo.indexOf(" @ ")+3);
-                    amountStr = amountStr.substring(0, 2);
-                    
-                    amountPercentage = 0.0;
-                    Double totalPrice = 0.0;
-                    try{
-                        amountPercentage = Double.parseDouble(amountStr);
-                        amountPercentage = amountPercentage/100.00;
-                        totalPrice = Double.parseDouble(totalPriceString);
-                    }catch (NumberFormatException numberEx){ //if the data format is not a double
-                        amountPercentage = -1.0; 
-                        totalPrice = -1.0;
+                    if(list!=null){
+                        itemInfo = list.get(selectedIndex-1);
+                        String totalPriceString = itemInfo.substring(itemInfo.indexOf("$")+1 , itemInfo.indexOf(" @ "));
+                        String locationString = itemInfo.substring(itemInfo.indexOf(" @ ")+3);
+                        amountStr = amountStr.substring(0, 2);
+                        
+                        amountPercentage = 0.0;
+                        Double totalPrice = 0.0;
+                        try{
+                            amountPercentage = Double.parseDouble(amountStr);
+                            amountPercentage = amountPercentage/100.00;
+                            totalPrice = Double.parseDouble(totalPriceString);
+                        }catch (NumberFormatException numberEx){ //if the data format is not a double
+                            amountPercentage = -1.0; 
+                            totalPrice = -1.0;
+                        }
+                        Double finalPrice = totalPrice*amountPercentage;
+                        finalPrice = Math.round(finalPrice*100.0) /100.0;
+                        /**********update panel***************/
+                        priceLabel.setText(PRICE_DEFAULT_STR + finalPrice);
+                        locationLabel.setText(LOCATION_DEFAULT_STR + locationString);
                     }
-                    Double finalPrice = totalPrice*amountPercentage;
-                    finalPrice = Math.round(finalPrice*100.0) /100.0;
-                    //System.out.println("final price!" + finalPrice + " = " + amountPercentage + " " + totalPrice);
-                    /**********update panel***************/
-                    priceLabel.setText(PRICE_DEFAULT_STR + finalPrice);
-                    locationLabel.setText(LOCATION_DEFAULT_STR + locationString);
                 }           
                 
             }
@@ -497,8 +518,7 @@ public class HomePage extends JFrame implements ActionListener{
                 JButton jButton = (JButton)event.getSource();
                 if(jButton.equals(createRequestButton)){
                     boolean createStatus = false;
-                    //                System.out.println(amountPercentage + "  " + itemInfo);
-                    if ( (amountPercentage>0.0) && (!itemInfo.equals("")) ){ // and time and date is not empty
+                    if ( (selectedIndex>0) && (amountPercentage>0.0) && (!itemInfo.equals("")) ){ // and time and date is not empty
                         createStatus = user.createGroupOrder(itemInfo, amountPercentage); // time, date 
                     }
                     if(createStatus){
@@ -509,7 +529,7 @@ public class HomePage extends JFrame implements ActionListener{
                         System.out.println("something went wrong");
                     }
                 }else if (jButton.equals(refreshButton)){
-                    this.setUpGroupOrderBoxes();
+                    this.updateOrderPanel();
                 } 
             }
             this.revalidate();
@@ -546,8 +566,8 @@ public class HomePage extends JFrame implements ActionListener{
             OrderPanel(String refNo, ArrayList<String> orderInfoList){
                 //example format: 1438865252, {Red Bell Peppers 5 kg, $21.29, CostCo, userID~0.4}
                 this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-                this.setPreferredSize(new Dimension(230,190));
-                this.setMaximumSize(new Dimension(230,190));
+                this.setPreferredSize(new Dimension(ORDER_PANEL_WIDTH,ORDER_PANEL_HEIGHT));
+                this.setMaximumSize(new Dimension(ORDER_PANEL_WIDTH,ORDER_PANEL_HEIGHT));
                 this.refNo = refNo; 
                 if(orderInfoList.size()>=3){
                     this.itemInfo = orderInfoList.get(0);
@@ -561,7 +581,7 @@ public class HomePage extends JFrame implements ActionListener{
                 for(int info=3; info<orderInfoList.size(); info++){
                     String temp = orderInfoList.get(info);
                     if(this.memberStr.equals("")){
-                         this.memberStr = temp.substring(0, temp.indexOf(Const.SPLIT));
+                        this.memberStr = temp.substring(0, temp.indexOf(Const.SPLIT));
                     }else{
                         this.memberStr = temp.substring(0, temp.indexOf(Const.SPLIT)) + ", " + this.memberStr;
                     }
@@ -620,7 +640,7 @@ public class HomePage extends JFrame implements ActionListener{
                 if (event.getSource() instanceof JButton){
                     JButton jButton = (JButton)event.getSource();
                     user.acceptGroupOrder(this.refNo, amountPercentage);
-                    System.out.println("accept grp order " + refNo);
+                    updateOrderPanel();
                 }
             }
         }
@@ -628,10 +648,87 @@ public class HomePage extends JFrame implements ActionListener{
 //----------------------------------------------------------------------------
 //inner class - AccountDetailPage
 //----------------------------------------------------------------------------
-    private class AccountDetailPage extends JPanel{
+    private class AccountDetailPage extends JPanel implements ActionListener{
+        private String userID;
+        JPanel pendingGrpOrder_Panel, comfirmedGrpOrder_Panel, resetPassword_Panel;
+        JLabel welcomeLabel;
+        
+        JPanel pendingOrder_Panel, completeOrder_Panel;
+        
+        
+        JPanel oldPassword_Panel, newPassword_Panel;
+        JLabel oldPassword_label, newPassword_label;
+        JTextField oldPassword_tf, newPassword_tf;
+        JButton resetPassword_button;
+        JLabel password_msg_label;
+        
         AccountDetailPage(){
+            this.userID = user.getUserID();
+            this.setLayout(new BorderLayout()); //new BoxLayout(this, BoxLayout.Y_AXIS));
+            welcomeLabel = new JLabel("Hi, " + this.userID + "!");
+            welcomeLabel.setHorizontalAlignment(JButton.CENTER);
             
+            /***********Reset Password Panel************/
+            resetPassword_Panel = new JPanel();
+            resetPassword_Panel.setLayout(new BoxLayout(resetPassword_Panel, BoxLayout.Y_AXIS));
+            resetPassword_Panel.setMaximumSize(new Dimension(DEFAULT_FRAME_SIZE_WIDTH, 100));
+            oldPassword_Panel= new JPanel();             //set up old password area
+            oldPassword_label = new JLabel("Old Password: ");
+            oldPassword_tf = new JTextField(20);
+            oldPassword_Panel.add(oldPassword_label);
+            oldPassword_Panel.add(oldPassword_tf);
+            newPassword_Panel = new JPanel();             //set up new password area
+            newPassword_label = new JLabel("New Password: ");
+            newPassword_tf = new JTextField(20);
+            newPassword_Panel.add(newPassword_label);
+            newPassword_Panel.add(newPassword_tf);
+             
+            resetPassword_button = new JButton("Change");
+            password_msg_label = new JLabel("");
+            resetPassword_button.addActionListener(this);
+            resetPassword_button.setAlignmentX(Component.CENTER_ALIGNMENT);
+            password_msg_label.setAlignmentX(Component.CENTER_ALIGNMENT);
+            resetPassword_Panel.add(oldPassword_Panel);    //add them into reset password area
+            resetPassword_Panel.add(newPassword_Panel);
+            resetPassword_Panel.add(resetPassword_button);
+            resetPassword_Panel.add(password_msg_label);
+            /******************add everything into this jpanel - boxlayout ***********************/
+            this.add(welcomeLabel, BorderLayout.NORTH);
+            this.add(resetPassword_Panel, BorderLayout.SOUTH);
         }
+        //----------------------------------------------------------------------------
+        private void updateDetailPanel(){
+            this.userID = user.getUserID();
+            welcomeLabel.setText("Hi, " + this.userID + "!");
+            this.revalidate();
+            this.repaint();
+        }
+        //----------------------------------------------------------------------------
+            @Override
+            public void actionPerformed(ActionEvent event){
+                if (event.getSource() instanceof JButton){
+                    JButton jButton = (JButton)event.getSource();
+                    if(jButton.equals(resetPassword_button)){
+                        System.out.println("pass");
+                        String oldPassword = oldPassword_tf.getText();
+                        String newPassword = newPassword_tf.getText();
+                        boolean status = user.resetPassword(this.userID, oldPassword, newPassword);
+                        System.out.println("hyell");
+                        if(status){
+                            password_msg_label.setText("Password updated");
+                        }else{
+                            password_msg_label.setText("Wrong old password. Please try again. ");
+                        }
+                        System.out.println("status: " + status);
+                        oldPassword_tf.setText("");
+                        newPassword_tf.setText("");
+                    }
+                }
+                
+                this.revalidate();
+                this.repaint();
+            }
+            //resetPassword
     }
 //----------------------------------------------------------------------------
 //inner class - AccountLoginPage
@@ -653,9 +750,17 @@ public class HomePage extends JFrame implements ActionListener{
         JTextField passwordInput_register;
         JButton registerEnter;
         
+        JLabel loginLabel;
+        JLabel registerLabel;
+        
         AccountLoginPage(){
+            this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+            loginLabel = new JLabel("Login");
+            registerLabel = new JLabel("Register");
+            
             /**********login panel***********/
             loginPanel = new JPanel();
+            loginPanel.setMaximumSize(new Dimension(DEFAULT_FRAME_SIZE_WIDTH, 100));
             userLabel = new JLabel("User ID: ");
             passwordLabel = new JLabel("Password: ");
             loginEnter = new JButton("Login");
@@ -672,6 +777,7 @@ public class HomePage extends JFrame implements ActionListener{
             loginPanel.add(loginEnter);
             /**********register panel***********/
             registerPanel = new JPanel();
+            registerPanel.setMaximumSize(new Dimension(DEFAULT_FRAME_SIZE_WIDTH, 100));
             userLabel_register = new JLabel("User ID: ");
             passwordLabel_register = new JLabel("Password: ");
             registerEnter = new JButton("Register");
@@ -687,29 +793,52 @@ public class HomePage extends JFrame implements ActionListener{
             registerPanel.add(registerEnter);
             registerPanel.setVisible(false);
             /**********add everything into the panel***********/
+            loginPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            this.add(loginLabel);
             this.add(loginPanel);
             this.add(messageLabel);
+            this.add(registerLabel);
             this.add(registerPanel);
-            
         }
+//----------------------------------------------------------------------------
         public void setNextIndex(String index){
             this.nextPageIndex = index;
         }
+//----------------------------------------------------------------------------
         @Override
         public void actionPerformed(ActionEvent event){
-            String userText = userInput.getText();
-            String passwordText = passwordInput.getText();
-            System.out.println("log: " + userText + "/" + passwordText);
             //catch unacceptable character in here; edit messagelabel's text
-            
-            boolean loginStatus = user.userLogin(userText, passwordText);
-            if(loginStatus){
-                changeCardPanel(this.nextPageIndex);
-            }else{    //wrong userId / password
-                messageLabel.setText("Wrong user ID / password. Please try again.");
+            if (event.getSource() instanceof JButton){
+                JButton jButton = (JButton)event.getSource();
+                if(jButton.equals(loginEnter)){
+                    String userText = userInput.getText();
+                    String passwordText = passwordInput.getText();
+                    String loginStatus = user.userLogin(userText, passwordText);
+                    if(loginStatus.equals(Const.LOGIN_ACCEPTED)){
+                        changeCardPanel(this.nextPageIndex);
+                    }else if (loginStatus.equals(Const.WRONG_PASSWORD)){    //wrong password
+                        messageLabel.setText("Wrong password. Please try again.");
+                    }else if (loginStatus.equals(Const.NO_SUCH_USER_ID)){   //userID not found
+                        messageLabel.setText("User ID not found. Please register or try again.");
+                        registerPanel.setVisible(true);
+                    }
+                }
+                if(jButton.equals(registerEnter)){
+                    String userText = userInput_register.getText();
+                    String passwordText = passwordInput_register.getText();
+                    String registerStatus = user.registerUser(userText, passwordText);
+                    if(registerStatus.equals(Const.LOGIN_ACCEPTED)){
+                        changeCardPanel(this.nextPageIndex);
+                    }else if (registerStatus.equals(Const.USER_ID_TAKEN)){
+                        messageLabel.setText("User ID is taken. Please try another ID.");
+                    }
+                }
             }
-            userInput.setText("");
+            userInput.setText("");                  //clear all jtextfield 
             passwordInput.setText("");
+            userInput_register.setText("");
+            passwordInput_register.setText("");
+            
         }
     }
 }

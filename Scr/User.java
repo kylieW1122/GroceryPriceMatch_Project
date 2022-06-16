@@ -14,11 +14,9 @@ import java.io.OutputStream;
  * @version 1.0, build June 2, 2022
  */
 public class User{
-    private String password;
     private String userID;
-    private static ArrayList<String> requestGroupOrderList;
-    private HashSet<String> committedGroupOrderList;
-    private HashMap<String, ArrayList<String>> groupOrderList;
+    private HashSet<String> committedGroupOrderRefNoList;
+    //private HashMap<String, ArrayList<String>> ;
     
     final String LOCAL_HOST = "127.0.0.1";
     final int PORT = 6666;
@@ -34,39 +32,63 @@ public class User{
     }
 //----------------------------------------------------------------------------
     User(){
-        this.requestGroupOrderList = new ArrayList<String>();
-        this.committedGroupOrderList = new HashSet<String>();
-        this.groupOrderList = new HashMap<String, ArrayList<String>>();
-        this.userID = null;
-        this.password = null;
+        this.committedGroupOrderRefNoList = new HashSet<String>();
+        this.userID = "";
         this.startConnecting();
     }
 //----------------------------------------------------------------------------
-    public String getUserID(){ return userID; }
+    public String getUserID(){ return this.userID; }
 //----------------------------------------------------------------------------
     public void createGroupOrder(String requestInfo){
         if(clientSocket.isConnected()){
             output.println("grpOrder - "+ this.getUserID() + "," +requestInfo);               //send the requestInfo to the host
             output.flush();
-            this.requestGroupOrderList.add(requestInfo);
-            System.out.println("here: " + requestGroupOrderList.toString());
         }
     }
 /****************************************************************************/
 //Networking
 //----------------------------------------------------------------------------
-    public boolean userLogin(String id, String password){
+    public String userLogin(String id, String password){
         output.println(Const.LOGIN + id + Const.SPLIT + password);
         output.flush();
+        String msg="";
         try{
-            String msg = input.readLine();
-            if(msg.equals("true")){
+            msg = input.readLine();
+            if(msg.equals(Const.LOGIN_ACCEPTED)){
                 this.userID = id;
-                this.password = password;
+            }
+        }catch(IOException exception){
+            System.out.println("ERROR - problem occurred when requesting user-login from the host"); 
+        }
+        return msg;
+    }
+//----------------------------------------------------------------------------
+    public String registerUser(String id, String password){
+        output.println(Const.REGISTER + id + Const.SPLIT + password);
+        output.flush();
+        String msg="";
+        try{
+            msg = input.readLine();
+            if(msg.equals(Const.LOGIN_ACCEPTED)){
+                this.userID = id;
+            }
+        }catch(IOException exception){
+            System.out.println("ERROR - problem occurred when  when requesting register-user from the host"); 
+        }
+        return msg;
+    }
+//----------------------------------------------------------------------------
+    public boolean resetPassword(String id, String oldPassword, String newPassword){
+        output.println(Const.PASSWORD_RESET + id + Const.SPLIT + oldPassword + Const.SPLIT + newPassword);
+        output.flush();
+        String msg = "";
+        try{
+            msg = input.readLine();
+            if(msg.equals("true")){
                 return true;
             }
         }catch(IOException exception){
-            exception.printStackTrace();
+            System.out.println("ERROR - problem occurred when requesting user-login from the host"); 
         }
         return false;
     }
@@ -79,9 +101,9 @@ public class User{
             Object object = objectInput.readObject();
             result = (ArrayList<String>)object;
         }catch(ClassNotFoundException ex){
-            System.out.println(ex.toString());
+            System.out.println("ERROR - objects do not match"); 
         }catch(IOException e){
-            System.out.println(e.toString());
+            System.out.println("ERROR - problem occurred when requesting search result from the host"); 
         }
         if(result == null){
             return new ArrayList<String>();
@@ -97,12 +119,9 @@ public class User{
             Object object = objectInput.readObject();
             result = (ArrayList<String>)object;
         }catch(ClassNotFoundException ex){
-            System.out.println(ex.toString());
+            System.out.println("ERROR - objects do not match"); 
         }catch(IOException e){
-            System.out.println(e.toString());
-        }
-        if(result == null){
-            return new ArrayList<String>();
+            System.out.println("ERROR - problem occurred when requesting item list from the host"); 
         }
         return result;
     }
@@ -110,35 +129,56 @@ public class User{
     public boolean createGroupOrder(String itemInfo, Double amountPercentage){
         output.println(Const.GROUP_ORDER + itemInfo + Const.SPLIT + this.userID + Const.SPLIT + amountPercentage + Const.SPLIT);
         output.flush();
+        String refNo = "";
+        try{
+            refNo = input.readLine();
+            setCommittedGroupOrderList();
+        }catch(IOException exception){
+            System.out.println("ERROR - problem occurred when requesting refNo. from the host"); 
+        }
         return true;
     }
 //----------------------------------------------------------------------------
     public HashMap<String, ArrayList<String>> refreshGroupOrder(){
-        System.out.println("BEFORE group list: " + this.groupOrderList.toString());
+        HashMap<String, ArrayList<String>> result = new HashMap<String, ArrayList<String>>();
         output.println(Const.GROUP_REFRESH);
         output.flush();
-        this.groupOrderList.clear();
         try{
             Object object = objectInput.readObject();
-            this.groupOrderList = (HashMap<String, ArrayList<String>>)object;
+            result = (HashMap<String, ArrayList<String>>)object;
         }catch(ClassNotFoundException ex){
-            System.out.println(ex.toString());
+            System.out.println("ERROR - objects do not match"); 
         }catch(IOException e){
-            System.out.println(e.toString());
+            System.out.println("ERROR - problem occurred when requesting group order list from the host"); 
         }
-        System.out.println("AFTER group list: " + this.groupOrderList.toString());
-        return this.groupOrderList;
+        return result;
     }
 //----------------------------------------------------------------------------
     public void acceptGroupOrder(String refNo, Double percentage){
         output.println(Const.GROUP_JOIN + refNo + Const.SPLIT + this.userID + Const.SPLIT + percentage);
         output.flush();
-        committedGroupOrderList.add(refNo);
-        System.out.println(committedGroupOrderList.toString());
+        setCommittedGroupOrderList();
     }
 //----------------------------------------------------------------------------
-    private boolean userLogout(){
-        return this.stopConnecting();
+    public boolean hasCommittedThisGroupOrder(String refNo){
+        if(committedGroupOrderRefNoList.contains(refNo)){
+            return true;
+        }
+        return false;
+    }
+//----------------------------------------------------------------------------
+    private void setCommittedGroupOrderList(){
+        output.println(Const.GET_USER_REFNO_LIST + this.userID);
+        output.flush();
+        try{
+            Object object = objectInput.readObject();
+            this.committedGroupOrderRefNoList = (HashSet<String>)object;
+            System.out.println(committedGroupOrderRefNoList.toString());
+        }catch(ClassNotFoundException ex){
+            System.out.println("ERROR - objects do not match"); 
+        }catch(IOException e){
+            System.out.println("ERROR - problem occurred when requesting user refNo. list from the host"); 
+        }
     }
 //----------------------------------------------------------------------------
     private boolean startConnecting(){
@@ -153,27 +193,11 @@ public class User{
             String msg = input.readLine();                        //get a response from the server
             System.out.println("Message from server: '" + msg+"'"); 
         }catch (Exception e){
+            
             //directly use database, instead of host, block all group order
             e.printStackTrace();
             return false;
         }
         return true;
     }
-//----------------------------------------------------------------------------
-    private boolean stopConnecting(){
-        try{
-            input.close();
-            output.close();
-            clientSocket.close();
-        }catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-//----------------------------------------------------------------------------
-/****************************************************************************/
-    @Override
-    public String toString(){ return this.userID; }
-//----------------------------------------------------------------------------
 }

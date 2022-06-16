@@ -185,13 +185,10 @@ public class DataBase {
             }
             
             if (statisticsList != null && !statisticsList.isEmpty()) {
-                
-                
                 Set<String> keys = statisticsList.keySet();
                 
                 for (String key: keys) {
-                    
-                    
+
                     double[] prices = statisticsList.get(key);
                     for (int i=0; i < prices.length; i++) {
                         ProductInfo prodInfo = new ProductInfo();
@@ -201,12 +198,11 @@ public class DataBase {
                         prodInfo.setPrice(prices[i]);
                         productList.add(prodInfo);
                     }
-                    
                 }
             }
             /*******************************************************************************/
         }catch (IOException e){
-            e.printStackTrace();
+            //leave it as an empty list
         } 
         return statisticsList;
     }
@@ -241,7 +237,7 @@ public class DataBase {
                 indexOfMap++;
             }
         }catch (IOException e){
-            e.printStackTrace();
+            //leave it as an empty list
         } 
         return sobeysList;
     }
@@ -262,7 +258,7 @@ public class DataBase {
                 addKeyword(itemNameTemp + " = " + itemPriceTemp, "CostCo");
             }
         }catch (IOException e){
-            e.printStackTrace();
+            //leave it as an empty list
         } 
         return costCoList;
     }
@@ -281,7 +277,7 @@ public class DataBase {
                 addKeyword(itemNameTemp + " = " + itemPriceTemp,"Walmart");
             }
         }catch (IOException e){
-            e.printStackTrace();
+            //leave it as an empty list
         }
         return walmartList;
     }
