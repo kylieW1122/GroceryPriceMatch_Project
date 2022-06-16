@@ -1,14 +1,20 @@
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.util.Collections;
+import java.util.Random;
+import java.util.HashSet;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.ObjectInputStream;
+import java.io.InputStreamReader;
 import java.io.InputStream;
 import java.io.FileReader;
 import java.io.BufferedReader;
+import java.io.PrintWriter;
+import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 /**[PriceMatchManagement.java]
   * This is final project - price match program
@@ -39,7 +45,6 @@ public class HostManagement{
     final int PORT = 6666;
     ServerSocket serverSocket;
     Socket clientSocket;
-    
 //----------------------------------------------------------------------------
     public static void main(String[] args){
         HostManagement hostServer = new HostManagement();
@@ -48,7 +53,6 @@ public class HostManagement{
     HostManagement(){
         this.database = new DataBase();
         this.setUp();
-        System.out.println(userPasswordMap.toString());
         this.writeUpdatedInfoToFiles();
         try{
             this.start();
@@ -63,18 +67,26 @@ public class HostManagement{
             
             this.userInfo_titleStr = input.readLine(); 
             while(input.ready()){    //keep reading lines while the End-of-File hasn't been reached
-                String name = input.readLine(); 
+                String msg = input.readLine(); 
+                String name = msg.substring(3, msg.indexOf(": "));
+                msg = msg.substring(msg.indexOf(": ")+2);
                 String password;
-                if(name.indexOf(Const.SPLIT)!=-1){
-                    password = name.substring(name.indexOf(": ")+2, name.indexOf(Const.SPLIT));
+                /******************set up the user's group order refNo list**********************/             
+                if(msg.indexOf(Const.SPLIT)!=-1){
+                    password = msg.substring(0, msg.indexOf(Const.SPLIT));
+                    msg = msg.substring(msg.indexOf(Const.SPLIT)+1);
+                    String listString = msg.substring(1, msg.length()-1);
+                    String[] arr = listString.split(", ");
+                    ArrayList<String> refNoArrayList = new ArrayList<String>();
+                    Collections.addAll(refNoArrayList, arr);
+                    userIDRefNoMap.put(name, refNoArrayList);
                 }else{
-                    password = name.substring(name.indexOf(": ")+2);
+                    password = msg;
                 }
-                name = name.substring(3, name.indexOf(": "));
                 userPasswordMap.put(name, password);
             }
             input.close();
-           
+            /******************set up the overall group order refNo list**********************/
             fileReader = new FileReader(groupOrder_fileName);
             input = new BufferedReader(fileReader);
             String line;
@@ -90,7 +102,6 @@ public class HostManagement{
                     refNoMapPending.put(refNo, infoList); //refNo, ArrayList<String> infoList
                 }
             }
-            System.out.println(refNoMapPending.toString());
             while((line = input.readLine()) != null){    //keep reading lines while the End-of-File hasn't been reached
                 //line format: 887974418~[Choice Green Peppers 1 1/9 bushel, $44.29, CostCo, A~0.6, mike~0.4]
                 String refNo = line.substring(0, line.indexOf(Const.SPLIT));
@@ -102,7 +113,6 @@ public class HostManagement{
                 refNoMapCompleted.put(refNo, infoList); //refNo, ArrayList<String> infoList
             }
             input.close();
-            
         }catch (IOException e){
             System.out.println("ERROR - file '" + userinfo_fileName + "' not found. ");
         }
@@ -110,20 +120,23 @@ public class HostManagement{
 //----------------------------------------------------------------------------
     private void writeUpdatedInfoToFiles(){ // rewrite the file everytime group order list has changed
         try{
+            /**********************write the GroupOrderInfo.txt*********************************/
             groupOrderFile = new File(groupOrder_fileName);
             output_writer = new PrintWriter(groupOrderFile);
+            //write group order info for pending orders
             output_writer.println(Const.GROUP_INFO_PENDING_SPLIT);
             for(String refNo: refNoMapPending.keySet()){
                 ArrayList<String> list = refNoMapPending.get(refNo);
                 output_writer.println(refNo + Const.SPLIT + list.toString());
             }
+            //write group order info for completed orders
             output_writer.println(Const.GROUP_INFO_COMPLETED_SPLIT);
             for(String refNo: refNoMapCompleted.keySet()){
                 ArrayList<String> list = refNoMapCompleted.get(refNo);
                 output_writer.println(refNo + Const.SPLIT + list.toString());
             }
             output_writer.close();
-            
+            /**********************write the UserInfo.txt****************************/
             userInfoFile = new File(userinfo_fileName);
             output_writer = new PrintWriter(userInfoFile);
             output_writer.println(userInfo_titleStr);
@@ -147,7 +160,7 @@ public class HostManagement{
     private String loginUser(String id, String password){
         if(userPasswordMap.containsKey(id)){
             String correctPassword = userPasswordMap.get(id);
-            if(password.equals(correctPassword)){         // password correct
+            if(password.equals(correctPassword)){       // password correct
                 return Const.LOGIN_ACCEPTED;
             }else{
                 return Const.WRONG_PASSWORD;
@@ -159,7 +172,7 @@ public class HostManagement{
 //----------------------------------------------------------------------------
     private String registerUser(String id, String password){
         if(userPasswordMap.containsKey(id)){
-            return Const.USER_ID_TAKEN; //false - userId taken 
+            return Const.USER_ID_TAKEN;   //false - userId taken 
         }else{
             userPasswordMap.put(id, password);
             writeUpdatedInfoToFiles();
@@ -177,7 +190,6 @@ public class HostManagement{
             }
         }
         return false;
-        
     }
 //----------------------------------------------------------------------------
     private String makeGroupOrder(String msg){
@@ -209,13 +221,12 @@ public class HostManagement{
             user_listOfRefNo.add(refNo);
         }else{
             user_listOfRefNo.add(refNo);
-            userIDRefNoMap.put(userID, user_listOfRefNo);
         }
+        userIDRefNoMap.put(userID, user_listOfRefNo);
     }
 //----------------------------------------------------------------------------
     private String generateUniqueRefNo(String itemInfo){
         int hash_code = Math.abs(itemInfo.hashCode());
-        System.out.println(hash_code);
         String refNo = Integer.toString(hash_code);
         while(refNoMapPending.containsKey(refNo)){
             Random random = new Random();
@@ -233,20 +244,22 @@ public class HostManagement{
         msg = msg.substring(msg.indexOf(Const.SPLIT)+1);
         String amountPercentage = msg;
         
-        updateRefNoListsInUser(refNo, userID);
         if(refNoMapPending.containsKey(refNo)){
             ArrayList<String> orderInfoList = refNoMapPending.get(refNo);
             orderInfoList.add(userID + Const.SPLIT + amountPercentage);
             refNoMapCompleted.put(refNo, orderInfoList);
             refNoMapPending.remove(refNo);
         }
+        updateRefNoListsInUser(refNo, userID);
         writeUpdatedInfoToFiles();
     }
 //----------------------------------------------------------------------------
     private HashSet<String> getRefNoList_user(String userID){
         HashSet<String> result = new HashSet<String>();
         ArrayList<String> user_refList = userIDRefNoMap.get(userID);
-        result.addAll(user_refList);
+        if(user_refList!=null){
+            result.addAll(user_refList);
+        }
         return result;
     }
 //----------------------------------------------------------------------------
@@ -255,7 +268,7 @@ public class HostManagement{
         ArrayList<String> user_refList = userIDRefNoMap.get(userID);
         for(String refNo: refNoMapCompleted.keySet()){
             ArrayList<String> orderInfoList = refNoMapCompleted.get(refNo);
-            if(user_refList.contains(refNo)){        // if that refNo is part of user's group order
+            if(!user_refList.contains(refNo)){        // if that refNo is part of user's completed group order
                 result.put(refNo, orderInfoList);
             }
         }
@@ -267,7 +280,7 @@ public class HostManagement{
         ArrayList<String> user_refList = userIDRefNoMap.get(userID);
         for(String refNo: refNoMapPending.keySet()){
             ArrayList<String> orderInfoList = refNoMapPending.get(refNo);
-            if(user_refList.contains(refNo)){        // if that refNo is part of user's group order
+            if(user_refList.contains(refNo)){        // if that refNo is part of user's pending group order
                 result.put(refNo, orderInfoList);
             }
         }
@@ -313,22 +326,28 @@ public class HostManagement{
                 while((msg = input.readLine())!=null){
                     System.out.println(msg);
                     if(msg.substring(0, Const.LOGIN.length()).equals(Const.LOGIN)){
-                        String userName = msg.substring(Const.LOGIN.length(), msg.indexOf(Const.SPLIT));
-                        String password = msg.substring(msg.indexOf(Const.SPLIT) +1);
+                        String userName = "";
+                        String password = "";
+                       // if(msg.length() > Const.SEARCH_KEYWORD.length()){ // if the keyword is not empty ""
+                            userName = msg.substring(Const.LOGIN.length(), msg.indexOf(Const.SPLIT));
+                            password = msg.substring(msg.indexOf(Const.SPLIT) +1);
+                        System.out.println(userName + " " + password);
+                       // }
                         String resultOfLogin = loginUser(userName, password);
-                        System.out.println(resultOfLogin);
                         output.println(resultOfLogin);
                         output.flush();
                     }else if (msg.substring(0, Const.REGISTER.length()).equals(Const.REGISTER)){
                         String userName = msg.substring(Const.REGISTER.length(), msg.indexOf(Const.SPLIT));
                         String password = msg.substring(msg.indexOf(Const.SPLIT) +1);
                         String resultOfLogin = registerUser(userName, password);
-                        System.out.println(resultOfLogin);
                         output.println(resultOfLogin);
                         output.flush();
                     }else if(msg.substring(0, Const.SEARCH_KEYWORD.length()).equals(Const.SEARCH_KEYWORD)){
-                        String keyword = msg.substring(Const.SEARCH_KEYWORD.length());
-                        ArrayList<String> resultList = DataBase.searchItemKeyword(keyword);
+                        ArrayList<String> resultList = new  ArrayList<String>();
+                        if(msg.length() > Const.SEARCH_KEYWORD.length()){ // if the keyword is not empty ""
+                            String keyword = msg.substring(Const.SEARCH_KEYWORD.length());
+                            resultList = DataBase.searchItemKeyword(keyword);
+                        }
                         objectOutput.writeObject(resultList);
                         objectOutput.flush();
                     }else if (msg.substring(0, Const.KEYWORD_LIST.length()).equals(Const.KEYWORD_LIST)){
@@ -367,6 +386,8 @@ public class HostManagement{
                         objectOutput.writeObject(pendingMap);
                         objectOutput.writeObject(completedMap);
                         objectOutput.flush();
+                    }else{
+                        System.out.println("wrong msg");
                     }
                 }
                 //after completing the communication close the streams but do not close the socket!

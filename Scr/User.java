@@ -1,12 +1,16 @@
 import java.util.ArrayList;
-import java.util.*;
-import java.io.*;
-import java.net.*;
-import java.util.Scanner;
+import java.util.HashSet;
+import java.util.HashMap;
 import java.io.ObjectInputStream;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Socket;
+
 /**[User.java]
  * This is final project - price match program
  * This class represent the object - User
@@ -16,9 +20,8 @@ import java.io.OutputStream;
 public class User{
     private String userID;
     private HashSet<String> committedGroupOrderRefNoList;
-    //private HashMap<String, ArrayList<String>> ;
     
-    final String LOCAL_HOST = "127.0.0.1";
+    final String LOCAL_HOST = "192.168.0.140"; //Kylie's macbook ip address //"127.0.0.1";
     final int PORT = 6666;
     Socket clientSocket;
     PrintWriter output;    
@@ -141,6 +144,7 @@ public class User{
 //----------------------------------------------------------------------------
     public HashMap<String, ArrayList<String>> refreshGroupOrder(){
         HashMap<String, ArrayList<String>> result = new HashMap<String, ArrayList<String>>();
+        HashMap<String, ArrayList<String>> clone_result = new HashMap<String, ArrayList<String>>();
         output.println(Const.GROUP_REFRESH);
         output.flush();
         try{
@@ -151,7 +155,14 @@ public class User{
         }catch(IOException e){
             System.out.println("ERROR - problem occurred when requesting group order list from the host"); 
         }
-        return result;
+        setCommittedGroupOrderList();
+        for(String result_refNo: result.keySet()){
+            ArrayList<String> orderInfo = result.get(result_refNo);
+            if(!this.hasCommittedThisGroupOrder(result_refNo)){
+                clone_result.put(result_refNo, orderInfo); //.remove(result_refNo);
+             }
+        }
+        return clone_result;
     }
 //----------------------------------------------------------------------------
     public void acceptGroupOrder(String refNo, Double percentage){
@@ -160,8 +171,8 @@ public class User{
         setCommittedGroupOrderList();
     }
 //----------------------------------------------------------------------------
-    public boolean hasCommittedThisGroupOrder(String refNo){
-        if(committedGroupOrderRefNoList.contains(refNo)){
+    private boolean hasCommittedThisGroupOrder(String refNo){
+        if(this.committedGroupOrderRefNoList.contains(refNo)){
             return true;
         }
         return false;
@@ -173,12 +184,33 @@ public class User{
         try{
             Object object = objectInput.readObject();
             this.committedGroupOrderRefNoList = (HashSet<String>)object;
-            System.out.println(committedGroupOrderRefNoList.toString());
         }catch(ClassNotFoundException ex){
             System.out.println("ERROR - objects do not match"); 
         }catch(IOException e){
             System.out.println("ERROR - problem occurred when requesting user refNo. list from the host"); 
         }
+    }
+//----------------------------------------------------------------------------
+    public ArrayList<HashMap> getGroupOrderList_user(){
+        ArrayList<HashMap> combinedList = new ArrayList<HashMap>();
+        HashMap<String, ArrayList<String>> pendingList = new HashMap<String, ArrayList<String>>();
+        HashMap<String, ArrayList<String>> completeList = new HashMap<String, ArrayList<String>>();
+        
+        output.println(Const.GET_USER_DETAIL_GROUP_LISTS + this.userID);
+        output.flush();
+        try{
+            Object object1 = objectInput.readObject();
+            Object object2 = objectInput.readObject();
+            pendingList = (HashMap<String, ArrayList<String>>)object1;
+            completeList = (HashMap<String, ArrayList<String>>)object2;
+            combinedList.add(pendingList);
+            combinedList.add(completeList);
+        }catch(ClassNotFoundException ex){
+            System.out.println("ERROR - objects do not match"); 
+        }catch(IOException e){
+            System.out.println("ERROR - problem occurred when requesting user group order list from the host"); 
+        }
+        return combinedList;
     }
 //----------------------------------------------------------------------------
     private boolean startConnecting(){

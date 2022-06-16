@@ -1,8 +1,12 @@
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
-import javax.swing.plaf.basic.*;
+import java.util.ArrayList;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import javax.swing.plaf.basic.BasicComboBoxEditor;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.ComboBoxEditor;
+
 class AutoCompleteComboBox extends JComboBox {
     public int caretPos = 0;
     public JTextField tfield = null;

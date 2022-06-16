@@ -2,10 +2,14 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import java.util.List;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
 import java.io.IOException;
-import java.util.List;
-import java.util.List;
-import java.util.*;
 import java.io.BufferedReader;  
 import java.io.FileReader;  
 
@@ -93,7 +97,7 @@ public class DataBase {
                 searchResult.addAll(keywordMap.get(str));
             }
         }
-        Set<String> set = new HashSet<>(searchResult); // remove all duplicates
+        Set<String> set = new HashSet<String>(searchResult); // remove all duplicates
         searchResult.clear();
         searchResult.addAll(set);
         return searchResult; 
