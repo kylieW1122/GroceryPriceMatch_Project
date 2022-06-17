@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.Instant;
 
 /**[HostManagement.java]
   * This is final project - Grocery Helper Program
@@ -124,6 +125,8 @@ public class HostManagement{
                 refNoMapCompleted.put(refNo, infoList); //refNo, ArrayList<String> infoList
             }
             input.close();
+            
+    
         }catch (IOException e){
             System.out.println("ERROR - file '" + userinfo_fileName + "' not found. ");
         }
@@ -242,15 +245,24 @@ public class HostManagement{
         }
         userIDRefNoMap.put(userID, user_listOfRefNo);
     }
+    
+    private void delay(long timeInMilliSeconds) {
+
+        long timestamp = System.currentTimeMillis();
+
+
+        do {
+
+        } while (System.currentTimeMillis() < timestamp + timeInMilliSeconds);
+
+    }
+    
     //----------------------------------------------------------------------------
     private String generateUniqueRefNo(String itemInfo){
-        int hash_code = Math.abs(itemInfo.hashCode());
-        String refNo = Integer.toString(hash_code);
+        String refNo = Long.toString(System.nanoTime());
         while(refNoMapPending.containsKey(refNo)){ //if refNo is taken, replace last digit with a character
-            Random random = new Random();
-            char randomizedCharacter = (char) (random.nextInt(26) + 'A');
-            refNo = refNo.substring(0, refNo.length()-1);
-            refNo = refNo + randomizedCharacter;
+        	delay(300);
+        	refNo = Long.toString(System.nanoTime());
         }
         return refNo;
     }
