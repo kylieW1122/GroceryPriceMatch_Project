@@ -15,7 +15,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Font;
-
 import javax.swing.GroupLayout;
 import javax.swing.BoxLayout;
 import javax.swing.Box;
@@ -37,17 +36,17 @@ import javax.swing.table.TableModel;
 import javax.swing.border.TitledBorder;
 import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 /**[HomePage.java]
-  * This is final project - price match program
-  * This class contains the main method to start the program
+  * This is final project - Grocery Helper Program
+  * This class is the main GUI of the program
   * 
   * @author Kylie Wong and Michelle Chan, ICS4UE
+  * @version 2.0, build June 16, 2022
   */
 public class HomePage extends JFrame implements ActionListener{
     private User user;

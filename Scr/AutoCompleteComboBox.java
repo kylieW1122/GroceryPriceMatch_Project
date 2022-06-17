@@ -6,7 +6,14 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ComboBoxEditor;
-
+/**[AutoCompleteComboBox.java]
+  * This is final project - Grocery Helper Program
+  * A JComboBox object that include a textfield that will autocomplete the data list given
+  * Copied from internet source and edited to suit program usage
+  * Code Source from https://www.tutorialspoint.com/how-can-we-implement-auto-complete-jcombobox-in-java
+  * 
+  * @author Kylie Wong and Michelle Chan, ICS4UE
+  */ 
 class AutoCompleteComboBox extends JComboBox {
     public int caretPos = 0;
     public JTextField tfield = null;

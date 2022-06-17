@@ -13,13 +13,13 @@ import java.io.IOException;
 import java.io.BufferedReader;  
 import java.io.FileReader;  
 
-/**[DataBase.java]
-  * This is final project - price match program
+/**[Database.java]
+  * This is final project - Grocery Helper Program
   * This class gets the item data from website and CSV flies and save them as HashMaps
   * @author Kylie Wong and Michelle Chan, ICS4UE
-  * @version 3.0, build June 3, 2022
+  * @version 2.0, build June 16, 2022
   */
-public class DataBase {
+public class Database {
     private static HashMap<String, String> sobeysItemsMap;
     private static HashMap<String, String> costCoItemsMap;
     private static HashMap<String, String> walmartItemsMap;   
@@ -37,11 +37,11 @@ public class DataBase {
     final static String WALMART_FILENAME = "resources/Database/walmart.csv";
     
     public static void main(String[] args){ //delete - just for debugging 
-        DataBase base = new DataBase();
+        Database base = new Database();
         System.out.println("result: "  + base.searchItemKeyword("a").toString());
     }
 //----------------------------------------------------------------------------
-    DataBase(){
+    Database(){
         keywordMap = new HashMap<String, ArrayList<String>>();
         wholeProductList = new ArrayList<String>();
         setUp();

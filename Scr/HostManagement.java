@@ -16,21 +16,28 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-/**[PriceMatchManagement.java]
-  * This is final project - price match program
-  * This class contains the main method and the host server to start the program
-  * http://helloraspberrypi.blogspot.com/2013/12/pass-arraylist-of-object-in-socket.html
+/**[HostManagement.java]
+  * This is final project - Grocery Helper Program
+  * This class contains the main method to start the host server
+  * 
+  * Only the host has access to Database, and user(client) sends request message to host.
+  * Host then returns the object list or message.
+  * Const.java is the "language" used between host and client.
   * 
   * @author Kylie Wong and Michelle Chan, ICS4UE
-  * @version 1.0, build May 27, 2022
+  * @version 2.0, build June 16, 2022
   */
 
 public class HostManagement{
+    private Database database;
+    //userIDRefNoMap format: {userId=the grpOrderList of that user}
     private static HashMap<String, ArrayList<String>> userIDRefNoMap = new HashMap<String, ArrayList<String>>();
+    //userPasswordMap format: {userId=password}
     private static HashMap<String, String> userPasswordMap = new HashMap<String, String>();
+    //refNoMapPending format: {refNo=order info list of the group orders that are not yet completed}
     private static HashMap<String, ArrayList<String>> refNoMapPending = new HashMap<String, ArrayList<String>>();
+    //refNoMapCompleted format:  {refNo=order info list of the group orders that are completed}
     private static HashMap<String, ArrayList<String>> refNoMapCompleted = new HashMap<String, ArrayList<String>>();
-    private DataBase database;
     
     private static FileReader fileReader; 
     private static BufferedReader input;
@@ -42,7 +49,7 @@ public class HostManagement{
     private final String groupOrder_fileName = "resources/GroupOrderInfo.txt";
     private String userInfo_titleStr;
     
-    final int PORT = 6666;
+    final int PORT = Const.SOCKET_PORT;
     ServerSocket serverSocket;
     Socket clientSocket;
 //----------------------------------------------------------------------------
@@ -51,27 +58,30 @@ public class HostManagement{
     }
 //----------------------------------------------------------------------------
     HostManagement(){
-        this.database = new DataBase();
+        this.database = new Database();
         this.setUp();
         this.writeUpdatedInfoToFiles();
         try{
             this.start();
         }catch(Exception e){ System.out.println("ERROR - problem occurred starting the server"); }
     }
-//----------------------------------------------------------------------------
+    //----------------------------------------------------------------------------
+    //read and write UserInfo.txt and GroupOrderInfo.txt, when there are changes to the lists (order groups or password)
+    //----------------------------------------------------------------------------
     private void setUp(){
         try{
-            /************read user info file which has the userid, password, and user's refNo to grp order****************/
+            /************read user info file which has the userid, password, and user's refNo list of grp orders****************/
             fileReader = new FileReader(userinfo_fileName);
             input = new BufferedReader(fileReader);
             
             this.userInfo_titleStr = input.readLine(); 
             while(input.ready()){    //keep reading lines while the End-of-File hasn't been reached
+                //format example: 3. userId: password~[2080537622]
                 String msg = input.readLine(); 
                 String name = msg.substring(3, msg.indexOf(": "));
                 msg = msg.substring(msg.indexOf(": ")+2);
                 String password;
-                /******************set up the user's group order refNo list**********************/             
+                /*******set up the user's group order refNo list: userPasswordMap & userIDRefNoMap********/             
                 if(msg.indexOf(Const.SPLIT)!=-1){
                     password = msg.substring(0, msg.indexOf(Const.SPLIT));
                     msg = msg.substring(msg.indexOf(Const.SPLIT)+1);
@@ -80,19 +90,20 @@ public class HostManagement{
                     ArrayList<String> refNoArrayList = new ArrayList<String>();
                     Collections.addAll(refNoArrayList, arr);
                     userIDRefNoMap.put(name, refNoArrayList);
-                }else{
+                }else{ //the user have no group order
                     password = msg;
                 }
                 userPasswordMap.put(name, password);
             }
             input.close();
-            /******************set up the overall group order refNo list**********************/
+            
+            /*******set up the overall group order refNo list: refNoMapPending & refNoMapCompleted********/
             fileReader = new FileReader(groupOrder_fileName);
             input = new BufferedReader(fileReader);
             String line;
             while((line = input.readLine())!= null && !line.equals(Const.GROUP_INFO_COMPLETED_SPLIT)){
                 if(!line.equals(Const.GROUP_INFO_PENDING_SPLIT)){
-                    //line format: 887974418~[Choice Green Peppers 1 1/9 bushel, $44.29, CostCo, A~0.6]
+                    //line format example: 887974418~[Choice Green Peppers 1 1/9 bushel, $44.29, CostCo, A~0.6]
                     String refNo = line.substring(0, line.indexOf(Const.SPLIT));
                     line = line.substring(line.indexOf(Const.SPLIT)+1);
                     line = line.substring(1, line.length()-1);
@@ -102,8 +113,8 @@ public class HostManagement{
                     refNoMapPending.put(refNo, infoList); //refNo, ArrayList<String> infoList
                 }
             }
-            while((line = input.readLine()) != null){    //keep reading lines while the End-of-File hasn't been reached
-                //line format: 887974418~[Choice Green Peppers 1 1/9 bushel, $44.29, CostCo, A~0.6, mike~0.4]
+            while((line = input.readLine()) != null){
+                //line format example: 887974418~[Choice Green Peppers 1 1/9 bushel, $44.29, CostCo, A~0.6, mike~0.4]
                 String refNo = line.substring(0, line.indexOf(Const.SPLIT));
                 line = line.substring(line.indexOf(Const.SPLIT)+1);
                 line = line.substring(1, line.length()-1);
@@ -117,10 +128,10 @@ public class HostManagement{
             System.out.println("ERROR - file '" + userinfo_fileName + "' not found. ");
         }
     }
-//----------------------------------------------------------------------------
-    private void writeUpdatedInfoToFiles(){ // rewrite the file everytime group order list has changed
+    //----------------------------------------------------------------------------
+    private void writeUpdatedInfoToFiles(){ //rewrite the file everytime group order list has changed
         try{
-            /**********************write the GroupOrderInfo.txt*********************************/
+            /**********************write the GroupOrderInfo.txt**************************/
             groupOrderFile = new File(groupOrder_fileName);
             output_writer = new PrintWriter(groupOrderFile);
             //write group order info for pending orders
@@ -143,10 +154,11 @@ public class HostManagement{
             int index=1;
             for(String userID: userPasswordMap.keySet()){
                 ArrayList<String> refNoList = userIDRefNoMap.get(userID);
+                //format example: 3. userId: password~[2080537622]
                 if(refNoList!=null){
                     output_writer.println(index + ". " + userID + ": " + userPasswordMap.get(userID) + 
                                           Const.SPLIT + refNoList.toString());
-                }else{
+                }else{ //if the user dos not have group order
                     output_writer.println(index + ". " + userID + ": " + userPasswordMap.get(userID)); 
                 }
                 index++;
@@ -156,11 +168,13 @@ public class HostManagement{
             System.out.println("ERROR - file '" + groupOrder_fileName + "' not found. ");
         }
     }
-//----------------------------------------------------------------------------
+    //----------------------------------------------------------------------------
+    //user-password related methods
+    //----------------------------------------------------------------------------
     private String loginUser(String id, String password){
         if(userPasswordMap.containsKey(id)){
             String correctPassword = userPasswordMap.get(id);
-            if(password.equals(correctPassword)){       // password correct
+            if(password.equals(correctPassword)){
                 return Const.LOGIN_ACCEPTED;
             }else{
                 return Const.WRONG_PASSWORD;
@@ -169,17 +183,17 @@ public class HostManagement{
             return Const.NO_SUCH_USER_ID;
         }
     }
-//----------------------------------------------------------------------------
+    //----------------------------------------------------------------------------
     private String registerUser(String id, String password){
         if(userPasswordMap.containsKey(id)){
-            return Const.USER_ID_TAKEN;   //false - userId taken 
+            return Const.USER_ID_TAKEN;
         }else{
             userPasswordMap.put(id, password);
             writeUpdatedInfoToFiles();
         }
         return Const.LOGIN_ACCEPTED;
     }
-//------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------
     private boolean resetUserPassword(String id, String oldPassword, String newPassword){
         if(userPasswordMap.containsKey(id)){
             String password = userPasswordMap.get(id);
@@ -189,10 +203,13 @@ public class HostManagement{
                 return true;
             }
         }
-        return false;
+        return false; // oldpassword does not match
     }
-//----------------------------------------------------------------------------
+    //----------------------------------------------------------------------------
+    //group order
+    //----------------------------------------------------------------------------
     private String makeGroupOrder(String msg){
+        //msg format example: Mini Cucumbers 2.27 kg = $7.49 @ CostCo~a-b-c~0.5~
         String itemInfo = msg.substring(0, msg.indexOf(Const.SPLIT));
         String itemName = itemInfo.substring(0, itemInfo.indexOf(" = "));
         String price = itemInfo.substring(itemInfo.indexOf(" = ") +3 , itemInfo.indexOf(" @ "));
@@ -205,15 +222,16 @@ public class HostManagement{
         ArrayList<String> infoList = new ArrayList<String>();
         infoList.add(0, itemName);
         infoList.add(1, price);
-        infoList.add(2, location); //add time, and date
+        infoList.add(2, location); 
         infoList.add(userID + Const.SPLIT + amountPercentage);
         String refNo = generateUniqueRefNo(itemName);
+        
         refNoMapPending.put(refNo, infoList);
         updateRefNoListsInUser(refNo, userID);
-        writeUpdatedInfoToFiles();
+        writeUpdatedInfoToFiles(); // update the two .txt files
         return refNo;
     }
-//----------------------------------------------------------------------------
+    //----------------------------------------------------------------------------
     private void updateRefNoListsInUser(String refNo, String userID){
         ArrayList<String> user_listOfRefNo = new ArrayList<String>(); 
         if(userIDRefNoMap.containsKey(userID)){
@@ -224,11 +242,11 @@ public class HostManagement{
         }
         userIDRefNoMap.put(userID, user_listOfRefNo);
     }
-//----------------------------------------------------------------------------
+    //----------------------------------------------------------------------------
     private String generateUniqueRefNo(String itemInfo){
         int hash_code = Math.abs(itemInfo.hashCode());
         String refNo = Integer.toString(hash_code);
-        while(refNoMapPending.containsKey(refNo)){
+        while(refNoMapPending.containsKey(refNo)){ //if refNo is taken, replace last digit with a character
             Random random = new Random();
             char randomizedCharacter = (char) (random.nextInt(26) + 'A');
             refNo = refNo.substring(0, refNo.length()-1);
@@ -236,7 +254,7 @@ public class HostManagement{
         }
         return refNo;
     }
-//----------------------------------------------------------------------------
+    //----------------------------------------------------------------------------
     private void acceptGroupOrder(String msg){
         String refNo = msg.substring(0, msg.indexOf(Const.SPLIT));
         msg = msg.substring(msg.indexOf(Const.SPLIT)+1);
@@ -251,7 +269,7 @@ public class HostManagement{
             refNoMapPending.remove(refNo);
         }
         updateRefNoListsInUser(refNo, userID);
-        writeUpdatedInfoToFiles();
+        writeUpdatedInfoToFiles(); // update the two .txt files
     }
 //----------------------------------------------------------------------------
     private HashSet<String> getRefNoList_user(String userID){
@@ -263,18 +281,20 @@ public class HostManagement{
         return result;
     }
 //----------------------------------------------------------------------------
+    //only return a list that is part of the user's order
     private HashMap<String, ArrayList<String>> getRefNoMapCompleted_user(String userID){
         HashMap<String, ArrayList<String>> result = new HashMap<String, ArrayList<String>>();
         ArrayList<String> user_refList = userIDRefNoMap.get(userID);
         for(String refNo: refNoMapCompleted.keySet()){
             ArrayList<String> orderInfoList = refNoMapCompleted.get(refNo);
-            if(!user_refList.contains(refNo)){        // if that refNo is part of user's completed group order
+            if(user_refList.contains(refNo)){        // if that refNo is part of user's completed group order
                 result.put(refNo, orderInfoList);
             }
         }
         return result;
     }
 //----------------------------------------------------------------------------
+    //only return a list that is part of the user's order
     private HashMap<String, ArrayList<String>> getRefNoMapPending_user(String userID){
         HashMap<String, ArrayList<String>> result = new HashMap<String, ArrayList<String>>();
         ArrayList<String> user_refList = userIDRefNoMap.get(userID);
@@ -286,6 +306,8 @@ public class HostManagement{
         }
         return result;
     }
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
     private void start() throws Exception{ 
         //create a socket with the local IP address and wait for connection request       
@@ -311,7 +333,7 @@ public class HostManagement{
         public ConnectionHandler(Socket socket) { 
             this.socket = socket;
         }
-       
+        //----------------------------------------------------------------------------
         @Override 
         public void run() {
             try {
@@ -324,15 +346,13 @@ public class HostManagement{
                 output.flush();         
                 
                 while((msg = input.readLine())!=null){
-                    System.out.println(msg);
+                    //call differnt method depends on the msg's tags(Const.)
                     if(msg.substring(0, Const.LOGIN.length()).equals(Const.LOGIN)){
                         String userName = "";
                         String password = "";
-                       // if(msg.length() > Const.SEARCH_KEYWORD.length()){ // if the keyword is not empty ""
-                            userName = msg.substring(Const.LOGIN.length(), msg.indexOf(Const.SPLIT));
-                            password = msg.substring(msg.indexOf(Const.SPLIT) +1);
+                        userName = msg.substring(Const.LOGIN.length(), msg.indexOf(Const.SPLIT));
+                        password = msg.substring(msg.indexOf(Const.SPLIT) +1);
                         System.out.println(userName + " " + password);
-                       // }
                         String resultOfLogin = loginUser(userName, password);
                         output.println(resultOfLogin);
                         output.flush();
@@ -346,12 +366,12 @@ public class HostManagement{
                         ArrayList<String> resultList = new  ArrayList<String>();
                         if(msg.length() > Const.SEARCH_KEYWORD.length()){ // if the keyword is not empty ""
                             String keyword = msg.substring(Const.SEARCH_KEYWORD.length());
-                            resultList = DataBase.searchItemKeyword(keyword);
+                            resultList = Database.searchItemKeyword(keyword);
                         }
                         objectOutput.writeObject(resultList);
                         objectOutput.flush();
                     }else if (msg.substring(0, Const.KEYWORD_LIST.length()).equals(Const.KEYWORD_LIST)){
-                        ArrayList<String> keywordList = DataBase.getWholeList();
+                        ArrayList<String> keywordList = Database.getWholeList();
                         objectOutput.writeObject(keywordList);
                         objectOutput.flush();
                     }else if(msg.substring(0, Const.GROUP_ORDER.length()).equals(Const.GROUP_ORDER)){
@@ -387,10 +407,9 @@ public class HostManagement{
                         objectOutput.writeObject(completedMap);
                         objectOutput.flush();
                     }else{
-                        System.out.println("wrong msg");
+                        System.out.println("ERROR - a communication problem occurred between host and user.");
                     }
                 }
-                //after completing the communication close the streams but do not close the socket!
                 input.close();
                 output.close();
             }catch (IOException e){ System.out.println("ERROR - problem occurred in the server"); }
