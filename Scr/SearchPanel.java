@@ -31,14 +31,14 @@ import javax.swing.JList;
 
 public class SearchPanel extends JPanel {
 	private JTextField txtSearchForYour;
-	private MainFrame mainFrame;
+	private HomePage mainFrame;
 	private DataBase database;
 
 	/**
 	 * Create the panel.
 	 */
 	public SearchPanel() {
-		mainFrame = MainFrame.getInstance();
+		mainFrame = HomePage.getInstance();
 		new DataBase();
 
 		setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
@@ -50,17 +50,17 @@ public class SearchPanel extends JPanel {
 				0.0, 0.1, 1.0, Double.MIN_VALUE };
 		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		setLayout(gridBagLayout);
-		ImageIcon imgSrchIcon = new ImageIcon(SearchPanel.class.getResource("/resources/1024px-Search_Icon.svg.png"));
+		ImageIcon imgSrchIcon = new ImageIcon(SearchPanel.class.getResource("/resources/icons/1024px-Search_Icon.svg.png"));
 		Image imageSrch = imgSrchIcon.getImage();
 		Image newSrchImg = imageSrch.getScaledInstance(5, 10, java.awt.Image.SCALE_SMOOTH);
 		imgSrchIcon = new ImageIcon(newSrchImg);
 
-		ImageIcon imgGraphIcon = new ImageIcon(SearchPanel.class.getResource("/resources/graph.jpg"));
+		ImageIcon imgGraphIcon = new ImageIcon(SearchPanel.class.getResource("/resources/icons/graph.jpg"));
 		Image imageGraph = imgGraphIcon.getImage();
 		Image newGraphImg = imageGraph.getScaledInstance(5, 6, java.awt.Image.SCALE_SMOOTH);
 		imgGraphIcon = new ImageIcon(newGraphImg);
 
-		JLabel lblNewLabel = new JLabel("My Company");
+		JLabel lblNewLabel = new JLabel(" ");
 		lblNewLabel.setForeground(Color.BLUE);
 		lblNewLabel.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 28));
 		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
@@ -127,10 +127,11 @@ public class SearchPanel extends JPanel {
 					}
 				}
 				SearchResultsPanel searchResultPanel = new SearchResultsPanel(data);
-				mainFrame.setContentPane(searchResultPanel);
+				//mainFrame.setContentPane(searchResultPanel);
+				mainFrame.setHomePagePanel(searchResultPanel);
 
-				mainFrame.revalidate();
-				mainFrame.repaint();
+		//		mainFrame.revalidate();
+		//		mainFrame.repaint();
 			}
 		});
 
@@ -194,10 +195,12 @@ public class SearchPanel extends JPanel {
 					map = DataBase.getPriceListByItemNYear(item, year);
 				}
 				PriceAnalysisPanel priceAnalysisPanel = new PriceAnalysisPanel(item, year, map);
-				mainFrame.setContentPane(priceAnalysisPanel);
-
-				mainFrame.revalidate();
-				mainFrame.repaint();
+				
+				mainFrame.setHomePagePanel(priceAnalysisPanel);
+//				mainFrame.setContentPane(priceAnalysisPanel);
+//
+//				mainFrame.revalidate();
+//				mainFrame.repaint();
 			}
 		});
 

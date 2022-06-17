@@ -13,13 +13,13 @@ import java.io.IOException;
 import java.io.BufferedReader;  
 import java.io.FileReader;  
 
-/**[Database.java]
+/**[DataBase.java]
   * This is final project - Grocery Helper Program
   * This class gets the item data from website and CSV flies and save them as HashMaps
   * @author Kylie Wong and Michelle Chan, ICS4UE
   * @version 2.0, build June 16, 2022
   */
-public class Database {
+public class DataBase {
     private static HashMap<String, String> sobeysItemsMap;
     private static HashMap<String, String> costCoItemsMap;
     private static HashMap<String, String> walmartItemsMap;   
@@ -32,16 +32,16 @@ public class Database {
     private static HashMap<String, double[]> statisticsHashmap;
     
     final static String SOBEYS_URL = "https://voila.ca/products?source=navigation&sublocationId=43a936d1-df1d-4bf1-a09c-b23c6a8edf63";  
-    final static String STATISTICS_CANADA_FILENAME = "resources/Database/1810000201-eng.csv";
-    final static String COSTCO_FILENAME = "resources/Database/costCo.csv";
-    final static String WALMART_FILENAME = "resources/Database/walmart.csv";
+    final static String STATISTICS_CANADA_FILENAME = "resources/DataBase/1810000201-eng.csv";
+    final static String COSTCO_FILENAME = "resources/DataBase/costCo.csv";
+    final static String WALMART_FILENAME = "resources/DataBase/walmart.csv";
     
     public static void main(String[] args){ //delete - just for debugging 
-        Database base = new Database();
+        DataBase base = new DataBase();
         System.out.println("result: "  + base.searchItemKeyword("a").toString());
     }
 //----------------------------------------------------------------------------
-    Database(){
+    DataBase(){
         keywordMap = new HashMap<String, ArrayList<String>>();
         wholeProductList = new ArrayList<String>();
         setUp();

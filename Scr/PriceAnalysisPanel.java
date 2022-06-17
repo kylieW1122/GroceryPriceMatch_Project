@@ -33,13 +33,13 @@ import javax.swing.table.JTableHeader;
  */
 public class PriceAnalysisPanel extends JPanel {
 	
-	private MainFrame mainFrame;
+	private HomePage mainFrame;
 
 	/**
 	 * Create the panel.
 	 */
 	public PriceAnalysisPanel(String item, String year, Map<String, Double> graphContent) {
-		mainFrame = MainFrame.getInstance();
+		mainFrame = HomePage.getInstance();
 		
 		  
 		  
@@ -52,13 +52,13 @@ public class PriceAnalysisPanel extends JPanel {
 
 		    
 		    
-			ImageIcon imgSrchIcon = new ImageIcon(SearchResultsPanel.class.getResource("/resources/1024px-Search_Icon.svg.png"));
+			ImageIcon imgSrchIcon = new ImageIcon(SearchResultsPanel.class.getResource("/resources/icons/1024px-Search_Icon.svg.png"));
 			Image imageSrch = imgSrchIcon.getImage();
 			Image newSrchImg = imageSrch.getScaledInstance( 5, 10,  java.awt.Image.SCALE_SMOOTH ) ; 
 			imgSrchIcon = new ImageIcon(newSrchImg);
 			
 		    
-		    JLabel lblNewLabel_1 = new JLabel("My Company");
+		    JLabel lblNewLabel_1 = new JLabel(" ");
 		    lblNewLabel_1.setForeground(Color.BLUE);
 		    lblNewLabel_1.setFont(new Font("Arial Black", Font.PLAIN, 18));
 		    GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
@@ -133,12 +133,15 @@ public class PriceAnalysisPanel extends JPanel {
 						  }
 					  }		  
 					  SearchResultsPanel searchResultPanel = new SearchResultsPanel(data);
-					  mainFrame.setContentPane(searchResultPanel);
+					  mainFrame.setHomePagePanel(searchResultPanel);
 			
-
-					
-					  mainFrame.revalidate();
-					  mainFrame.repaint();
+					  
+//					  mainFrame.setContentPane(searchResultPanel);
+//			
+//
+//					
+//					  mainFrame.revalidate();
+//					  mainFrame.repaint();
 				  }
 			});
 		    
@@ -166,32 +169,32 @@ public class PriceAnalysisPanel extends JPanel {
 		    gbc_panel.gridy = 4;
 		    add(panel, gbc_panel);
 		    
-			ImageIcon imgGoBackIcon = new ImageIcon(SearchResultsPanel.class.getResource("/resources/back.png"));
+			ImageIcon imgGoBackIcon = new ImageIcon(SearchResultsPanel.class.getResource("/resources/icons/back.png"));
 			Image imageGoBack = imgGoBackIcon.getImage();
 			Image newGoBackImg = imageGoBack.getScaledInstance( 5, 10,  java.awt.Image.SCALE_SMOOTH ) ; 
 			imgGoBackIcon = new ImageIcon(newGoBackImg);
 		    
-		    JButton btnGoBack = new JButton("       Back      ");
-
-	        btnGoBack.setIcon(imgGoBackIcon);
-
-		    GridBagConstraints gbc_btnGoBack = new GridBagConstraints();
-		    gbc_btnGoBack.gridwidth = 4;
-		    gbc_btnGoBack.insets = new Insets(0, 0, 5, 5);
-		    gbc_btnGoBack.gridx = 2;
-		    gbc_btnGoBack.gridy = 7;
-		    add(btnGoBack, gbc_btnGoBack);
-		    
-		    btnGoBack.addActionListener(new ActionListener()
-			{
-				  public void actionPerformed(ActionEvent e) {
-					
-					  SearchPanel searchPanel = new SearchPanel();
-					  mainFrame.setContentPane(searchPanel);
-					  mainFrame.revalidate();
-					  mainFrame.repaint();
-				  }
-			});		
+//		    JButton btnGoBack = new JButton("       Back      ");
+//
+//	        btnGoBack.setIcon(imgGoBackIcon);
+//
+//		    GridBagConstraints gbc_btnGoBack = new GridBagConstraints();
+//		    gbc_btnGoBack.gridwidth = 4;
+//		    gbc_btnGoBack.insets = new Insets(0, 0, 5, 5);
+//		    gbc_btnGoBack.gridx = 2;
+//		    gbc_btnGoBack.gridy = 7;
+//		    add(btnGoBack, gbc_btnGoBack);
+//		    
+//		    btnGoBack.addActionListener(new ActionListener()
+//			{
+//				  public void actionPerformed(ActionEvent e) {
+//					
+//					  SearchPanel searchPanel = new SearchPanel();
+//					  mainFrame.setContentPane(searchPanel);
+//					  mainFrame.revalidate();
+//					  mainFrame.repaint();
+//				  }
+//			});		
 		    
 		
 

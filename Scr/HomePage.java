@@ -50,22 +50,19 @@ import java.util.Set;
   */
 public class HomePage extends JFrame implements ActionListener{
     private User user;
-    private static String[] actionStrings = {"Home", "Price Analysis", "Group Order", "View Account Details"};
-    private SearchItemPage searchItemPanel;
-    private PriceAnalysisPage priceAnalysisPanel;
+    private static String[] actionStrings = {"Home", "Group Order", "View Account Details"};
+
     private GroupOrderPage groupOrderPanel;
     private AccountDetailPage acountDetailPanel;
     private AccountLoginPage accountLoginPanel;
    
     private final String HOME_PAGE_INDEX  = "0";
-    private final String SEARCH_PAGE_INDEX = "1";
-    private final String PRICE_ANALYSIS_INDEX = "2";
-    private final String GROUP_ORDER_INDEX = "3";
-    private final String ACCOUNT_DETAIL_INDEX = "4";
-    private final String ACCOUNT_LOGIN_INDEX = "5";
+
+    private final String GROUP_ORDER_INDEX = "1";
+    private final String ACCOUNT_DETAIL_INDEX = "2";
+
     
-    private final String SEARCH_STR = "Search";
-    private final String PRICE_ANALYSIS_STR = "Price Analysis";
+
     private final String GROUP_ORDER_STR = "Group Order";
     private final String BACK_HOME_STR = "Back To Home";
     private final String ACCOUNT_DETAIL_STR = "View Account Details";
@@ -88,14 +85,34 @@ public class HomePage extends JFrame implements ActionListener{
     JButton accountSettingButton;
     JButton reviewGrpOrderButton;
     JButton bottomHomeButton;
+
     
     JPanel cardPanel;
     CardLayout cl;
     JComboBox actionList;
+    private static HomePage instance;
+ 
+ 
+    public static HomePage getInstance() {
+ 
+    	return instance;
+    }
+    
+    public void setHomePagePanel(JPanel panel) {
+    	homePagePanel.removeAll(); 
+    	homePagePanel.add(panel, BorderLayout.CENTER);
+    	cardPanel.remove(homePagePanel); 
+    	 cardPanel.add(homePagePanel, 0);
+    	 this.remove(cardPanel);
+    	 this.add(cardPanel, BorderLayout.CENTER);
+    	 this.revalidate();
+    	 this.repaint();
+    }
 //----------------------------------------------------------------------------
-    HomePage(User user){
+   public HomePage(User user){
+		instance = this;
         this.user = user;
-        this.setTitle("Company Name");
+        this.setTitle("Grocery Price Match");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(DEFAULT_FRAME_SIZE_WIDTH, DEFAULT_FRAME_SIZE_HEIGHT);
         this.setResizable(true);
@@ -112,27 +129,13 @@ public class HomePage extends JFrame implements ActionListener{
         homePagePanel.setLayout(new BorderLayout());
         
         /*************************MID JPANEL**********************************/
-        midPanel = new JPanel(new GridLayout(0,1));
-        midPanel.setBackground(Color.WHITE);
-        searchPanel = new JPanel();
-        searchTextField = new JTextField(30);
-        enterSearchPanel = new JButton(SEARCH_STR);
-        enterSearchPanel.addActionListener(this);
+ 
+        JPanel search = new SearchPanel();
+        homePagePanel.add(search, BorderLayout.CENTER);
         
-        midButtonPanel = new JPanel();
-        priceAnalysisButton = new JButton(PRICE_ANALYSIS_STR);
-        priceAnalysisButton.addActionListener(this);
-        groupOrderButton = new JButton(GROUP_ORDER_STR);
-        groupOrderButton.addActionListener(this);
-        searchPanel.add(searchTextField);
-        searchPanel.add(enterSearchPanel);
-        
-        midPanel.add(searchPanel);
-        midButtonPanel.add(priceAnalysisButton);
-        midButtonPanel.add(groupOrderButton);
-        midPanel.add(midButtonPanel);
-        
-        homePagePanel.add(midPanel, BorderLayout.CENTER);
+        /*****************************ADD EVERYTHING INTO mainhomePagePanel************************************/
+        cardPanel.add(homePagePanel, 0);
+
         /************************BOTTOM PANEL**********************************/
         mainBottomPanel = new JPanel();
         bottomHomeButton = new JButton(BACK_HOME_STR);
@@ -142,22 +145,12 @@ public class HomePage extends JFrame implements ActionListener{
         
         mainBottomPanel.add(bottomHomeButton);
         mainBottomPanel.add(accountSettingButton);
-        /*****************************ADD EVERYTHING INTO mainhomePagePanel************************************/
-        cardPanel.add(homePagePanel, HOME_PAGE_INDEX);
-        searchItemPanel = new SearchItemPage();
-        cardPanel.add(searchItemPanel, SEARCH_PAGE_INDEX);
-        priceAnalysisPanel = new PriceAnalysisPage();
-        cardPanel.add(priceAnalysisPanel, PRICE_ANALYSIS_INDEX);
-        groupOrderPanel = new GroupOrderPage();
-        cardPanel.add(groupOrderPanel, GROUP_ORDER_INDEX);
-        acountDetailPanel = new AccountDetailPage();
-        cardPanel.add(acountDetailPanel, ACCOUNT_DETAIL_INDEX);
+        groupOrderPanel = new GroupOrderPage(user);
+        acountDetailPanel = new AccountDetailPage(user);
         accountLoginPanel = new AccountLoginPage();
-        cardPanel.add(accountLoginPanel, ACCOUNT_LOGIN_INDEX);
         
         /*****************************************************************/
         cl.show(cardPanel, "0");
-//        actionList.setPopupVisible(true);
         this.add(actionList, BorderLayout.NORTH);
         this.add(cardPanel, BorderLayout.CENTER);
         this.add(mainBottomPanel, BorderLayout.SOUTH);
@@ -169,180 +162,73 @@ public class HomePage extends JFrame implements ActionListener{
         if(event.getSource() instanceof JComboBox){
             JComboBox cb = (JComboBox)event.getSource();
             int index = cb.getSelectedIndex();
-            if(index>0){
-                index = index+1;
-            }
             String cardNo = Integer.toString(index);
             if(cardNo.equals(GROUP_ORDER_INDEX)){
                 loginRequired(GROUP_ORDER_INDEX);
             }else if (cardNo.equals(ACCOUNT_DETAIL_INDEX)){
                 loginRequired(ACCOUNT_DETAIL_INDEX);
-            }else{
+            }
+            else if (cardNo.equals(HOME_PAGE_INDEX)) {
+                changeCardPanel(HOME_PAGE_INDEX);
+            	this.setHomePagePanel(new SearchPanel());
+            }
+            else{
                 cl.show(cardPanel, cardNo);
             }
         }else if (event.getSource() instanceof JButton){
             String command = event.getActionCommand();
-            if(command.equals(PRICE_ANALYSIS_STR)){
-                changeCardPanel(PRICE_ANALYSIS_INDEX);
-            }else if (command.equals(GROUP_ORDER_STR)){
+            if (command.equals(GROUP_ORDER_STR)){
                 loginRequired(GROUP_ORDER_INDEX);
             }else if (command.equals(BACK_HOME_STR)){
                 changeCardPanel(HOME_PAGE_INDEX);
-            }else if (command.equals(ACCOUNT_DETAIL_STR)){
+            	this.setHomePagePanel(new SearchPanel());
+            }
+            else if (command.equals(ACCOUNT_DETAIL_STR)){
                 loginRequired(ACCOUNT_DETAIL_INDEX);
-            }else if(command.equals(SEARCH_STR)){
-                changeCardPanel(SEARCH_PAGE_INDEX);
-                String userInputText = searchTextField.getText();
-                searchTextField.setText("");
-                searchItemPanel.searchKeyWord(userInputText);
             }
         }
     }
 //----------------------------------------------------------------------------
     private void loginRequired(String pageIndex){
-        if(!user.getUserID().equals("")){     //if user is logged in
-            changeCardPanel(pageIndex);
+
+        if(user.getUserID()!=null && !user.getUserID().isEmpty()){     //if user is logged in
+             
+              if (pageIndex.equals(ACCOUNT_DETAIL_INDEX)) {
+            	  changeCardPanel(ACCOUNT_DETAIL_INDEX);
+            	  this.setHomePagePanel(acountDetailPanel);
+              } else if (pageIndex.equals(GROUP_ORDER_INDEX)) {
+            	  changeCardPanel(GROUP_ORDER_INDEX);
+            	  this.setHomePagePanel(groupOrderPanel);
+              }
+
         }else{
-            accountLoginPanel.setNextIndex(pageIndex);
-            cl.show(cardPanel, ACCOUNT_LOGIN_INDEX);
+	         changeCardPanel(pageIndex);
+	         accountLoginPanel.setNextIndex(pageIndex);
+        		this.setHomePagePanel(accountLoginPanel);
+            System.out.println("not yet login");
+         
         }
     }
 //----------------------------------------------------------------------------
     private void changeCardPanel(String index){
         cl.show(cardPanel, index);
         if(index.equals(ACCOUNT_DETAIL_INDEX)){
-            acountDetailPanel.updateDetailPanel();
+         
+        	actionList.setSelectedIndex(Integer.parseInt(ACCOUNT_DETAIL_INDEX));
         }
-        if(index.equals(GROUP_ORDER_INDEX)){
-             groupOrderPanel.updateOrderPanel();
+        else if(index.equals(GROUP_ORDER_INDEX)){
+        
+        	actionList.setSelectedIndex(Integer.parseInt(GROUP_ORDER_INDEX));
         }
-        if(index.equals(HOME_PAGE_INDEX)){
+        else if(index.equals(HOME_PAGE_INDEX)){
             actionList.setSelectedIndex(Integer.parseInt(index));
-        }else if (!index.equals(SEARCH_PAGE_INDEX)){
-            actionList.setSelectedIndex(Integer.parseInt(index)-1);
         }
     }
-//----------------------------------------------------------------------------
-//inner class - SearchItemPage
-//----------------------------------------------------------------------------
-    private class SearchItemPage extends JPanel{
-        private ArrayList<String> searchResultList = new ArrayList<String>();
-        private final String[] columnNames = {"Store", "Item name", "Price"};
-        
-        JScrollPane scrollPane;
-        JTable table;
-        DefaultTableModel model;
-        JTableHeader header;
-        GridBagLayout gridBagLayout;
-        GridBagConstraints gbc_scrollPane;
-//----------------------------------------------------------------------------
-        SearchItemPage(){
-            String[][] emptyList = {{"", "", ""}};
-            setUpSearchPanel(emptyList);
-        }
-//----------------------------------------------------------------------------
-        private void setUpSearchPanel(String[][] data){
-            if(data.length>0){
-                model = new DefaultTableModel(data, columnNames) {
-                    @Override
-                    public Class getColumnClass(int column) {
-                        return getValueAt(0, column).getClass();
-                    }
-                };
-                
-                gridBagLayout = new GridBagLayout();
-                gridBagLayout.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-                gridBagLayout.rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
-                gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-                this.setLayout(gridBagLayout);
-                
-                gbc_scrollPane = new GridBagConstraints();
-                gbc_scrollPane.gridheight = 2;
-                
-                table = new JTable(model);
-                table.setBorder(new LineBorder(new Color(0, 0, 0)));
-                header = table.getTableHeader();
-                
-                header.setBackground(Color.GREEN);
-                header.setForeground(Color.BLACK);
-                
-                scrollPane = new JScrollPane(table);
-                gbc_scrollPane.gridwidth = 4;
-                gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
-                gbc_scrollPane.fill = GridBagConstraints.BOTH;
-                gbc_scrollPane.gridx = 2;
-                gbc_scrollPane.gridy = 4;
-                
-                this.add(scrollPane, gbc_scrollPane);
-            }
-        }
-//---------------------------------------------------------------------------- 
-        private void update(String[][] data){ //update jpanel with the search result
-            this.removeAll();
-            this.setUpSearchPanel(data);
-            this.revalidate();
-            this.repaint();
-        }
-//---------------------------------------------------------------------------- 
-        private void searchKeyWord(String searchText){
-            searchResultList = user.getSearchResultList(searchText);
-            String [][] data = {{"","",""}}; 
-            int numOfItems = searchResultList.size();
-            if(numOfItems>0){
-                data = new String[numOfItems][3];
-                
-                int mapCount = 0;
-                for (String itemInfoStr: searchResultList){
-                    data[mapCount][0] = itemInfoStr.substring(0, itemInfoStr.indexOf(" - "));
-                    data[mapCount][1] = itemInfoStr.substring(itemInfoStr.indexOf(" - ") + 3, itemInfoStr.indexOf(" = "));
-                    data[mapCount][2] = itemInfoStr.substring(itemInfoStr.indexOf(" = ") +3);
-                    mapCount ++;
-                    
-                }
-            }
-            update(data);
-        }
-    }
-//----------------------------------------------------------------------------
-//inner class - PriceAnalysisPage
-//----------------------------------------------------------------------------
-    private class PriceAnalysisPage extends JPanel{
-        JPanel topPanel;
-        JButton enterSearchPanel;
-        JLabel searchLabel;
-        JTextField searchTextField;
-        
-        JPanel midPanel;
-        JPanel graphPanel;
-        
-        JPanel bottomPanel;
-        JLabel creditLabel;
-        PriceAnalysisPage(){
-            this.setLayout(new BorderLayout());
-            /************************TOP PANEL**********************************/
-            topPanel = new JPanel();
-            topPanel.setBackground(Color.WHITE);
-            enterSearchPanel = new JButton("Go! ");
-            searchLabel = new JLabel(SEARCH_STR);
-            searchTextField = new JTextField(30);
-            topPanel.add(searchLabel);
-            topPanel.add(searchTextField);
-            topPanel.add(enterSearchPanel);
-            this.add(topPanel, BorderLayout.NORTH);
-            /************************MID PANEL**********************************/
-            //add the graph here
-            /************************BOTTOM PANEL**********************************/
-            bottomPanel = new JPanel();
-            creditLabel = new JLabel("Data from Statitics Canada");
-            bottomPanel.add(creditLabel);
-            this.add(bottomPanel, BorderLayout.SOUTH);
-        }
-    }
+
 //----------------------------------------------------------------------------
 //inner class - GroupOrderPage
 //----------------------------------------------------------------------------
-    private class GroupOrderPage extends JPanel implements ActionListener{
+     class GroupOrderPage extends JPanel implements ActionListener{
         JPanel topPanel;
         JPanel rightPanel;
         JPanel rightDownPanel;
@@ -361,6 +247,7 @@ public class HomePage extends JFrame implements ActionListener{
         JButton refreshButton;
         
         private ArrayList<String> list;
+        private User user;
         
         final String PRICE_DEFAULT_STR = "Price: $ ";
         final String LOCATION_DEFAULT_STR = "Store Location: ";
@@ -375,7 +262,7 @@ public class HomePage extends JFrame implements ActionListener{
         private HashMap<String, ArrayList<String>> groupOrderMap;
 //----------------------------------------------------------------------------
         private String[] amountList_cb = {"", "10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %", "80 %", "90 %"};
-        GroupOrderPage(){
+        GroupOrderPage(User user){
             this.setLayout(new BorderLayout());
             topPanel = new JPanel();
             rightPanel = new JPanel();
@@ -388,6 +275,7 @@ public class HomePage extends JFrame implements ActionListener{
             itemLabel = new JLabel("Item: ");
             itemLabel.setAlignmentX(JLabel.LEFT);
             itemNameField = new JTextField(20);
+            this.user = user;
             
             list = user.getWholeItemArrayList();
             String[] cb_itemList =  new String[list.size()+1];
@@ -474,7 +362,7 @@ public class HomePage extends JFrame implements ActionListener{
             /*****loop throught the group order list****/
             for(String refNo : groupOrderMap.keySet()){
                 ArrayList<String> orderInfo = groupOrderMap.get(refNo);
-                resultList.add(new OrderPanel(refNo, orderInfo));
+                resultList.add(new OrderPanel(user, refNo, orderInfo));
             }
             return resultList;
         }
@@ -548,7 +436,7 @@ public class HomePage extends JFrame implements ActionListener{
 //----------------------------------------------------------------------------
         //inner class inside GroupOrderPage - OrderPanel
 //----------------------------------------------------------------------------
-        private class OrderPanel extends JPanel implements ActionListener{ 
+        class OrderPanel extends JPanel implements ActionListener{ 
             private String refNo;
             private String itemInfo;
             private String itemPrice;
@@ -556,6 +444,7 @@ public class HomePage extends JFrame implements ActionListener{
             private String memberStr;
             private String amountStr;
             private Double amountPercentage;
+            private User user;
             
             final JButton acceptButton = new JButton("Accept");
             final String MEMBER_LABEL_STR = "Group member: ";
@@ -565,12 +454,13 @@ public class HomePage extends JFrame implements ActionListener{
             final String LOCATION_STR = "Store Location: ";
             JLabel memberLabel, itemLabel, amountLabel, priceLabel, locationLabel;
             //----------------------------------------------------------------------------
-            OrderPanel(String refNo, ArrayList<String> orderInfoList){
+            OrderPanel(User user, String refNo, ArrayList<String> orderInfoList){
                 //example format: 1438865252, {Red Bell Peppers 5 kg, $21.29, CostCo, userID~0.4}
                 this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
                 this.setPreferredSize(new Dimension(ORDER_PANEL_WIDTH,ORDER_PANEL_HEIGHT));
                 this.setMaximumSize(new Dimension(ORDER_PANEL_WIDTH,ORDER_PANEL_HEIGHT));
                 this.refNo = refNo; 
+                this.user=user;
                 if(orderInfoList.size()>=3){
                     this.itemInfo = orderInfoList.get(0);
                     this.itemPrice = orderInfoList.get(1);
@@ -650,7 +540,7 @@ public class HomePage extends JFrame implements ActionListener{
 //----------------------------------------------------------------------------
 //inner class - AccountDetailPage
 //----------------------------------------------------------------------------
-    private class AccountDetailPage extends JPanel implements ActionListener{
+     class AccountDetailPage extends JPanel implements ActionListener{
         private String userID;
         private ArrayList<HashMap> orderCombinedList;
         private final String[] pendingOrderTitles = {"Reference No.", "Item Info", "Location", "Price"};
@@ -671,7 +561,7 @@ public class HomePage extends JFrame implements ActionListener{
         JButton resetPassword_button;
         JLabel password_msg_label;
                 
-        AccountDetailPage(){
+        AccountDetailPage(User user){
             this.userID = user.getUserID();
             this.setLayout(new BorderLayout()); //new BoxLayout(this, BoxLayout.Y_AXIS));
             welcomeLabel = new JLabel("Hi, " + this.userID + "!");
@@ -803,7 +693,7 @@ public class HomePage extends JFrame implements ActionListener{
             completeOrder_Panel.add(completeOrder_scrollPane);
         }
         //----------------------------------------------------------------------------
-        private void updateDetailPanel(){
+        public void updateDetailPanel(){
             this.userID = user.getUserID();
             this.orderCombinedList = user.getGroupOrderList_user();
             setUpGroupOrderListTables();
@@ -840,7 +730,7 @@ public class HomePage extends JFrame implements ActionListener{
 //----------------------------------------------------------------------------
 //inner class - AccountLoginPage
 //----------------------------------------------------------------------------
-    private class AccountLoginPage extends JPanel implements ActionListener{
+    class AccountLoginPage extends JPanel implements ActionListener{
         private String nextPageIndex;
         JPanel loginPanel;
         JLabel userLabel;

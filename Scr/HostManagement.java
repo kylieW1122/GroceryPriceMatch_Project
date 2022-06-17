@@ -29,7 +29,7 @@ import java.net.Socket;
   */
 
 public class HostManagement{
-    private Database database;
+    private DataBase database;
     //userIDRefNoMap format: {userId=the grpOrderList of that user}
     private static HashMap<String, ArrayList<String>> userIDRefNoMap = new HashMap<String, ArrayList<String>>();
     //userPasswordMap format: {userId=password}
@@ -58,7 +58,7 @@ public class HostManagement{
     }
 //----------------------------------------------------------------------------
     HostManagement(){
-        this.database = new Database();
+        this.database = new DataBase();
         this.setUp();
         this.writeUpdatedInfoToFiles();
         try{
@@ -366,12 +366,12 @@ public class HostManagement{
                         ArrayList<String> resultList = new  ArrayList<String>();
                         if(msg.length() > Const.SEARCH_KEYWORD.length()){ // if the keyword is not empty ""
                             String keyword = msg.substring(Const.SEARCH_KEYWORD.length());
-                            resultList = Database.searchItemKeyword(keyword);
+                            resultList = DataBase.searchItemKeyword(keyword);
                         }
                         objectOutput.writeObject(resultList);
                         objectOutput.flush();
                     }else if (msg.substring(0, Const.KEYWORD_LIST.length()).equals(Const.KEYWORD_LIST)){
-                        ArrayList<String> keywordList = Database.getWholeList();
+                        ArrayList<String> keywordList = DataBase.getWholeList();
                         objectOutput.writeObject(keywordList);
                         objectOutput.flush();
                     }else if(msg.substring(0, Const.GROUP_ORDER.length()).equals(Const.GROUP_ORDER)){

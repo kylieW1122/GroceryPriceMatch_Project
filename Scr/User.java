@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 import java.util.HashSet;
+
+
+
 import java.util.HashMap;
 import java.io.ObjectInputStream;
 import java.io.InputStream;
@@ -22,7 +25,8 @@ public class User{
     private String userID;
     private HashSet<String> committedGroupOrderRefNoList;
     
-    final String LOCAL_HOST = "192.168.0.140"; //Kylie's macbook ip address
+   // final String LOCAL_HOST = "192.168.0.140"; //Kylie's macbook ip address
+    final String LOCAL_HOST = "127.0.0.1"; //Kylie's macbook ip address
     final int PORT = Const.SOCKET_PORT;
     Socket clientSocket;
     PrintWriter output;    
@@ -32,7 +36,8 @@ public class User{
 //----------------------------------------------------------------------------
     public static void main(String[] args){ //start main GUI here
         User user = new User();
-        HomePage frame = new HomePage(user);
+        new HomePage(user);
+     
     }
 //----------------------------------------------------------------------------
     User(){
