@@ -2,7 +2,7 @@
   * This is final project - Grocery Helper Program
   * Class of constants; defines the communication tags between host and clients  
   * 
-  * @author Kylie Wong and Michelle Chan, ICS4UE
+  * @author Kylie Wong, ICS4UE
   */ 
 public final class Const{ 
     public static final int SOCKET_PORT = 6666;

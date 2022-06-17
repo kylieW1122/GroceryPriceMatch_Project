@@ -12,7 +12,7 @@ import javax.swing.ComboBoxEditor;
   * Copied from internet source and edited to suit program usage
   * Code Source from https://www.tutorialspoint.com/how-can-we-implement-auto-complete-jcombobox-in-java
   * 
-  * @author Kylie Wong and Michelle Chan, ICS4UE
+  * @author Kylie Wong, ICS4UE
   */ 
 class AutoCompleteComboBox extends JComboBox {
     public int caretPos = 0;

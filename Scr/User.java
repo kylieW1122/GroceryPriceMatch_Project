@@ -15,7 +15,7 @@ import java.net.Socket;
  * This is final project - Grocery Helper Program
  * This class represent the User - client socket
  * This is the place to start the program, and it will connect to the host if that is available 
- * @author Kylie Wong and Michelle Chan, ICS4UE
+ * @author Kylie Wong, ICS4UE
  * @version 2.0, build June 16, 2022
  */
 public class User{

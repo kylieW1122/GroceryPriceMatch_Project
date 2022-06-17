@@ -25,7 +25,7 @@ import java.time.Instant;
   * Host then returns the object list or message.
   * Const.java is the "language" used between host and client.
   * 
-  * @author Kylie Wong and Michelle Chan, ICS4UE
+  * @author Kylie Wong, ICS4UE
   * @version 2.0, build June 16, 2022
   */
 
