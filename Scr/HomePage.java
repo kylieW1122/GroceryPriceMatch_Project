@@ -103,7 +103,7 @@ public class HomePage extends JFrame implements ActionListener{
     //----------------------------------------------------------------------------
     HomePage(User user){
         this.user = user;
-        this.setTitle("Your Grocery Helper");
+        this.setTitle("Grocery Price Comparison");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(DEFAULT_FRAME_SIZE_WIDTH, DEFAULT_FRAME_SIZE_HEIGHT);
         this.setResizable(true);
