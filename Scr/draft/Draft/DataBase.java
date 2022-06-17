@@ -16,7 +16,6 @@ import java.io.FileReader;
 /**[DataBase.java]
   * This is final project - Grocery Helper Program
   * This class gets the item data from website and CSV flies and save them as HashMaps
-  * 
   * @author Kylie Wong and Michelle Chan, ICS4UE
   * @version 2.0, build June 16, 2022
   */
@@ -31,17 +30,20 @@ public class DataBase {
     private static HashMap<String, ArrayList<String>> keywordMap;
     
     private static HashMap<String, double[]> statisticsHashmap;
-    private static ArrayList<String> statisticsItemNames;
     
     final static String SOBEYS_URL = "https://voila.ca/products?source=navigation&sublocationId=43a936d1-df1d-4bf1-a09c-b23c6a8edf63";  
-    final static String STATISTICS_CANADA_FILENAME = "resources/Database/1810000201-eng.csv";
-    final static String COSTCO_FILENAME = "resources/Database/costCo.csv";
-    final static String WALMART_FILENAME = "resources/Database/walmart.csv";
+    final static String STATISTICS_CANADA_FILENAME = "resources/DataBase/1810000201-eng.csv";
+    final static String COSTCO_FILENAME = "resources/DataBase/costCo.csv";
+    final static String WALMART_FILENAME = "resources/DataBase/walmart.csv";
+    
+    public static void main(String[] args){ //delete - just for debugging 
+        DataBase base = new DataBase();
+        System.out.println("result: "  + base.searchItemKeyword("a").toString());
+    }
 //----------------------------------------------------------------------------
     DataBase(){
         keywordMap = new HashMap<String, ArrayList<String>>();
         wholeProductList = new ArrayList<String>();
-        statisticsItemNames = new ArrayList<String>();
         setUp();
     }
 //----------------------------------------------------------------------------
@@ -86,9 +88,6 @@ public class DataBase {
     public static ArrayList<String> getWholeList(){
         return wholeProductList;
     }
-    public static ArrayList<String> getStatisticsItemList(){
-        return statisticsItemNames;
-    }
 //----------------------------------------------------------------------------
     public static ArrayList<String> searchItemKeyword(String userInput){ //sort the list
         ArrayList<String> searchResult = new ArrayList<String>();
@@ -116,6 +115,46 @@ public class DataBase {
             }
         }
         return map;
+    }
+    //DO NOT REMOVE, THIS IS REQUIRED TO UPDATE THE MAP 
+    // Finds the product by name from each grocery map and puts them all into one main map
+    private static Map<String, Map<String, Double>> updateMatchingMap(String company, Map<String, Map<String, Double>> map,
+                                                                      HashMap<String, String> data, String matchingProductName ) {
+        
+        
+        if (map == null) { map = new HashMap<String, Map<String, Double>>(); }
+        Map<String, Double> productMap = new HashMap<String, Double>();
+        if (data != null && !data.isEmpty()) {
+            Set<String> keys = data.keySet();
+            for (String itemKeyName: keys) {
+                if (itemKeyName.toLowerCase().contains(matchingProductName.toLowerCase())) {
+                    String valStr = data.get(itemKeyName);
+                    valStr = valStr.substring(1);
+                    Double value = Double.valueOf(valStr);
+                    productMap.put(itemKeyName, value);
+                }
+            }
+        }
+        
+        
+        if (productMap != null && !productMap.isEmpty())
+        {
+            map.put(company, productMap);
+        }
+        return map;
+        
+    }
+    
+    //DO NOT REMOVE, THIS IS REQUIRED FOR SEARCH FUNCTIONALITY
+    // Item name search between different grocery stores
+    // This method will reuse updateMatchinMap to update the map for different grocery stores 
+    public static Map<String, Map<String, Double>> productSearch(String productName) {
+        Map<String, Map<String, Double>> map = new HashMap<String, Map<String, Double>>();
+        map = updateMatchingMap("sobeys", map, sobeysItemsMap, productName );
+        map = updateMatchingMap("costco", map, costCoItemsMap, productName );
+        map = updateMatchingMap("walmart", map, walmartItemsMap, productName );
+        return map;
+        
     }
 //----------------------------------------------------------------------------
     private static HashMap<String, double[]> setUpStatisticsCanadaPriceMatchList(String fileName){ //DONE
@@ -153,7 +192,7 @@ public class DataBase {
                 Set<String> keys = statisticsList.keySet();
                 
                 for (String key: keys) {
-                    statisticsItemNames.add(key);
+
                     double[] prices = statisticsList.get(key);
                     for (int i=0; i < prices.length; i++) {
                         ProductInfo prodInfo = new ProductInfo();
@@ -247,28 +286,4 @@ public class DataBase {
         return walmartList;
     }
 //----------------------------------------------------------------------------
-    /**
-     * @author Michelle
-     * Stores the product info in this Object
-     */
-    private static class ProductInfo {
-        
-        private String monYear;
-        private String itemName;
-        private Double price;
-        public String getMonYear() { return monYear; }
-        public void setMonYear(String monYear) { this.monYear = monYear; }
-        public String getItemName() {
-            return itemName;
-        }
-        public void setItemName(String itemName) {
-            this.itemName = itemName;
-        }
-        public Double getPrice() {
-            return price;
-        }
-        public void setPrice(Double price) {
-            this.price = price;
-        } 
-    }
 }
