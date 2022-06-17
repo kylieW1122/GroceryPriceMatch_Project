@@ -352,6 +352,7 @@ public class HostManagement{
                         String password = "";
                         userName = msg.substring(Const.LOGIN.length(), msg.indexOf(Const.SPLIT));
                         password = msg.substring(msg.indexOf(Const.SPLIT) +1);
+                        System.out.println(userName + " " + password);
                         String resultOfLogin = loginUser(userName, password);
                         output.println(resultOfLogin);
                         output.flush();

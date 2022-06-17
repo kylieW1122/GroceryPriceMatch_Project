@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 import java.util.HashSet;
+
+
+
 import java.util.HashMap;
 import java.io.ObjectInputStream;
 import java.io.InputStream;
@@ -20,10 +23,10 @@ import java.net.Socket;
  */
 public class User{
     private String userID;
-    private boolean host_is_alive;
     private HashSet<String> committedGroupOrderRefNoList;
-    private DataBase database;
-    final String LOCAL_HOST = "127.0.0.1"; //"192.168.0.140"; //Kylie's macbook ip address
+    
+   // final String LOCAL_HOST = "192.168.0.140"; //Kylie's macbook ip address
+    final String LOCAL_HOST = "127.0.0.1"; //Kylie's macbook ip address
     final int PORT = Const.SOCKET_PORT;
     Socket clientSocket;
     PrintWriter output;    
@@ -33,19 +36,17 @@ public class User{
 //----------------------------------------------------------------------------
     public static void main(String[] args){ //start main GUI here
         User user = new User();
-        HomePage frame = new HomePage(user);
+        new HomePage(user);
+     
     }
 //----------------------------------------------------------------------------
     User(){
-        this.database = new DataBase();
         this.committedGroupOrderRefNoList = new HashSet<String>();
         this.userID = "";
-        this.host_is_alive = true;
         this.startConnecting();  //connect with the host using socket
     }
 //----------------------------------------------------------------------------
     public String getUserID(){ return this.userID; }
-    public Boolean getHostStatus(){ return this.host_is_alive; }
 //----------------------------------------------------------------------------
 /****************************************************************************************************************/
     private boolean startConnecting(){
@@ -60,7 +61,8 @@ public class User{
             String msg = input.readLine();                        //get a response from the server
             System.out.println("Message from server: '" + msg + "'"); 
         }catch (Exception e){
-            this.host_is_alive = false;
+            //directly use database, instead of host, block all group order
+            e.printStackTrace();
             return false;
         }
         return true;
@@ -215,7 +217,7 @@ public class User{
     //----------------------------------------------------------------------------
     //account detail 
     //----------------------------------------------------------------------------
-    public ArrayList<HashMap> getGroupOrderList_user(){
+    public ArrayList<HashMap> getGroupOrderList_user(){ // return 
         ArrayList<HashMap> combinedList = new ArrayList<HashMap>();
         HashMap<String, ArrayList<String>> pendingList = new HashMap<String, ArrayList<String>>();
         HashMap<String, ArrayList<String>> completeList = new HashMap<String, ArrayList<String>>();
