@@ -245,24 +245,17 @@ public class HostManagement{
         }
         userIDRefNoMap.put(userID, user_listOfRefNo);
     }
-    
-    private void delay(long timeInMilliSeconds) {
-
-        long timestamp = System.currentTimeMillis();
-
-
-        do {
-
-        } while (System.currentTimeMillis() < timestamp + timeInMilliSeconds);
-
-    }
-    
     //----------------------------------------------------------------------------
-    private String generateUniqueRefNo(String itemInfo){
+    private void delay(long timeInMilliSeconds){ //@author Michelle
+        long timestamp = System.currentTimeMillis();
+        do{}while (System.currentTimeMillis() < timestamp + timeInMilliSeconds);
+    }
+    //----------------------------------------------------------------------------
+    private String generateUniqueRefNo(String itemInfo){ //@author Michelle
         String refNo = Long.toString(System.nanoTime());
-        while(refNoMapPending.containsKey(refNo)){ //if refNo is taken, replace last digit with a character
-        	delay(300);
-        	refNo = Long.toString(System.nanoTime());
+        while(refNoMapPending.containsKey(refNo)){ //if refNo is taken, gererate a new one
+            delay(300);
+            refNo = Long.toString(System.nanoTime());
         }
         return refNo;
     }

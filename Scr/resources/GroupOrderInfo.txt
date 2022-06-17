@@ -1,0 +1,4 @@
+--------------Pending Group Order--------------
+831164873118820~[Mini Cucumbers 2.27 kg, $7.49, CostCo, userID~0.6]
+831150547200238~[Mini Cucumbers 2.27 kg, $7.49, CostCo, userID~0.3]
+--------------Completed Group Order--------------
