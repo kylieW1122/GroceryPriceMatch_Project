@@ -48,7 +48,7 @@ import java.util.Set;
   * This is final project - Grocery Helper Program
   * This class is the main GUI of the program
   * 
-  * @author Kylie Wong and Michelle Chan, ICS4UE
+  * @author Kylie Wong, ICS4UE
   * @version 2.0, build June 16, 2022
   */
 public class HomePage extends JFrame implements ActionListener{
@@ -79,9 +79,11 @@ public class HomePage extends JFrame implements ActionListener{
     private final int DEFAULT_FRAME_SIZE_HEIGHT = 700;
     private final Font TITLE_FONT = new Font("titleFont", Font.PLAIN, 18);
     
+    private final static String ANALYSIS_ICON_FILE = "resources/icons/graphIcon.png";
+    private final static String GROUP_ICON_FILE = "resources/icons/groupIcon.png";
+    
     JPanel homePagePanel;
     
-    JPanel midPanel;
     JPanel searchPanel;
     JPanel midButtonPanel;
     JTextField searchTextField;
@@ -116,38 +118,37 @@ public class HomePage extends JFrame implements ActionListener{
         /********************set homePagePanel, main panel of homepage**********************/
         homePagePanel = new JPanel();
         homePagePanel.setLayout(new BorderLayout());
-        /******MID JPANEL of homePagePanel********/
-        midPanel = new JPanel(); //new BoxLayout(midPanel,BoxLayout.Y_AXIS)); //GridLayout(0,1));
-        midPanel.setBackground(Color.WHITE);
+        /****search panel******/
         searchPanel = new JPanel();
-        searchPanel.setPreferredSize(new Dimension(0, 30));
-        searchPanel.setMaximumSize(new Dimension(0, 30));
+        searchPanel.setPreferredSize(new Dimension(DEFAULT_FRAME_SIZE_WIDTH, 100));
         searchTextField = new JTextField(30);
         enterSearchPanel = new JButton(SEARCH_STR);
         enterSearchPanel.addActionListener(this);
-        
-        midButtonPanel = new JPanel();
-        priceAnalysisButton = new JButton(PRICE_ANALYSIS_STR, new ImageIcon("resources/icons/graphIcon.png"));  
-        priceAnalysisButton.setVerticalTextPosition(AbstractButton.BOTTOM);
-        priceAnalysisButton.setHorizontalTextPosition(AbstractButton.CENTER);
-        
-        //priceAnalysisButton = new JButton(PRICE_ANALYSIS_STR);
-        priceAnalysisButton.addActionListener(this);
-        groupOrderButton = new JButton(GROUP_ORDER_STR, new ImageIcon("resources/icons/groupIcon.png"));
-        groupOrderButton.setVerticalTextPosition(AbstractButton.BOTTOM);
-        groupOrderButton.setHorizontalTextPosition(AbstractButton.CENTER);
-        
-        //groupOrderButton = new JButton(GROUP_ORDER_STR);
-        groupOrderButton.addActionListener(this);
         searchPanel.add(searchTextField);
         searchPanel.add(enterSearchPanel);
+        homePagePanel.add(searchPanel, BorderLayout.NORTH);
+        /****button panel******/
+        Dimension buttonDimension = new Dimension(380, 380);
+        midButtonPanel = new JPanel();
+        priceAnalysisButton = new JButton(PRICE_ANALYSIS_STR, new ImageIcon(ANALYSIS_ICON_FILE));  
+        priceAnalysisButton.setFont(TITLE_FONT);
+        priceAnalysisButton.setVerticalTextPosition(AbstractButton.BOTTOM);
+        priceAnalysisButton.setHorizontalTextPosition(AbstractButton.CENTER);
+        priceAnalysisButton.setPreferredSize(buttonDimension);
+        priceAnalysisButton.setVerticalAlignment(JButton.CENTER);
+        priceAnalysisButton.addActionListener(this);
         
-        midPanel.add(searchPanel);
+        groupOrderButton = new JButton(GROUP_ORDER_STR, new ImageIcon(GROUP_ICON_FILE));
+        groupOrderButton.setFont(TITLE_FONT);
+        groupOrderButton.setVerticalTextPosition(AbstractButton.BOTTOM);
+        groupOrderButton.setHorizontalTextPosition(AbstractButton.CENTER);
+        groupOrderButton.setPreferredSize(buttonDimension);
+        groupOrderButton.setVerticalAlignment(JButton.CENTER);
+        groupOrderButton.addActionListener(this);
+       
         midButtonPanel.add(priceAnalysisButton);
         midButtonPanel.add(groupOrderButton);
-        midPanel.add(midButtonPanel);
-        
-        homePagePanel.add(searchPanel, BorderLayout.CENTER);
+        homePagePanel.add(midButtonPanel, BorderLayout.CENTER);
         /*******BOTTOM PANEL of homePagePanel********/
         mainBottomPanel = new JPanel();
         bottomHomeButton = new JButton(BACK_HOME_STR);
@@ -159,21 +160,18 @@ public class HomePage extends JFrame implements ActionListener{
         mainBottomPanel.add(accountSettingButton);
         /*****************************ADD ALL PANELS INTO cardPanel************************************/
         cardPanel.add(homePagePanel, HOME_PAGE_INDEX);
-        searchItemPanel = new SearchItemPage();
+        searchItemPanel = new SearchItemPage();    //inner class in HomePage
         cardPanel.add(searchItemPanel, SEARCH_PAGE_INDEX);
-        
-        Map<String, Double> emptyMap = new HashMap<String, Double>();
-        priceAnalysisPanel = new PriceAnalysisPanel("", "2021", emptyMap);
+        priceAnalysisPanel = new PriceAnalysisPanel();
         cardPanel.add(priceAnalysisPanel, PRICE_ANALYSIS_INDEX);
-        
-        accessDeclinedPanel = new AccessDeclinedPage();
+        accessDeclinedPanel = new AccessDeclinedPage();    //inner class in HomePage
         cardPanel.add(accessDeclinedPanel, ACCESS_DECLINED_INDEX);
         if(user.getHostStatus()){  //host is active. If not, only have access to search item and price analysis graph
-            groupOrderPanel = new GroupOrderPage();
+            groupOrderPanel = new GroupOrderPage();    //inner class in HomePage
             cardPanel.add(groupOrderPanel, GROUP_ORDER_INDEX);
-            acountDetailPanel = new AccountDetailPage();
+            acountDetailPanel = new AccountDetailPage();    //inner class in HomePage
             cardPanel.add(acountDetailPanel, ACCOUNT_DETAIL_INDEX);
-            accountLoginPanel = new AccountLoginPage();
+            accountLoginPanel = new AccountLoginPage();    //inner class in HomePage
             cardPanel.add(accountLoginPanel, ACCOUNT_LOGIN_INDEX);
         }
         /*****************************************************************/
@@ -230,17 +228,18 @@ public class HomePage extends JFrame implements ActionListener{
                 }
             }else{
                 cl.show(cardPanel, index);
+                /****update the panel if needed and actionLsit index****/
+                if(index.equals(ACCOUNT_DETAIL_INDEX)){
+                    acountDetailPanel.updateDetailPanel();
+                }else if(index.equals(GROUP_ORDER_INDEX)){
+                    groupOrderPanel.updateOrderPanel();
+                }
             }
-            /****update the panel if needed and actionLsit index****/
-            if(index.equals(ACCOUNT_DETAIL_INDEX)){
-                acountDetailPanel.updateDetailPanel();
-            }else if(index.equals(GROUP_ORDER_INDEX)){
-                groupOrderPanel.updateOrderPanel();
-            }else if(index.equals(HOME_PAGE_INDEX)){
-                actionList.setSelectedIndex(Integer.parseInt(index));
-            }else if (!index.equals(SEARCH_PAGE_INDEX)){
-                actionList.setSelectedIndex(Integer.parseInt(index)-1);
-            }
+        }
+        if(index.equals(HOME_PAGE_INDEX)){
+            actionList.setSelectedIndex(Integer.parseInt(index));
+        }else if (!index.equals(SEARCH_PAGE_INDEX)){
+            actionList.setSelectedIndex(Integer.parseInt(index)-1);
         }
     }
 //----------------------------------------------------------------------------

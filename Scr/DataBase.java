@@ -86,6 +86,7 @@ public class DataBase {
     public static ArrayList<String> getWholeList(){
         return wholeProductList;
     }
+//----------------------------------------------------------------------------
     public static ArrayList<String> getStatisticsItemList(){
         return statisticsItemNames;
     }
@@ -247,10 +248,11 @@ public class DataBase {
         return walmartList;
     }
 //----------------------------------------------------------------------------
-    /**
+    /**inner class - ProductInfo
      * @author Michelle
      * Stores the product info in this Object
      */
+//----------------------------------------------------------------------------
     private static class ProductInfo {
         
         private String monYear;
