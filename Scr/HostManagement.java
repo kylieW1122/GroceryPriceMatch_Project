@@ -246,14 +246,17 @@ public class HostManagement{
         userIDRefNoMap.put(userID, user_listOfRefNo);
     }
     //----------------------------------------------------------------------------
+   // This function delays the processing time in milliseconds  
     private void delay(long timeInMilliSeconds){ //@author Michelle
         long timestamp = System.currentTimeMillis();
         do{}while (System.currentTimeMillis() < timestamp + timeInMilliSeconds);
     }
     //----------------------------------------------------------------------------
-    private String generateUniqueRefNo(String itemInfo){ //@author Michelle
+    // This function generates a unique ref number based on the current nanosecond of the time which will give a unique number 
+    // This function will be served one at a time 
+    private synchronized String generateUniqueRefNo(String itemInfo){ //@author Michelle
         String refNo = Long.toString(System.nanoTime());
-        while(refNoMapPending.containsKey(refNo)){ //if refNo is taken, gererate a new one
+        while(refNoMapPending.containsKey(refNo)){ //if refNo is taken, generate a new one
             delay(300);
             refNo = Long.toString(System.nanoTime());
         }

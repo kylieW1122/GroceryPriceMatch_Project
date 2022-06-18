@@ -14,7 +14,6 @@ import java.awt.GridBagConstraints;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Insets;
-import java.awt.ComponentOrientation;
 import java.awt.Font;
 import javax.swing.GroupLayout;
 import javax.swing.BoxLayout;
@@ -37,8 +36,6 @@ import javax.swing.table.TableModel;
 import javax.swing.border.TitledBorder;
 import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
-import javax.swing.border.Border;
-import javax.swing.AbstractButton;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,42 +45,34 @@ import java.util.Set;
   * This is final project - Grocery Helper Program
   * This class is the main GUI of the program
   * 
-  * @author Kylie Wong, ICS4UE
+  * @author Kylie Wong and Michelle Chan, ICS4UE
   * @version 2.0, build June 16, 2022
   */
 public class HomePage extends JFrame implements ActionListener{
     private User user;
-    private static String[] actionStrings = {"Home", "Price Analysis", "Group Order", "View Account Details"};
-    private SearchItemPage searchItemPanel;
-    private PriceAnalysisPanel priceAnalysisPanel;
+    private static String[] actionStrings = {"Home", "Group Order", "View Account Details"};
+
     private GroupOrderPage groupOrderPanel;
     private AccountDetailPage acountDetailPanel;
     private AccountLoginPage accountLoginPanel;
-    private AccessDeclinedPage accessDeclinedPanel;
-    
+   
     private final String HOME_PAGE_INDEX  = "0";
-    private final String SEARCH_PAGE_INDEX = "1";
-    private final String PRICE_ANALYSIS_INDEX = "2";
-    private final String GROUP_ORDER_INDEX = "3";
-    private final String ACCOUNT_DETAIL_INDEX = "4";
-    private final String ACCOUNT_LOGIN_INDEX = "5";
-    private final String ACCESS_DECLINED_INDEX = "6";
+
+    private final String GROUP_ORDER_INDEX = "1";
+    private final String ACCOUNT_DETAIL_INDEX = "2";
+
     
-    private final String SEARCH_STR = "Search";
-    private final String PRICE_ANALYSIS_STR = "Price Analysis";
+
     private final String GROUP_ORDER_STR = "Group Order";
     private final String BACK_HOME_STR = "Back To Home";
     private final String ACCOUNT_DETAIL_STR = "View Account Details";
     
     private final int DEFAULT_FRAME_SIZE_WIDTH = 1000;
     private final int DEFAULT_FRAME_SIZE_HEIGHT = 700;
-    private final Font TITLE_FONT = new Font("titleFont", Font.PLAIN, 18);
-    
-    private final static String ANALYSIS_ICON_FILE = "resources/icons/graphIcon.png";
-    private final static String GROUP_ICON_FILE = "resources/icons/groupIcon.png";
     
     JPanel homePagePanel;
     
+    JPanel midPanel;
     JPanel searchPanel;
     JPanel midButtonPanel;
     JTextField searchTextField;
@@ -96,14 +85,36 @@ public class HomePage extends JFrame implements ActionListener{
     JButton accountSettingButton;
     JButton reviewGrpOrderButton;
     JButton bottomHomeButton;
+
     
     JPanel cardPanel;
     CardLayout cl;
     JComboBox actionList;
-    //----------------------------------------------------------------------------
-    HomePage(User user){
+    private static HomePage instance;
+ 
+ 
+    public static HomePage getInstance() {
+ 
+    	return instance;
+    }
+    
+    
+    // @Michelle
+    public void setHomePagePanel(JPanel panel) {
+    	homePagePanel.removeAll(); 
+    	homePagePanel.add(panel, BorderLayout.CENTER);
+    	cardPanel.remove(homePagePanel); 
+    	 cardPanel.add(homePagePanel, 0);
+    	 this.remove(cardPanel);
+    	 this.add(cardPanel, BorderLayout.CENTER);
+    	 this.revalidate();
+    	 this.repaint();
+    }
+//----------------------------------------------------------------------------
+   public HomePage(User user){
+		instance = this;
         this.user = user;
-        this.setTitle("Grocery Price Comparison");
+        this.setTitle("Grocery Price Match");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(DEFAULT_FRAME_SIZE_WIDTH, DEFAULT_FRAME_SIZE_HEIGHT);
         this.setResizable(true);
@@ -115,41 +126,21 @@ public class HomePage extends JFrame implements ActionListener{
         cl = new CardLayout();
         cardPanel = new JPanel();
         cardPanel.setLayout(cl);
-        /********************set homePagePanel, main panel of homepage**********************/
+        /********************set homePagePanel - HomePagePanel**********************/
         homePagePanel = new JPanel();
         homePagePanel.setLayout(new BorderLayout());
-        /****search panel******/
-        searchPanel = new JPanel();
-        searchPanel.setPreferredSize(new Dimension(DEFAULT_FRAME_SIZE_WIDTH, 100));
-        searchTextField = new JTextField(30);
-        enterSearchPanel = new JButton(SEARCH_STR);
-        enterSearchPanel.addActionListener(this);
-        searchPanel.add(searchTextField);
-        searchPanel.add(enterSearchPanel);
-        homePagePanel.add(searchPanel, BorderLayout.NORTH);
-        /****button panel******/
-        Dimension buttonDimension = new Dimension(380, 380);
-        midButtonPanel = new JPanel();
-        priceAnalysisButton = new JButton(PRICE_ANALYSIS_STR, new ImageIcon(ANALYSIS_ICON_FILE));  
-        priceAnalysisButton.setFont(TITLE_FONT);
-        priceAnalysisButton.setVerticalTextPosition(AbstractButton.BOTTOM);
-        priceAnalysisButton.setHorizontalTextPosition(AbstractButton.CENTER);
-        priceAnalysisButton.setPreferredSize(buttonDimension);
-        priceAnalysisButton.setVerticalAlignment(JButton.CENTER);
-        priceAnalysisButton.addActionListener(this);
         
-        groupOrderButton = new JButton(GROUP_ORDER_STR, new ImageIcon(GROUP_ICON_FILE));
-        groupOrderButton.setFont(TITLE_FONT);
-        groupOrderButton.setVerticalTextPosition(AbstractButton.BOTTOM);
-        groupOrderButton.setHorizontalTextPosition(AbstractButton.CENTER);
-        groupOrderButton.setPreferredSize(buttonDimension);
-        groupOrderButton.setVerticalAlignment(JButton.CENTER);
-        groupOrderButton.addActionListener(this);
-       
-        midButtonPanel.add(priceAnalysisButton);
-        midButtonPanel.add(groupOrderButton);
-        homePagePanel.add(midButtonPanel, BorderLayout.CENTER);
-        /*******BOTTOM PANEL of homePagePanel********/
+        /*************************MID JPANEL**********************************/
+ 
+        // The middle Panel is a replacement panel for the different search results, group orders, 
+        // etc. to display a different panel
+        JPanel search = new SearchPanel();
+        homePagePanel.add(search, BorderLayout.CENTER);
+        
+        /*****************************ADD EVERYTHING INTO mainhomePagePanel************************************/
+        cardPanel.add(homePagePanel, 0);
+
+        /************************BOTTOM PANEL**********************************/
         mainBottomPanel = new JPanel();
         bottomHomeButton = new JButton(BACK_HOME_STR);
         bottomHomeButton.addActionListener(this);
@@ -158,215 +149,109 @@ public class HomePage extends JFrame implements ActionListener{
         
         mainBottomPanel.add(bottomHomeButton);
         mainBottomPanel.add(accountSettingButton);
-        /*****************************ADD ALL PANELS INTO cardPanel************************************/
-        cardPanel.add(homePagePanel, HOME_PAGE_INDEX);
-        searchItemPanel = new SearchItemPage();    //inner class in HomePage
-        cardPanel.add(searchItemPanel, SEARCH_PAGE_INDEX);
-        priceAnalysisPanel = new PriceAnalysisPanel();
-        cardPanel.add(priceAnalysisPanel, PRICE_ANALYSIS_INDEX);
-        accessDeclinedPanel = new AccessDeclinedPage();    //inner class in HomePage
-        cardPanel.add(accessDeclinedPanel, ACCESS_DECLINED_INDEX);
-        if(user.getHostStatus()){  //host is active. If not, only have access to search item and price analysis graph
-            groupOrderPanel = new GroupOrderPage();    //inner class in HomePage
-            cardPanel.add(groupOrderPanel, GROUP_ORDER_INDEX);
-            acountDetailPanel = new AccountDetailPage();    //inner class in HomePage
-            cardPanel.add(acountDetailPanel, ACCOUNT_DETAIL_INDEX);
-            accountLoginPanel = new AccountLoginPage();    //inner class in HomePage
-            cardPanel.add(accountLoginPanel, ACCOUNT_LOGIN_INDEX);
-        }
+        groupOrderPanel = new GroupOrderPage(user);
+        acountDetailPanel = new AccountDetailPage(user);
+        accountLoginPanel = new AccountLoginPage();
+        
         /*****************************************************************/
-        cl.show(cardPanel, "0"); //cardLayout
+        cl.show(cardPanel, "0");
         this.add(actionList, BorderLayout.NORTH);
         this.add(cardPanel, BorderLayout.CENTER);
         this.add(mainBottomPanel, BorderLayout.SOUTH);
         this.setVisible(true);
     }
-    //----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     @Override
     public void actionPerformed(ActionEvent event){
         if(event.getSource() instanceof JComboBox){
+        	// @Michelle
+        	// changes menu bar when menu option gets selected
             JComboBox cb = (JComboBox)event.getSource();
             int index = cb.getSelectedIndex();
-            if(index>0){
-                index = index+1;
-            }
             String cardNo = Integer.toString(index);
-            changeCardPanel(cardNo);
+            if(cardNo.equals(GROUP_ORDER_INDEX)){
+                loginRequired(GROUP_ORDER_INDEX);
+            }else if (cardNo.equals(ACCOUNT_DETAIL_INDEX)){
+                loginRequired(ACCOUNT_DETAIL_INDEX);
+            }
+            else if (cardNo.equals(HOME_PAGE_INDEX)) {
+                changeCardPanel(HOME_PAGE_INDEX);
+            	this.setHomePagePanel(new SearchPanel());
+            }
+            else{
+                cl.show(cardPanel, cardNo);
+            }
         }else if (event.getSource() instanceof JButton){
+        	// @Michelle 
+        	// changes menu bar when the bottom panel button gets selected
             String command = event.getActionCommand();
-            if(command.equals(PRICE_ANALYSIS_STR)){
-                changeCardPanel(PRICE_ANALYSIS_INDEX);
-            }else if (command.equals(GROUP_ORDER_STR)){
-                changeCardPanel(GROUP_ORDER_INDEX);
+            if (command.equals(GROUP_ORDER_STR)){
+                loginRequired(GROUP_ORDER_INDEX);
             }else if (command.equals(BACK_HOME_STR)){
                 changeCardPanel(HOME_PAGE_INDEX);
-            }else if (command.equals(ACCOUNT_DETAIL_STR)){
-                changeCardPanel(ACCOUNT_DETAIL_INDEX);
-            }else if(command.equals(SEARCH_STR)){
-                changeCardPanel(SEARCH_PAGE_INDEX);
-                String userInputText = searchTextField.getText();
-                searchTextField.setText("");
-                searchItemPanel.searchKeyWord(userInputText);
+            	this.setHomePagePanel(new SearchPanel());
+            }
+            else if (command.equals(ACCOUNT_DETAIL_STR)){
+                loginRequired(ACCOUNT_DETAIL_INDEX);
             }
         }
     }
-    //----------------------------------------------------------------------------
-    private void changeCardPanel(String index){
-        if(!user.getHostStatus()){  //host is not active, block all access except search item and price analysis graph
-            if( (index.equals(GROUP_ORDER_INDEX)) || (index.equals(ACCOUNT_DETAIL_INDEX)) || (index.equals(ACCOUNT_LOGIN_INDEX)) ){
-                cl.show(cardPanel, ACCESS_DECLINED_INDEX);
-            }else{
-                cl.show(cardPanel, index);
-            }
+//----------------------------------------------------------------------------
+    private void loginRequired(String pageIndex){
+
+        if(user.getUserID()!=null && !user.getUserID().isEmpty()){     //if user is logged in
+             
+        	// @Michelle
+        	// When the user selects Account Details through the menu selection, this function will switch to the account detail panel
+              if (pageIndex.equals(ACCOUNT_DETAIL_INDEX)) {
+            	  changeCardPanel(ACCOUNT_DETAIL_INDEX);
+            	  this.setHomePagePanel(acountDetailPanel);
+              } 
+           // @Michelle
+           // When the user selects Group Order through the menu selection, this function will switch to the group order panel
+              else if (pageIndex.equals(GROUP_ORDER_INDEX)) {
+            	  changeCardPanel(GROUP_ORDER_INDEX);
+            	  this.setHomePagePanel(groupOrderPanel);
+              }
+
         }else{
-            if( (index.equals(GROUP_ORDER_INDEX)) || (index.equals(ACCOUNT_DETAIL_INDEX)) ){
-                if(!user.getUserID().equals("")){     //if user is logged in
-                    cl.show(cardPanel, index);
-                }else{
-                    accountLoginPanel.setNextIndex(index);
-                    cl.show(cardPanel, ACCOUNT_LOGIN_INDEX);
-                }
-            }else{
-                cl.show(cardPanel, index);
-                /****update the panel if needed and actionLsit index****/
-                if(index.equals(ACCOUNT_DETAIL_INDEX)){
-                    acountDetailPanel.updateDetailPanel();
-                }else if(index.equals(GROUP_ORDER_INDEX)){
-                    groupOrderPanel.updateOrderPanel();
-                }
-            }
+        	// @Michelle
+        	// When not logged in yet, the menu selection will present the login page and continue to the selected 
+        	// panel/page after a successful login
+	         changeCardPanel(pageIndex);
+	         accountLoginPanel.setNextIndex(pageIndex);
+        		this.setHomePagePanel(accountLoginPanel);
+            System.out.println("not yet login");
+         
         }
-        if(index.equals(HOME_PAGE_INDEX)){
+    }
+//----------------------------------------------------------------------------
+    
+    // @Michelle
+    // This function will change the middle panel when called
+    private void changeCardPanel(String index){
+        cl.show(cardPanel, index);
+        if(index.equals(ACCOUNT_DETAIL_INDEX)){
+         
+        	actionList.setSelectedIndex(Integer.parseInt(ACCOUNT_DETAIL_INDEX));
+        }
+        else if(index.equals(GROUP_ORDER_INDEX)){
+        
+        	actionList.setSelectedIndex(Integer.parseInt(GROUP_ORDER_INDEX));
+        }
+        else if(index.equals(HOME_PAGE_INDEX)){
             actionList.setSelectedIndex(Integer.parseInt(index));
-        }else if (!index.equals(SEARCH_PAGE_INDEX)){
-            actionList.setSelectedIndex(Integer.parseInt(index)-1);
         }
     }
-//----------------------------------------------------------------------------
-//inner class - SearchItemPage
-//----------------------------------------------------------------------------
-    private class SearchItemPage extends JPanel{
-        private ArrayList<String> searchResultList = new ArrayList<String>();
-        private final String[] columnNames = {"Store", "Item name", "Price"};
-        
-        JScrollPane scrollPane;
-        JTable table;
-        DefaultTableModel model;
-        JTableHeader header;
-        GridBagLayout gridBagLayout;
-        GridBagConstraints gbc_scrollPane;
-        //----------------------------------------------------------------------------
-        SearchItemPage(){
-            String[][] emptyList = {{"", "", ""}};
-            setUpSearchPanel(emptyList);
-        }
-        //----------------------------------------------------------------------------
-        private void setUpSearchPanel(String[][] data){
-            if(data.length>0){
-                model = new DefaultTableModel(data, columnNames) {
-                    @Override
-                    public Class getColumnClass(int column) {
-                        return getValueAt(0, column).getClass();
-                    }
-                };
-                
-                gridBagLayout = new GridBagLayout();
-                gridBagLayout.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-                gridBagLayout.rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
-                gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-                this.setLayout(gridBagLayout);
-                
-                gbc_scrollPane = new GridBagConstraints();
-                gbc_scrollPane.gridheight = 2;
-                
-                table = new JTable(model);
-                table.setBorder(new LineBorder(new Color(0, 0, 0)));
-                header = table.getTableHeader();
-                
-                header.setBackground(Color.GREEN);
-                header.setForeground(Color.BLACK);
-                
-                scrollPane = new JScrollPane(table);
-                gbc_scrollPane.gridwidth = 4;
-                gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
-                gbc_scrollPane.fill = GridBagConstraints.BOTH;
-                gbc_scrollPane.gridx = 2;
-                gbc_scrollPane.gridy = 4;
-                
-                this.add(scrollPane, gbc_scrollPane);
-            }
-        }
-        //----------------------------------------------------------------------------
-        private void update(String[][] data){ //update jpanel with the search result
-            this.removeAll();
-            this.setUpSearchPanel(data);
-            this.revalidate();
-            this.repaint();
-        }
-        //----------------------------------------------------------------------------
-        private void searchKeyWord(String searchText){
-            searchResultList = DataBase.searchItemKeyword(searchText); //user.getSearchResultList(searchText);
-            String [][] data = {{"","",""}}; 
-            int numOfItems = searchResultList.size();
-            if(numOfItems>0){
-                data = new String[numOfItems][3];
-                
-                int mapCount = 0;
-                for (String itemInfoStr: searchResultList){
-                    data[mapCount][0] = itemInfoStr.substring(0, itemInfoStr.indexOf(" - "));
-                    data[mapCount][1] = itemInfoStr.substring(itemInfoStr.indexOf(" - ") + 3, itemInfoStr.indexOf(" = "));
-                    data[mapCount][2] = itemInfoStr.substring(itemInfoStr.indexOf(" = ") +3);
-                    mapCount ++;
-                    
-                }
-            }
-            update(data);
-        }
-    }
-//----------------------------------------------------------------------------
-//inner class - PriceAnalysisPage
-//----------------------------------------------------------------------------
-    private class PriceAnalysisPage extends JPanel{
-        JPanel topPanel;
-        JButton enterSearchPanel;
-        JLabel searchLabel;
-        JTextField searchTextField;
-        
-        JPanel midPanel;
-        JPanel graphPanel;
-        
-        JPanel bottomPanel;
-        JLabel creditLabel;
-        PriceAnalysisPage(){
-            this.setLayout(new BorderLayout());
-            /********TOP PANEL*********/
-            topPanel = new JPanel();
-            topPanel.setBackground(Color.WHITE);
-            enterSearchPanel = new JButton("Go! ");
-            searchLabel = new JLabel(SEARCH_STR);
-            searchTextField = new JTextField(30);
-            topPanel.add(searchLabel);
-            topPanel.add(searchTextField);
-            topPanel.add(enterSearchPanel);
-            this.add(topPanel, BorderLayout.NORTH);
-            /******MID PANEL*******/
-            //add the graph here
-            /******BOTTOM PANEL*******/
-            bottomPanel = new JPanel();
-            creditLabel = new JLabel("Data from Statitics Canada");
-            bottomPanel.add(creditLabel);
-            this.add(bottomPanel, BorderLayout.SOUTH);
-        }
-    }
+
 //----------------------------------------------------------------------------
 //inner class - GroupOrderPage
 //----------------------------------------------------------------------------
-    private class GroupOrderPage extends JPanel implements ActionListener{
+     class GroupOrderPage extends JPanel implements ActionListener{
         JPanel topPanel;
         JPanel rightPanel;
         JPanel rightDownPanel;
-        
+        //JPanel labelPanel, textFieldPanel;
         JScrollPane orderStream_scrollPane;
         JTextField itemNameField;
         JButton createRequestButton;
@@ -376,10 +261,12 @@ public class HomePage extends JFrame implements ActionListener{
         JComboBox amountComboBox;
         
         JLabel dateLabel, timeLabel;
+        
         JPanel orderDisplayPanel;
         JButton refreshButton;
         
         private ArrayList<String> list;
+        private User user;
         
         final String PRICE_DEFAULT_STR = "Price: $ ";
         final String LOCATION_DEFAULT_STR = "Store Location: ";
@@ -392,21 +279,22 @@ public class HomePage extends JFrame implements ActionListener{
         
         private ArrayList<OrderPanel> orderPanelList;
         private HashMap<String, ArrayList<String>> groupOrderMap;
-        //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
         private String[] amountList_cb = {"", "10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %", "80 %", "90 %"};
-        GroupOrderPage(){
+        GroupOrderPage(User user){
             this.setLayout(new BorderLayout());
             topPanel = new JPanel();
             rightPanel = new JPanel();
-            rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+            rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.PAGE_AXIS));
             rightPanel.setMaximumSize(new Dimension(400, 0));
             rightPanel.setPreferredSize(new Dimension(300, 0));
-            rightPanel.setComponentOrientation( ComponentOrientation.LEFT_TO_RIGHT );
-            /**********************set up create group order panel****************************/
+            //rightPanel.setMaximumSize(new Dimension(600, 0));
+            /**********************set up request label list ****************************/
             /***********ITEM************/
             itemLabel = new JLabel("Item: ");
             itemLabel.setAlignmentX(JLabel.LEFT);
             itemNameField = new JTextField(20);
+            this.user = user;
             
             list = user.getWholeItemArrayList();
             String[] cb_itemList =  new String[list.size()+1];
@@ -448,10 +336,10 @@ public class HomePage extends JFrame implements ActionListener{
             rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
             
             createRequestButton = new JButton("Create");
-            createRequestButton.setAlignmentX(JButton.LEFT);
+            createRequestButton.setAlignmentX(JButton.CENTER);
             createRequestButton.addActionListener(this);
-            messageLabel = new JLabel();
-            messageLabel.setAlignmentX(JLabel.LEFT);
+            messageLabel = new JLabel("");
+            messageLabel.setAlignmentX(JLabel.CENTER);
             
             rightPanel.add(createRequestButton);
             rightPanel.add(Box.createRigidArea(new Dimension(0, 30)));
@@ -472,11 +360,11 @@ public class HomePage extends JFrame implements ActionListener{
             this.add(rightPanel, BorderLayout.EAST);
             this.add(orderStream_scrollPane, BorderLayout.CENTER);
         }
-        //----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
         private void updateOrderPanel(){
             this.orderPanelList = setUpGroupOrderBoxes();
             orderDisplayPanel.removeAll();
-            
+
             orderDisplayPanel.setLayout(new GridLayout(0, 3));
             for(OrderPanel pane: this.orderPanelList){
                 orderDisplayPanel.add(pane);
@@ -484,20 +372,20 @@ public class HomePage extends JFrame implements ActionListener{
             this.revalidate();
             this.repaint();
         }
-        //----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
         private ArrayList<OrderPanel> setUpGroupOrderBoxes(){
             this.groupOrderMap = new HashMap<String, ArrayList<String>>();
             this.groupOrderMap = user.refreshGroupOrder();
             ArrayList<OrderPanel> resultList = new ArrayList<OrderPanel>();
             resultList.clear();
-            /*****loop throught the group order list, create OrderPanel****/
+            /*****loop throught the group order list****/
             for(String refNo : groupOrderMap.keySet()){
                 ArrayList<String> orderInfo = groupOrderMap.get(refNo);
-                resultList.add(new OrderPanel(refNo, orderInfo));
+                resultList.add(new OrderPanel(user, refNo, orderInfo));
             }
             return resultList;
         }
-        //----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
         @Override
         public void actionPerformed(ActionEvent event){
             int amountIndex = amountComboBox.getSelectedIndex();
@@ -556,7 +444,7 @@ public class HomePage extends JFrame implements ActionListener{
             this.revalidate();
             this.repaint();
         }
-        //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
         private void resetRequestPanel(){
             priceLabel.setText(PRICE_DEFAULT_STR);
             locationLabel.setText(LOCATION_DEFAULT_STR);
@@ -564,10 +452,10 @@ public class HomePage extends JFrame implements ActionListener{
             AutoCompleteComboBox cb = (AutoCompleteComboBox) itemComboBox;
             cb.resetField();
         }
-        //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
         //inner class inside GroupOrderPage - OrderPanel
-        //----------------------------------------------------------------------------
-        private class OrderPanel extends JPanel implements ActionListener{ 
+//----------------------------------------------------------------------------
+        class OrderPanel extends JPanel implements ActionListener{ 
             private String refNo;
             private String itemInfo;
             private String itemPrice;
@@ -575,6 +463,7 @@ public class HomePage extends JFrame implements ActionListener{
             private String memberStr;
             private String amountStr;
             private Double amountPercentage;
+            private User user;
             
             final JButton acceptButton = new JButton("Accept");
             final String MEMBER_LABEL_STR = "Group member: ";
@@ -584,12 +473,13 @@ public class HomePage extends JFrame implements ActionListener{
             final String LOCATION_STR = "Store Location: ";
             JLabel memberLabel, itemLabel, amountLabel, priceLabel, locationLabel;
             //----------------------------------------------------------------------------
-            OrderPanel(String refNo, ArrayList<String> orderInfoList){
+            OrderPanel(User user, String refNo, ArrayList<String> orderInfoList){
                 //example format: 1438865252, {Red Bell Peppers 5 kg, $21.29, CostCo, userID~0.4}
                 this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
                 this.setPreferredSize(new Dimension(ORDER_PANEL_WIDTH,ORDER_PANEL_HEIGHT));
                 this.setMaximumSize(new Dimension(ORDER_PANEL_WIDTH,ORDER_PANEL_HEIGHT));
                 this.refNo = refNo; 
+                this.user=user;
                 if(orderInfoList.size()>=3){
                     this.itemInfo = orderInfoList.get(0);
                     this.itemPrice = orderInfoList.get(1);
@@ -669,7 +559,7 @@ public class HomePage extends JFrame implements ActionListener{
 //----------------------------------------------------------------------------
 //inner class - AccountDetailPage
 //----------------------------------------------------------------------------
-    private class AccountDetailPage extends JPanel implements ActionListener{
+     class AccountDetailPage extends JPanel implements ActionListener{
         private String userID;
         private ArrayList<HashMap> orderCombinedList;
         private final String[] pendingOrderTitles = {"Reference No.", "Item Info", "Location", "Price"};
@@ -689,13 +579,12 @@ public class HomePage extends JFrame implements ActionListener{
         JTextField oldPassword_tf, newPassword_tf;
         JButton resetPassword_button;
         JLabel password_msg_label;
-        
-        AccountDetailPage(){
+                
+        AccountDetailPage(User user){
             this.userID = user.getUserID();
-            this.setLayout(new BorderLayout());
+            this.setLayout(new BorderLayout()); //new BoxLayout(this, BoxLayout.Y_AXIS));
             welcomeLabel = new JLabel("Hi, " + this.userID + "!");
             welcomeLabel.setHorizontalAlignment(JButton.CENTER);
-            welcomeLabel.setFont(TITLE_FONT);
             
             /***********Reset Password Panel************/
             resetPassword_Panel = new JPanel();
@@ -711,7 +600,7 @@ public class HomePage extends JFrame implements ActionListener{
             newPassword_tf = new JTextField(20);
             newPassword_Panel.add(newPassword_label);
             newPassword_Panel.add(newPassword_tf);
-            
+             
             resetPassword_button = new JButton("Change");
             password_msg_label = new JLabel("");
             resetPassword_button.addActionListener(this);
@@ -722,7 +611,6 @@ public class HomePage extends JFrame implements ActionListener{
             resetPassword_Panel.add(resetPassword_button);
             resetPassword_Panel.add(password_msg_label);
             
-            /*************Create center panel for group order tables*********************/
             JPanel centerPanel = new JPanel();
             centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
             pendingOrder_Panel = new JPanel();
@@ -744,7 +632,7 @@ public class HomePage extends JFrame implements ActionListener{
             centerPanel.add(refreshButton);
             centerPanel.add(Box.createRigidArea(new Dimension(100, 20)));
             
-            /******************add everything into this jpanel - boxlayout***********************/
+            /******************add everything into this jpanel - boxlayout ***********************/
             this.add(welcomeLabel, BorderLayout.NORTH);
             this.add(centerPanel, BorderLayout.CENTER);
             this.add(resetPassword_Panel, BorderLayout.SOUTH);
@@ -824,7 +712,7 @@ public class HomePage extends JFrame implements ActionListener{
             completeOrder_Panel.add(completeOrder_scrollPane);
         }
         //----------------------------------------------------------------------------
-        private void updateDetailPanel(){
+        public void updateDetailPanel(){
             this.userID = user.getUserID();
             this.orderCombinedList = user.getGroupOrderList_user();
             setUpGroupOrderListTables();
@@ -834,34 +722,34 @@ public class HomePage extends JFrame implements ActionListener{
             this.repaint();
         }
         //----------------------------------------------------------------------------
-        @Override
-        public void actionPerformed(ActionEvent event){
-            if (event.getSource() instanceof JButton){
-                JButton jButton = (JButton)event.getSource();
-                if(jButton.equals(resetPassword_button)){    
-                    String oldPassword = oldPassword_tf.getText();
-                    String newPassword = newPassword_tf.getText();
-                    boolean status = user.resetPassword(this.userID, oldPassword, newPassword);
-                    if(status){
-                        password_msg_label.setText("Password updated");
-                    }else{
-                        password_msg_label.setText("Wrong old password. Please try again. ");
+            @Override
+            public void actionPerformed(ActionEvent event){
+                if (event.getSource() instanceof JButton){
+                    JButton jButton = (JButton)event.getSource();
+                    if(jButton.equals(resetPassword_button)){       //resetPassword
+                        String oldPassword = oldPassword_tf.getText();
+                        String newPassword = newPassword_tf.getText();
+                        boolean status = user.resetPassword(this.userID, oldPassword, newPassword);
+                        if(status){
+                            password_msg_label.setText("Password updated");
+                        }else{
+                            password_msg_label.setText("Wrong old password. Please try again. ");
+                        }
+                        oldPassword_tf.setText("");
+                        newPassword_tf.setText("");
+                    }else if (jButton.equals(refreshButton)){
+                        this.updateDetailPanel();
                     }
-                    oldPassword_tf.setText("");
-                    newPassword_tf.setText("");
-                }else if (jButton.equals(refreshButton)){
-                    this.updateDetailPanel();
                 }
+                
+                this.revalidate();
+                this.repaint();
             }
-            
-            this.revalidate();
-            this.repaint();
-        }
     }
 //----------------------------------------------------------------------------
 //inner class - AccountLoginPage
 //----------------------------------------------------------------------------
-    private class AccountLoginPage extends JPanel implements ActionListener{
+    class AccountLoginPage extends JPanel implements ActionListener{
         private String nextPageIndex;
         JPanel loginPanel;
         JLabel userLabel;
@@ -884,10 +772,8 @@ public class HomePage extends JFrame implements ActionListener{
         AccountLoginPage(){
             this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
             loginLabel = new JLabel("Login");
-            loginLabel.setFont(TITLE_FONT);
             loginLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             registerLabel = new JLabel("Register");
-            registerLabel.setFont(TITLE_FONT);
             registerLabel.setVisible(false);
             registerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             
@@ -940,11 +826,11 @@ public class HomePage extends JFrame implements ActionListener{
             this.add(Box.createRigidArea(new Dimension(100, 20)));
             this.add(messageLabel);
         }
-        //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
         public void setNextIndex(String index){
             this.nextPageIndex = index;
         }
-        //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
         @Override
         public void actionPerformed(ActionEvent event){
             //catch unacceptable character in here; edit messagelabel's text
@@ -956,9 +842,9 @@ public class HomePage extends JFrame implements ActionListener{
                     String loginStatus = user.userLogin(userText, passwordText);
                     if(loginStatus.equals(Const.LOGIN_ACCEPTED)){
                         changeCardPanel(this.nextPageIndex);
-                    }else if (loginStatus.equals(Const.WRONG_PASSWORD)){  
+                    }else if (loginStatus.equals(Const.WRONG_PASSWORD)){    //wrong password
                         messageLabel.setText("Wrong password. Please try again.");
-                    }else if (loginStatus.equals(Const.NO_SUCH_USER_ID)){ 
+                    }else if (loginStatus.equals(Const.NO_SUCH_USER_ID)){   //userID not found
                         messageLabel.setText("User ID not found. Please register or try again.");
                         registerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
                         registerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -982,18 +868,6 @@ public class HomePage extends JFrame implements ActionListener{
             userInput_register.setText("");
             passwordInput_register.setText("");
             
-        }
-    }
-//----------------------------------------------------------------------------
-//inner class - AccessDeclinedPage, host is not active
-//----------------------------------------------------------------------------
-    private class AccessDeclinedPage extends JPanel{
-        JLabel declinedMessage_label;
-        AccessDeclinedPage(){
-            this.setLayout(new BorderLayout());
-            declinedMessage_label = new JLabel("Access Declined. Host is not active, please contact administrator for more information"
-                                                   ,  SwingConstants.CENTER);
-            this.add(declinedMessage_label, BorderLayout.CENTER);
         }
     }
 }
